@@ -1,0 +1,22 @@
+gui.commandBlock.goToCommandEditor=Command Editor
+gui.commandBlock.trackingOutput=Tracking Output
+gui.commandBlock.ignoringOutput=Ignoring Output
+gui.commandBlock.noOutput=[No Output]
+
+gui.commandEditor.commandLabel=Command:
+gui.commandEditor.give.item=Item:
+gui.commandEditor.give.player=Player:
+gui.commandEditor.noCommand=[No Command]
+gui.commandEditor.noItem=[No Item]
+gui.commandEditor.playerSelector.selectBy=Select By:
+gui.commandEditor.playerSelector.username=Username
+gui.commandEditor.playerSelector.uuid=UUID
+gui.commandEditor.selectCommand.example=Example: %s
+gui.commandEditor.selectCommand.give.desc=Gives an item stack to a player
+gui.commandEditor.selectCommand.give.example=/give Earthcomputer cobblestone
+gui.commandEditor.selectCommand.test.desc=A test command
+gui.commandEditor.selectCommand.test.example=/test Sample text
+gui.commandEditor.selectCommand.title=Select Command
+gui.commandEditor.selectItem.search=Search
+gui.commandEditor.selectItem.title=Select Item
+gui.commandEditor.title=Command Editor

@@ -1,0 +1,16 @@
+[
+{
+  "modid": "easyeditors",
+  "name": "Easy Editors",
+  "description": "Easy Editor GUIs for command blocks, books and more!",
+  "version": "1.0",
+  "mcversion": "1.8",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Earthcomputer"],
+  "credits": "Earthcomputer",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
