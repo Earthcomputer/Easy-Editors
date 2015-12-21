@@ -34,8 +34,6 @@ public class GuiColorPicker extends GuiScreen {
 		buttonList.add(cancelButton = new GuiButton(1, width / 2 + 5, height - 30, 200, 20, I18n.format("gui.cancel")));
 	}
 
-	private static final int COL = 7425;
-
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();

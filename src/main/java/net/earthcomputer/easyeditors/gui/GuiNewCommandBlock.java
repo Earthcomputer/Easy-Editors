@@ -33,7 +33,7 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 	private GuiTextField trackedOutput;
 	private boolean shouldTrackOutput;
 
-	private String newCommand = null;
+	private boolean hadFirstInit = false;
 
 	public GuiNewCommandBlock(GuiCommandBlock old) throws Exception {
 		theCommandBlock = (CommandBlockLogic) localCommandBlockField.get(old);
@@ -51,11 +51,13 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 				I18n.format("gui.commandBlock.trackingOutput")));
 		buttonList.add(linkToCommandEditor = new GuiButton(5, width / 2 + 150 - 100, 50, 100, 20,
 				I18n.format("gui.commandBlock.goToCommandEditor")));
+		String command = null;
+		if (hadFirstInit)
+			command = commandText.getText();
 		commandText = new GuiTextField(2, fontRendererObj, width / 2 - 150, 50, 196, 20);
 		commandText.setMaxStringLength(32767);
 		commandText.setFocused(true);
-		commandText.setText(newCommand == null ? theCommandBlock.getCustomName() : newCommand);
-		newCommand = null;
+		commandText.setText(hadFirstInit ? command : theCommandBlock.getCustomName());
 		trackedOutput = new GuiTextField(3, fontRendererObj, width / 2 - 150, 150, 196, 20);
 		trackedOutput.setMaxStringLength(32767);
 		trackedOutput.setEnabled(false);
@@ -63,6 +65,8 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 		shouldTrackOutput = theCommandBlock.shouldTrackOutput();
 		updateTrackOutputButton();
 		doneButton.enabled = commandText.getText().trim().length() > 0;
+
+		hadFirstInit = true;
 	}
 
 	@Override
@@ -129,27 +133,24 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
-		drawCenteredString(fontRendererObj, I18n.format("advMode.setCommand"), width / 2, 20, 16777215);
-		drawString(fontRendererObj, I18n.format("advMode.command"), width / 2 - 150, 37, 10526880);
+		drawCenteredString(fontRendererObj, I18n.format("advMode.setCommand"), width / 2, 20, 0xffffff);
+		drawString(fontRendererObj, I18n.format("advMode.command"), width / 2 - 150, 37, 0xa0a0a0);
 		commandText.drawTextBox();
-		byte b0 = 75;
-		byte b1 = 0;
-		FontRenderer fontrenderer = fontRendererObj;
-		String s = I18n.format("advMode.nearestPlayer");
-		int i1 = width / 2 - 150;
-		int l = b1 + 1;
-		drawString(fontrenderer, s, i1, b0 + b1 * fontRendererObj.FONT_HEIGHT, 10526880);
-		drawString(fontRendererObj, I18n.format("advMode.randomPlayer"), width / 2 - 150,
-				b0 + l++ * fontRendererObj.FONT_HEIGHT, 10526880);
-		drawString(fontRendererObj, I18n.format("advMode.allPlayers"), width / 2 - 150,
-				b0 + l++ * fontRendererObj.FONT_HEIGHT, 10526880);
-		drawString(fontRendererObj, I18n.format("advMode.allEntities"), width / 2 - 150,
-				b0 + l++ * fontRendererObj.FONT_HEIGHT, 10526880);
-		drawString(fontRendererObj, "", width / 2 - 150, b0 + l++ * fontRendererObj.FONT_HEIGHT, 10526880);
+		byte hintsTop = 75;
+		int hintsLeft = width / 2 - 150;
+		int hintNumber = 1;
+		drawString(fontRendererObj, I18n.format("advMode.nearestPlayer"), hintsLeft, hintsTop, 0xa0a0a0);
+		drawString(fontRendererObj, I18n.format("advMode.randomPlayer"), hintsLeft,
+				hintsTop + hintNumber++ * fontRendererObj.FONT_HEIGHT, 0xa0a0a0);
+		drawString(fontRendererObj, I18n.format("advMode.allPlayers"), hintsLeft,
+				hintsTop + hintNumber++ * fontRendererObj.FONT_HEIGHT, 0xa0a0a0);
+		drawString(fontRendererObj, I18n.format("advMode.allEntities"), hintsLeft,
+				hintsTop + hintNumber++ * fontRendererObj.FONT_HEIGHT, 0xa0a0a0);
+		drawString(fontRendererObj, "", hintsLeft, hintsTop + hintNumber++ * fontRendererObj.FONT_HEIGHT, 0xa0a0a0);
 
 		if (trackedOutput.getText().length() > 0) {
-			int k = b0 + l * fontRendererObj.FONT_HEIGHT + 16;
-			drawString(fontRendererObj, I18n.format("advMode.previousOutput"), width / 2 - 150, k, 10526880);
+			int y = hintsTop + hintNumber * fontRendererObj.FONT_HEIGHT + 16;
+			drawString(fontRendererObj, I18n.format("advMode.previousOutput"), width / 2 - 150, y, 0xa0a0a0);
 			trackedOutput.drawTextBox();
 		}
 
@@ -171,7 +172,7 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 
 	@Override
 	public void setCommand(String command) {
-		newCommand = command;
+		commandText.setText(command);
 	}
 
 	@Override
