@@ -1,9 +1,11 @@
 package net.earthcomputer.easyeditors.gui;
 
 import java.awt.Color;
+import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
 
+import net.earthcomputer.easyeditors.util.GeneralUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -11,6 +13,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.MathHelper;
 
 public class GuiColorPicker extends GuiScreen {
 
@@ -20,9 +23,15 @@ public class GuiColorPicker extends GuiScreen {
 	private GuiButton cancelButton;
 
 	private int hue;
-	private int saturation = 255;
-	private int brightness = 127;
+	private int saturation = 100;
+	private int value = 100;
 	private int alpha = 255;
+
+	/**
+	 * -1 for nothing, 0 for wheel, 1 for hue, 2 for saturation, 3 for value, 4
+	 * for red, 5 for green, 6 for blue
+	 */
+	private int clicked = -1;
 
 	public GuiColorPicker(GuiScreen previousScreen) {
 		this.previousScreen = previousScreen;
@@ -64,12 +73,12 @@ public class GuiColorPicker extends GuiScreen {
 
 		y -= 20;
 		worldRenderer.startDrawingQuads();
-		worldRenderer.setColorOpaque_I(Color.HSBtoRGB((float) hue / 360, 0, (float) brightness / 255));
+		worldRenderer.setColorOpaque_I(GeneralUtils.hsvToRgb(hue, 0, value));
 		worldRenderer.addVertexWithUV(250, y + 20, 0, 0, 1);
-		worldRenderer.setColorOpaque_I(Color.HSBtoRGB((float) hue / 360, 1, (float) brightness / 255));
+		worldRenderer.setColorOpaque_I(GeneralUtils.hsvToRgb(hue, 100, value));
 		worldRenderer.addVertexWithUV(314, y + 20, 0, 1, 1);
 		worldRenderer.addVertexWithUV(314, y, 0, 1, 0);
-		worldRenderer.setColorOpaque_I(Color.HSBtoRGB((float) hue / 360, 0, (float) brightness / 255));
+		worldRenderer.setColorOpaque_I(GeneralUtils.hsvToRgb(hue, 0, value));
 		worldRenderer.addVertexWithUV(250, y, 0, 0, 0);
 		tessellator.draw();
 
@@ -77,7 +86,7 @@ public class GuiColorPicker extends GuiScreen {
 		worldRenderer.startDrawingQuads();
 		worldRenderer.setColorOpaque_I(0);
 		worldRenderer.addVertexWithUV(250, y + 20, 0, 0, 1);
-		worldRenderer.setColorOpaque_I(Color.HSBtoRGB((float) hue / 360, (float) saturation / 255, 0.5f));
+		worldRenderer.setColorOpaque_I(GeneralUtils.hsvToRgb(hue, saturation, 100));
 		worldRenderer.addVertexWithUV(314, y + 20, 0, 1, 1);
 		worldRenderer.addVertexWithUV(314, y, 0, 1, 0);
 		worldRenderer.setColorOpaque_I(0);
@@ -86,8 +95,7 @@ public class GuiColorPicker extends GuiScreen {
 
 		y += 50;
 		worldRenderer.startDrawingQuads();
-		worldRenderer.setColorRGBA_I(
-				Color.HSBtoRGB((float) hue / 360, (float) saturation / 255, (float) brightness / 255), alpha);
+		worldRenderer.setColorRGBA_I(GeneralUtils.hsvToRgb(hue, saturation, value), alpha);
 		worldRenderer.addVertexWithUV(70, y + 20, 0, 0, 1);
 		worldRenderer.addVertexWithUV(130, y + 20, 0, 1, 1);
 		worldRenderer.addVertexWithUV(130, y, 0, 1, 0);
@@ -97,13 +105,51 @@ public class GuiColorPicker extends GuiScreen {
 		GlStateManager.enableTexture2D();
 
 		y = height / 2 - 30;
-		int dist = brightness >= 128 ? (brightness - 128) * 50 / 128 : 50;
+		int dist = saturation / 2;
 		GlStateManager.tryBlendFuncSeparate(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ONE_MINUS_SRC_COLOR, 1, 0);
 		mc.getTextureManager().bindTexture(Gui.icons);
-		this.drawTexturedModalRect(92 + (int) Math.cos(Math.toRadians(hue)) * dist,
-				y + (int) Math.sin(Math.toRadians(hue)) * dist - 8, 0, 0, 16, 16);
+		this.drawTexturedModalRect(93 + (int) (Math.cos(Math.toRadians(hue)) * dist),
+				y + (int) (Math.sin(Math.toRadians(hue)) * dist) - 7, 0, 0, 16, 16);
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
+	}
+
+	@Override
+	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		if (mouseButton == 0) {
+			int y = height / 2 - 30;
+			int dx = mouseX - 100;
+			int dy = mouseY - y;
+			if (dx * dx + dy * dy <= 50 * 50) {
+				clicked = 0;
+				updateWheelClick(dx, dy);
+			}
+
+			y -= 20;
+			if (mouseX >= 250 && mouseX < 314 && mouseY >= y && mouseY < y + 20) {
+				clicked = 1;
+				updateSaturationClick(mouseX - 250);
+			}
+		}
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
+		if (mouseButton == 0)
+			clicked = -1;
+	}
+
+	@Override
+	public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		switch (clicked) {
+		case 0:
+			updateWheelClick(mouseX - 100, mouseY - (height / 2 - 30));
+			break;
+		case 1:
+			updateSaturationClick(mouseX - 250);
+			break;
+		}
 	}
 
 	@Override
@@ -116,6 +162,21 @@ public class GuiColorPicker extends GuiScreen {
 			mc.displayGuiScreen(previousScreen);
 			break;
 		}
+	}
+
+	private void updateWheelClick(int dx, int dy) {
+		hue = (int) Math.toDegrees(Math.atan2(dy, dx));
+		if (hue < 0)
+			hue += 360;
+
+		int dist = (int) Math.sqrt(dx * dx + dy * dy);
+		if (dist > 50)
+			dist = 50;
+		saturation = dist * 2;
+	}
+
+	private void updateSaturationClick(int dx) {
+		saturation = MathHelper.clamp_int(dx * 100 / 64, 0, 100);
 	}
 
 }
