@@ -67,4 +67,28 @@ public class GeneralUtils {
 		return ((int) ((r + m) * 255) << 16) | ((int) ((g + m) * 255) << 8) | ((int) ((b + m) * 255));
 	}
 
+	public static int[] rgbToHsv(int rgb) {
+		// Source: en.wikipedia.org/wiki/HSV_and_HSL#Formal_derivation
+		float r = (float) ((rgb & 0xff0000) >> 16) / 255;
+		float g = (float) ((rgb & 0x00ff00) >> 8) / 255;
+		float b = (float) (rgb & 0x0000ff) / 255;
+		float M = r > g ? (r > b ? r : b) : (g > b ? g : b);
+		float m = r < g ? (r < b ? r : b) : (g < b ? g : b);
+		float c = M - m;
+		float h;
+		if (M == r) {
+			h = ((g - b) / c);
+			while (h < 0)
+				h = 6 - h;
+			h %= 6;
+		} else if (M == g) {
+			h = ((b - r) / c) + 2;
+		} else {
+			h = ((r - g) / c) + 4;
+		}
+		h *= 60;
+		float s = c / M;
+		return new int[] { c == 0 ? -1 : (int) h, (int) (s * 100), (int) (M * 100) };
+	}
+
 }
