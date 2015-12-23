@@ -20,3 +20,5 @@ gui.commandEditor.selectCommand.title=Select Command
 gui.commandEditor.selectItem.search=Search
 gui.commandEditor.selectItem.title=Select Item
 gui.commandEditor.title=Command Editor
+gui.selectColor.opacity=Opacity:
+gui.selectColor.title=Select Color
