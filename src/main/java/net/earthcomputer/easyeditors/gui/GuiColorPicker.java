@@ -2,6 +2,7 @@ package net.earthcomputer.easyeditors.gui;
 
 import java.io.IOException;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
@@ -55,8 +56,8 @@ public class GuiColorPicker extends GuiScreen {
 
 	@Override
 	public void initGui() {
-		buttonList.add(doneButton = new GuiButton(0, width / 2 - 205, height - 30, 200, 20, I18n.format("gui.done")));
-		buttonList.add(cancelButton = new GuiButton(1, width / 2 + 5, height - 30, 200, 20, I18n.format("gui.cancel")));
+		buttonList.add(doneButton = new GuiButton(0, width / 2 - 160, height - 30, 150, 20, I18n.format("gui.done")));
+		buttonList.add(cancelButton = new GuiButton(1, width / 2 + 5, height - 30, 150, 20, I18n.format("gui.cancel")));
 
 		class NumberPredicate implements Predicate<String> {
 			private int max;
@@ -336,6 +337,10 @@ public class GuiColorPicker extends GuiScreen {
 
 	@Override
 	public void keyTyped(char typedChar, int keyCode) {
+		if (keyCode == Keyboard.KEY_ESCAPE) {
+			actionPerformed(cancelButton);
+			return;
+		}
 		hueField.textboxKeyTyped(typedChar, keyCode);
 		saturationField.textboxKeyTyped(typedChar, keyCode);
 		valueField.textboxKeyTyped(typedChar, keyCode);
@@ -528,7 +533,7 @@ public class GuiColorPicker extends GuiScreen {
 		int rgbBoxesLeft = hsvBoxesLeft + 100;
 		switch (clicked) {
 		case 0:
-			updateWheelClick(mouseX - 100, mouseY - (height / 2 - 30));
+			updateWheelClick(mouseX - (width / 2 - 80), mouseY - (height / 2 - 30));
 			break;
 		case 1:
 			updateHueClick(mouseX - hsvBoxesLeft);
