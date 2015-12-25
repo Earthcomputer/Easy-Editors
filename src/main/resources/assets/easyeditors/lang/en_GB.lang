@@ -1,0 +1,16 @@
+gui.easyeditorsconfig.colortitleline2=Click on the colours to select them more easily
+gui.easyeditorsconfig.colortooltip=Colour Picker
+gui.easyeditorsconfig.ctgy.colors=Colours
+gui.easyeditorsconfig.ctgy.colors.tooltip=Change the colours used in editors such as the command editor
+gui.easyeditorsconfig.colors.box.command.tooltip=The colour of the box of a command (default a bluish colour)
+gui.easyeditorsconfig.colors.box.playerSelector.tooltip=The colour of the box of a player selector
+gui.easyeditorsconfig.colors.label.generic.tooltip=The colour of a label
+gui.easyeditorsconfig.colors.label.playerSelector.tooltip=The colour of a label in a player selector
+gui.easyeditorsconfig.colors.misc.commandName.tooltip=The colour of the command name
+gui.easyeditorsconfig.colors.misc.commandName.invalid.tooltip=The colour of the command name, if it is invalid
+gui.easyeditorsconfig.colors.playerSelector.selectBy.tooltip=The colour "Select By:" appears in a player selector
+gui.easyeditorsconfig.colors.misc.radioOutline.tooltip=The colour a radio list outlines the selected element (default white)
+gui.easyeditorsconfig.colors.misc.itemName.tooltip=The colour of the name of an item
+gui.easyeditorsconfig.colors.misc.itemName.invalid.tooltip=The colour of an invalid item name
+
+gui.selectColor.title=Select Colour

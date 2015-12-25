@@ -21,6 +21,7 @@ gui.commandEditor.selectItem.search=Search
 gui.commandEditor.selectItem.title=Select Item
 gui.commandEditor.title=Command Editor
 
+gui.easyeditorsconfig.active=Active
 gui.easyeditorsconfig.colors.box.command=Commands
 gui.easyeditorsconfig.colors.box.playerSelector=Player Selectors
 gui.easyeditorsconfig.colors.misc.itemName=Item Name
