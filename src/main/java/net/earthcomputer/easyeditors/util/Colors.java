@@ -17,10 +17,15 @@ public class Colors {
 	public static final Color playerSelectorLabel = new Color("label.playerSelector", 0x215500,
 			"The color of a label in a player selector");
 	public static final Color commandName = new Color("misc.commandName", 0, "The color of the command name");
+	public static final Color invalidCommandName = new Color("misc.commandName.invalid", 0xff0000,
+			"The color of the command name, if it is invalid");
 	public static final Color playerSelectorSelectBy = new Color("playerSelector.selectBy", 0,
 			"The color \"Select By:\" appears in a player selector");
 	public static final Color radioOutline = new Color("misc.radioOutline", 0xffffffff, true,
 			"The color a radio list outlines the selected element (default white)");
+	public static final Color itemName = new Color("misc.itemName", 0, "The color of the name of an item");
+	public static final Color invalidItemName = new Color("misc.itemName.invalid", 0xff0000,
+			"The color of an invalid item name");
 
 	public static List<Color> allColors() {
 		return Collections.unmodifiableList(colors);

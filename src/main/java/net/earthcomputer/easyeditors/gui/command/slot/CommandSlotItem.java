@@ -5,6 +5,7 @@ import java.util.List;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
 import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
+import net.earthcomputer.easyeditors.util.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -20,8 +21,7 @@ public class CommandSlotItem extends GuiCommandSlotImpl implements IItemSelector
 	private ItemStack item;
 
 	public CommandSlotItem() {
-		super(18 + Minecraft.getMinecraft().fontRendererObj
-				.getStringWidth(EnumChatFormatting.DARK_RED + I18n.format("gui.commandEditor.noItem")),
+		super(18 + Minecraft.getMinecraft().fontRendererObj.getStringWidth(I18n.format("gui.commandEditor.noItem")),
 				Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT > 16
 						? Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT : 16);
 		setItem(null);
@@ -43,9 +43,7 @@ public class CommandSlotItem extends GuiCommandSlotImpl implements IItemSelector
 	}
 
 	private String getDisplayText() {
-		return item == null
-				? EnumChatFormatting.DARK_RED + I18n.format("gui.commandEditor.noItem") + EnumChatFormatting.RESET
-				: item.getDisplayName();
+		return item == null ? I18n.format("gui.commandEditor.noItem") : item.getDisplayName();
 	}
 
 	@Override
@@ -68,7 +66,9 @@ public class CommandSlotItem extends GuiCommandSlotImpl implements IItemSelector
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
 		top = fontRenderer.FONT_HEIGHT > 16 ? y : y + 8 - fontRenderer.FONT_HEIGHT / 2;
-		fontRenderer.drawString(getDisplayText(), x + 18, top, 0);
+		String str = getDisplayText();
+		fontRenderer.drawString(str, x + 18, top, str.equals(I18n.format("gui.commandEditor.noItem"))
+				? Colors.invalidItemName.color : Colors.itemName.color);
 	}
 
 	@Override

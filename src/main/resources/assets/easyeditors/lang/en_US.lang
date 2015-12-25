@@ -20,5 +20,24 @@ gui.commandEditor.selectCommand.title=Select Command
 gui.commandEditor.selectItem.search=Search
 gui.commandEditor.selectItem.title=Select Item
 gui.commandEditor.title=Command Editor
+
+gui.easyeditorsconfig.colors.box.command=Commands
+gui.easyeditorsconfig.colors.box.playerSelector=Player Selectors
+gui.easyeditorsconfig.colors.misc.itemName=Item Name
+gui.easyeditorsconfig.colors.misc.itemName.invalid=Invalid Item Name
+gui.easyeditorsconfig.colors.label.generic=Labels
+gui.easyeditorsconfig.colors.label.playerSelector=Player Selector Labels
+gui.easyeditorsconfig.colors.misc.commandName=Command Names
+gui.easyeditorsconfig.colors.misc.commandName.invalid=Invalid Command Names
+gui.easyeditorsconfig.colors.playerSelector.selectBy=Player Selector Title
+gui.easyeditorsconfig.colors.misc.radioOutline=Radio Outline
+gui.easyeditorsconfig.colortitleline2=Click on the colors to select them more easily
+gui.easyeditorsconfig.colortooltip=Color Picker
+gui.easyeditorsconfig.ctgy.colors=Colors
+gui.easyeditorsconfig.ctgy.colors.tooltip=Change the colors used in editors such as the command editor
+gui.easyeditorsconfig.ctgy.general=General Settings
+gui.easyeditorsconfig.ctgy.general.tooltop=Any settings which do not fall into any other category
+gui.easyeditorsconfig.title=Easy Editors Configuration
+
 gui.selectColor.opacity=Opacity:
 gui.selectColor.title=Select Color

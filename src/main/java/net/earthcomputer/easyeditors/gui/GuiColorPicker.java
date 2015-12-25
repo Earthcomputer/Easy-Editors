@@ -22,10 +22,11 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 
 public class GuiColorPicker extends GuiScreen {
 
-	private static final ResourceLocation transparentBackground = new ResourceLocation(
+	public static final ResourceLocation transparentBackground = new ResourceLocation(
 			"easyeditors:textures/misc/transparent.png");
 
 	private GuiScreen previousScreen;
+	private IColorPickerCallback callback;
 
 	private GuiButton doneButton;
 	private GuiButton cancelButton;
@@ -50,8 +51,23 @@ public class GuiColorPicker extends GuiScreen {
 	 */
 	private int clicked = -1;
 
-	public GuiColorPicker(GuiScreen previousScreen) {
+	public GuiColorPicker(GuiScreen previousScreen, IColorPickerCallback callback) {
+		this(previousScreen, callback, true);
+	}
+
+	public GuiColorPicker(GuiScreen previousScreen, IColorPickerCallback callback, boolean enableAlpha) {
 		this.previousScreen = previousScreen;
+		this.callback = callback;
+		this.enableAlpha = enableAlpha;
+
+		int color = callback.getColor();
+		rgb = color & 0x00ffffff;
+		alpha = (color & 0xff000000) >>> 24;
+
+		int[] hsv = GeneralUtils.rgbToHsv(rgb);
+		hue = hsv[0] == -1 ? 0 : hsv[0];
+		saturation = hsv[1];
+		value = hsv[2];
 	}
 
 	@Override
@@ -281,12 +297,14 @@ public class GuiColorPicker extends GuiScreen {
 		worldRenderer.addVertex(x + (rgb & 0x0000ff) * 64 / 255, y + 20, 0);
 		tessellator.draw();
 
-		x = width / 2 - 170;
-		y = height / 2 - 32;
-		worldRenderer.startDrawing(GL11.GL_LINES);
-		worldRenderer.addVertex(x, y + 64 - alpha * 64 / 255, 0);
-		worldRenderer.addVertex(x + 20, y + 64 - alpha * 64 / 255, 0);
-		tessellator.draw();
+		if (enableAlpha) {
+			x = width / 2 - 170;
+			y = height / 2 - 32;
+			worldRenderer.startDrawing(GL11.GL_LINES);
+			worldRenderer.addVertex(x, y + 64 - alpha * 64 / 255, 0);
+			worldRenderer.addVertex(x + 20, y + 64 - alpha * 64 / 255, 0);
+			tessellator.draw();
+		}
 
 		GlStateManager.enableTexture2D();
 
@@ -318,10 +336,12 @@ public class GuiColorPicker extends GuiScreen {
 		drawString(fontRendererObj, "G:", width / 2 + 60, y, 0xffffff);
 		drawString(fontRendererObj, "B:", width / 2 + 120, y, 0xffffff);
 
-		str = I18n.format("gui.selectColor.opacity");
-		x = width / 2 - 150 - fontRendererObj.getStringWidth(str);
-		y = height / 2 - 45;
-		drawString(fontRendererObj, str, x, y, 0xffffff);
+		if (enableAlpha) {
+			str = I18n.format("gui.selectColor.opacity");
+			x = width / 2 - 150 - fontRendererObj.getStringWidth(str);
+			y = height / 2 - 45;
+			drawString(fontRendererObj, str, x, y, 0xffffff);
+		}
 
 		hueField.drawTextBox();
 		saturationField.drawTextBox();
@@ -577,6 +597,7 @@ public class GuiColorPicker extends GuiScreen {
 	public void actionPerformed(GuiButton button) {
 		switch (button.id) {
 		case 0:
+			callback.setColor(enableAlpha ? (alpha << 24) | rgb : rgb);
 			mc.displayGuiScreen(previousScreen);
 			break;
 		case 1:

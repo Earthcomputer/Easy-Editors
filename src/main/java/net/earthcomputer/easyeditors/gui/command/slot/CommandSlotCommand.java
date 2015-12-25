@@ -52,8 +52,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 				commandName.isEmpty() ? I18n.format("gui.commandEditor.noCommand") : commandName,
 				Colors.commandName.color);
 		if (ICommandSyntax.forCommandName(commandName) == null)
-			label.setColor(Minecraft.getMinecraft().fontRendererObj
-					.getColorCode(EnumChatFormatting.DARK_RED.toString().charAt(1)));
+			label.setColor(Colors.invalidCommandName.color);
 		return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.commandLabel"), label,
 				new CommandSlotButton(20, 20, "...") {
 					@Override
