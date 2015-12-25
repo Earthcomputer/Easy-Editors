@@ -36,7 +36,7 @@ gui.easyeditorsconfig.colortooltip=Color Picker
 gui.easyeditorsconfig.ctgy.colors=Colors
 gui.easyeditorsconfig.ctgy.colors.tooltip=Change the colors used in editors such as the command editor
 gui.easyeditorsconfig.ctgy.general=General Settings
-gui.easyeditorsconfig.ctgy.general.tooltop=Any settings which do not fall into any other category
+gui.easyeditorsconfig.ctgy.general.tooltip=Any settings which do not fall into any other category
 gui.easyeditorsconfig.title=Easy Editors Configuration
 
 gui.selectColor.opacity=Opacity:
