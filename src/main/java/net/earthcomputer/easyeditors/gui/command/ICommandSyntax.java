@@ -12,6 +12,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotItem;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Colors;
 import net.minecraft.client.resources.I18n;
@@ -72,10 +73,16 @@ public abstract class ICommandSyntax {
 			return new IGuiCommandSlot[] {
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"),
 							new CommandSlotRectangle(playerSelector, Colors.playerSelectorBox.color)),
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.item"), item.withButton()),
-					expand1 = new CommandSlotExpand(
-							CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.damage"),
-									damage = new CommandSlotIntTextField(50, 50, 0, Short.MAX_VALUE))) };
+					CommandSlotLabel
+							.createLabel(I18n.format("gui.commandEditor.give.item"),
+									new CommandSlotRectangle(
+											new CommandSlotVerticalArrangement(item.withButton(),
+													expand1 = new CommandSlotExpand(CommandSlotLabel
+															.createLabel(I18n.format("gui.commandEditor.item.damage"),
+																	Colors.itemLabel.color,
+																	damage = new CommandSlotIntTextField(50, 50, 0,
+																			Short.MAX_VALUE)))),
+									Colors.itemBox.color)) };
 		}
 
 		@Override

@@ -8,7 +8,10 @@ import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.util.GeneralUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
@@ -63,12 +66,9 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GuiUtils.drawContinuousTexturedBox(buttonLocation, x, y, 0, hovered ? 86 : 66, 32, 16, 200, 20, 3,
 				partialTicks);
-		if (hovered)
-			GlStateManager.color(1, 1, 0xa0 / 255f);
-		else
-			GlStateManager.color(0xe0 / 255f, 0xe0 / 255f, 0xe0 / 255f);
+		GlStateManager.disableDepth();
 		Minecraft.getMinecraft().getTextureManager().bindTexture(arrowLocation);
-		GuiUtils.drawTexturedModalRect(x + 8, y + 2, isExpanded ? 1 : 0, 0, 16, 16, partialTicks);
+		Gui.drawModalRectWithCustomSizedTexture(x + 8, y, isExpanded ? 16 : 0, hovered ? 16 : 0, 16, 16, 32, 32);
 
 		if (isExpanded)
 			child.draw(x, y + 18, mouseX, mouseY, partialTicks);
