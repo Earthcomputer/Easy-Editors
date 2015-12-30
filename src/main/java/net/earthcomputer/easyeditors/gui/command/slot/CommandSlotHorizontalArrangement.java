@@ -9,8 +9,22 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 
+/**
+ * A command slot which contains multiple child command slots, arranged
+ * horizontally
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl implements ISizeChangeListener {
 
+	/**
+	 * An array of the child command slots. After modifying this array, all
+	 * children in this array must have this command slot as one of their size
+	 * change listeners (using
+	 * {@link IGuiCommandSlot#addSizeChangeListener(ISizeChangeListener)}. Also,
+	 * after modifying this array, {@link #recalcSize()} must be called
+	 */
 	protected IGuiCommandSlot[] children;
 
 	public CommandSlotHorizontalArrangement(IGuiCommandSlot... children) {
@@ -37,6 +51,9 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 		return height;
 	}
 
+	/**
+	 * Recalculates the overall size of this command slot
+	 */
 	protected void recalcSize() {
 		int size = children.length == 0 ? 0 : children.length * 2 - 2;
 		int i;
@@ -53,6 +70,10 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 		setHeight(size);
 	}
 
+	/**
+	 * 
+	 * @return The number of children
+	 */
 	public int size() {
 		return children.length;
 	}

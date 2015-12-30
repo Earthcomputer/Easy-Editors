@@ -6,6 +6,12 @@ import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.minecraft.client.renderer.GlStateManager;
 
+/**
+ * A command slot which encases its child in a colored rectangle
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeChangeListener {
 
 	private IGuiCommandSlot child;
@@ -39,22 +45,22 @@ public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeCha
 		drawVerticalLine(x + getWidth(), y, y + getHeight(), 0xff000000);
 		child.draw(x + 2, y + 2, mouseX, mouseY, partialTicks);
 	}
-	
+
 	@Override
 	public void onKeyTyped(char typedChar, int keyCode) {
 		child.onKeyTyped(typedChar, keyCode);
 	}
-	
+
 	@Override
 	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		child.onMouseClicked(mouseX, mouseY, mouseButton);
 	}
-	
+
 	@Override
 	public void onMouseReleased(int mouseX, int mouseY, int mouseButton) {
 		child.onMouseReleased(mouseX, mouseY, mouseButton);
 	}
-	
+
 	@Override
 	public void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);

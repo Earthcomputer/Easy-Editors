@@ -8,9 +8,9 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiColorPicker;
 import net.earthcomputer.easyeditors.gui.IColorPickerCallback;
-import net.earthcomputer.easyeditors.util.GeneralUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -28,6 +28,12 @@ import net.minecraftforge.fml.client.config.GuiConfigEntries.ListEntryBase;
 import net.minecraftforge.fml.client.config.HoverChecker;
 import net.minecraftforge.fml.client.config.IConfigElement;
 
+/**
+ * The Easy Editors GUI factory, used for config
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiFactory implements IModGuiFactory {
 
 	@Override
@@ -50,6 +56,12 @@ public class GuiFactory implements IModGuiFactory {
 		return null;
 	}
 
+	/**
+	 * The Easy Editors config GUI
+	 * 
+	 * @author Earthcomputer
+	 *
+	 */
 	public static class EasyEditorsConfigGui extends GuiConfig {
 		public EasyEditorsConfigGui(GuiScreen previousScreen) {
 			super(previousScreen, getConfigElements(), EasyEditors.ID, false, false,
@@ -63,6 +75,12 @@ public class GuiFactory implements IModGuiFactory {
 			return list;
 		}
 
+		/**
+		 * The category entry for general settings
+		 * 
+		 * @author Earthcomputer
+		 *
+		 */
 		public static class GeneralEntry extends CategoryEntry {
 
 			public GeneralEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList,
@@ -80,6 +98,12 @@ public class GuiFactory implements IModGuiFactory {
 
 		}
 
+		/**
+		 * The category entry for color customization
+		 * 
+		 * @author Earthcomputer
+		 *
+		 */
 		public static class ColorsEntry extends CategoryEntry {
 
 			public ColorsEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
@@ -97,6 +121,15 @@ public class GuiFactory implements IModGuiFactory {
 
 		}
 
+		/**
+		 * The entry class used for customizing colors. Most of the code is
+		 * adapted from
+		 * {@link net.minecraftforge.fml.client.config.GuiConfigEntries.StringEntry
+		 * StringEntry}
+		 * 
+		 * @author Earthcomputer
+		 *
+		 */
 		public static class ColorEntry extends ListEntryBase implements IColorPickerCallback {
 
 			protected final GuiTextField textFieldValue;
@@ -264,7 +297,8 @@ public class GuiFactory implements IModGuiFactory {
 
 			@Override
 			public void setColor(int color) {
-				textFieldValue.setText(String.format(allowAlpha ? "%08X" : "%06X", color));
+				textFieldValue
+						.setText(String.format(allowAlpha ? "%08X" : "%06X", allowAlpha ? color : color & 0x00ffffff));
 			}
 
 		}

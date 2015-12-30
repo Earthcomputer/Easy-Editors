@@ -2,10 +2,10 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
 import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
-import net.earthcomputer.easyeditors.util.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,6 +16,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 
+/**
+ * A command slot representing an item
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotItem extends GuiCommandSlotImpl implements IItemSelectorCallback {
 
 	private ItemStack item;
@@ -85,6 +91,11 @@ public class CommandSlotItem extends GuiCommandSlotImpl implements IItemSelector
 		}
 	}
 
+	/**
+	 * 
+	 * @return An IGuiCommandSlot, consisting of this command slot, and a button
+	 *         to change the item
+	 */
 	public IGuiCommandSlot withButton() {
 		return new CommandSlotHorizontalArrangement(this, new CommandSlotButton(20, 20, "...") {
 			@Override

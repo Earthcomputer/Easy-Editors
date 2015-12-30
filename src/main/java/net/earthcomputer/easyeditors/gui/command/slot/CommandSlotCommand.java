@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiCommandSelector;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
 import net.earthcomputer.easyeditors.gui.command.ICommandSyntax;
-import net.earthcomputer.easyeditors.util.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -17,6 +17,12 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
 
+/**
+ * A command slot which represents a command
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotCommand extends CommandSlotVerticalArrangement implements ICommandEditorCallback {
 
 	private String commandName = "";
@@ -115,6 +121,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		}
 	}
 
+	/**
+	 * 
+	 * @return Whether the command is valid
+	 */
 	public boolean isValid() {
 		return commandSyntax == null ? false : commandSyntax.isValid();
 	}

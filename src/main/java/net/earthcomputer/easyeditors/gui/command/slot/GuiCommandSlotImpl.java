@@ -7,6 +7,12 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.minecraft.client.gui.Gui;
 
+/**
+ * An implementation of IGuiCommandSlot
+ * 
+ * @author Earthcomputer
+ *
+ */
 public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot {
 
 	private int width;

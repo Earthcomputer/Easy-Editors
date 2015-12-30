@@ -15,6 +15,12 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ReportedException;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
+/**
+ * A command slot which represents an expandable text field
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotTextField extends GuiCommandSlotImpl {
 
 	private GuiTypeListenerTextField wrappedTextField;
@@ -24,10 +30,22 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	private int maxWidth;
 	private int wordsToConsume;
 
+	/**
+	 * Creates a text field with the given minimum width and the given maximum
+	 * width, which consumes 1 argument
+	 * 
+	 * @param minWidth
+	 * @param maxWidth
+	 */
 	public CommandSlotTextField(int minWidth, int maxWidth) {
 		this(minWidth, maxWidth, 1);
 	}
 
+	/**
+	 * Creates a text field with the given minimum width and the given maximum
+	 * width, which consumes wordsToConsume arguments. wordsToConsume should be
+	 * -1 if all the words up to the end of the command should be consumed
+	 */
 	public CommandSlotTextField(int minWidth, int maxWidth, int wordsToConsume) {
 		super(minWidth + 2, 22);
 		this.minWidth = minWidth;
@@ -68,14 +86,30 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		}
 	}
 
+	/**
+	 * 
+	 * @return The text contained by the text field
+	 */
 	public String getText() {
 		return wrappedTextField.getText();
 	}
 
+	/**
+	 * Sets the text contained by the text field
+	 * 
+	 * @param text
+	 */
 	public void setText(String text) {
 		wrappedTextField.setText(text);
 	}
 
+	/**
+	 * Sets the filter for the contents of this text field. If the text field is
+	 * allowed to contain some text, the content filter should return true,
+	 * otherwise, it should return false
+	 * 
+	 * @param contentFilter
+	 */
 	public void setContentFilter(Predicate<String> contentFilter) {
 		wrappedTextField.func_175205_a(contentFilter);
 	}
@@ -92,10 +126,19 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		wrappedTextField.drawTextBox();
 	}
 
+	/**
+	 * Sets the maximum number of characters allowed in the text field (default
+	 * 32)
+	 * 
+	 * @param maxStringLength
+	 */
 	public void setMaxStringLength(int maxStringLength) {
 		wrappedTextField.setMaxStringLength(maxStringLength);
 	}
 
+	/**
+	 * Called when the text in the text field changes
+	 */
 	protected void onTextChanged() {
 		GuiTypeListenerTextField oldTextField = wrappedTextField;
 		GuiTypeListenerTextField newTextField = wrappedTextField = new GuiTypeListenerTextField(this, x + 1, y + 1,

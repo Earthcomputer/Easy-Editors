@@ -4,14 +4,20 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.util.Colors;
-import net.earthcomputer.easyeditors.util.GeneralUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
+/**
+ * A command slot representing a list of elements with radio buttons
+ * 
+ * @author Earthcomputer
+ *
+ */
 public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements ISizeChangeListener {
 
 	private static final ResourceLocation radioButtonLocation = new ResourceLocation(
@@ -54,10 +60,19 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 		return total;
 	}
 
+	/**
+	 * 
+	 * @return The index of the currently selected element
+	 */
 	public int getSelectedIndex() {
 		return selectedIndex;
 	}
 
+	/**
+	 * Sets the index of the currently selected element
+	 * 
+	 * @param selectedIndex
+	 */
 	public void setSelectedIndex(int selectedIndex) {
 		this.selectedIndex = selectedIndex;
 	}
@@ -66,7 +81,7 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 		if (index >= args.length)
 			throw new CommandSyntaxException();
-		selectedIndex = getSelectedIndexForString(args[index]);
+		selectedIndex = getSelectedIndexForString(args, index);
 		if (!children.isEmpty()) {
 			return children.get(selectedIndex).readFromArgs(args, index);
 		}
@@ -107,7 +122,14 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 		}
 	}
 
-	protected abstract int getSelectedIndexForString(String rawCommand) throws CommandSyntaxException;
+	/**
+	 * 
+	 * @param rawCommand
+	 * @return What the selected index should be for the given part of the
+	 *         command
+	 * @throws CommandSyntaxException
+	 */
+	protected abstract int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException;
 
 	@Override
 	public void onKeyTyped(char typedChar, int keyCode) {

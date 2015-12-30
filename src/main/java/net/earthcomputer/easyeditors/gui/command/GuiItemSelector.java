@@ -29,6 +29,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 
+/**
+ * A GUI which displays a list of all the items in the game for the user to
+ * select one. A search feature is included
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiItemSelector extends GuiTwoWayScroll {
 
 	private static Map<String, ItemStack> allItems = Maps.newLinkedHashMap();
@@ -59,10 +66,25 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 
 	private ItemStack selectedItem;
 
+	/**
+	 * Creates a GuiItemSelector with the given callback, with allowSubItems set
+	 * to true
+	 * 
+	 * @param previous
+	 * @param callback
+	 */
 	public GuiItemSelector(GuiScreen previous, IItemSelectorCallback callback) {
 		this(previous, callback, true);
 	}
 
+	/**
+	 * Creates a GuiItemSelector with the given callback, with allowSubItems
+	 * specified
+	 * 
+	 * @param previous
+	 * @param callback
+	 * @param allowSubItems
+	 */
 	public GuiItemSelector(GuiScreen previous, IItemSelectorCallback callback, boolean allowSubItems) {
 		super(55, 30, 220, 1);
 		if (!hasInitializedItems) {
@@ -91,7 +113,8 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
 		searchLabel = I18n.format("gui.commandEditor.selectItem.search");
 		int labelWidth = fontRendererObj.getStringWidth(searchLabel);
-		searchText = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25, 200, 20);
+		searchText = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25, 200,
+				20);
 	}
 
 	@Override

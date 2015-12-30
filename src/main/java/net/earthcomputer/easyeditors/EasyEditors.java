@@ -3,10 +3,13 @@ package net.earthcomputer.easyeditors;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.earthcomputer.easyeditors.api.ChatBlocker;
+import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.EasyEditorsApi;
+import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.api.GuiReplacementRegistry;
+import net.earthcomputer.easyeditors.api.Colors.Color;
 import net.earthcomputer.easyeditors.gui.GuiNewCommandBlock;
-import net.earthcomputer.easyeditors.util.Colors;
-import net.earthcomputer.easyeditors.util.Colors.Color;
-import net.earthcomputer.easyeditors.util.GeneralUtils;
 import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -22,21 +25,46 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = EasyEditors.ID, name = EasyEditors.NAME, version = EasyEditors.VERSION, clientSideOnly = true, canBeDeactivated = true, guiFactory = "net.earthcomputer.easyeditors.GuiFactory")
+/**
+ * The main mod class of Easy Editors
+ * 
+ * @author Earthcomputer
+ *
+ */
+@Mod(modid = EasyEditors.ID, name = EasyEditors.NAME, version = EasyEditors.VERSION, clientSideOnly = true, guiFactory = "net.earthcomputer.easyeditors.GuiFactory")
 public class EasyEditors {
 
+	/**
+	 * The modid of Easy Editors
+	 */
 	public static final String ID = "easyeditors";
+	/**
+	 * The name of Easy Editors
+	 */
 	public static final String NAME = "Easy Editors";
+	/**
+	 * The version of Easy Editors
+	 */
 	public static final String VERSION = "1.0";
 
+	/**
+	 * The singleton instance of Easy Editors
+	 */
 	@Instance(ID)
 	public static EasyEditors instance;
 
-	public static final GuiReplacementRegistry GUI_REPLACEMENT_REGISTRY = new GuiReplacementRegistry();
-
+	/**
+	 * The Easy Editors configuration
+	 */
 	public Configuration config;
-	public boolean active;
 
+	/**
+	 * A client-side mod must always accept remote clients and servers
+	 * 
+	 * @param mods
+	 * @param remoteSide
+	 * @return
+	 */
 	@NetworkCheckHandler
 	public boolean acceptsRemote(Map<String, String> mods, Side remoteSide) {
 		return true;
@@ -51,8 +79,8 @@ public class EasyEditors {
 	@EventHandler
 	public void init(FMLInitializationEvent e) {
 		FMLCommonHandler.instance().bus().register(this);
-		MinecraftForge.EVENT_BUS.register(GUI_REPLACEMENT_REGISTRY);
-		GUI_REPLACEMENT_REGISTRY.registerReplacement(GuiCommandBlock.class, GuiNewCommandBlock.class);
+
+		GuiReplacementRegistry.getInstance().registerReplacement(GuiCommandBlock.class, GuiNewCommandBlock.class);
 
 		readFromConfig();
 	}
@@ -63,9 +91,12 @@ public class EasyEditors {
 			readFromConfig();
 	}
 
+	/**
+	 * Reads from {@link #config}, then saves it if it has changed
+	 */
 	public void readFromConfig() {
 		Property prop = config.get("general", "active", true, "Whether Easy Editors should replace GUIs");
-		active = prop.getBoolean();
+		EasyEditorsApi.isEasyEditorsActive = prop.getBoolean();
 		prop.setLanguageKey("gui.easyeditorsconfig.active");
 		config.addCustomCategoryComment("colors",
 				"This changes all the colors in things like the command editor.\n"

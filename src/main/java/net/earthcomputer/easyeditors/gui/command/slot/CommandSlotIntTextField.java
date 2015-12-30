@@ -2,9 +2,15 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import com.google.common.base.Predicate;
 
+import net.earthcomputer.easyeditors.api.Patterns;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.util.Patterns;
 
+/**
+ * A text field which has an integer value
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotIntTextField extends CommandSlotTextField {
 
 	private int minValue;
@@ -54,6 +60,10 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		return 1;
 	}
 
+	/**
+	 * 
+	 * @return Whether the value inside this text field is a valid integer
+	 */
 	public boolean isValid() {
 		try {
 			Integer.parseInt(getText());
@@ -63,6 +73,10 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @return The value of this text field, as an integer
+	 */
 	public int getIntValue() {
 		return getText().isEmpty() ? 0 : Integer.parseInt(getText());
 	}

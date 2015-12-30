@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.util.GeneralUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,6 +15,13 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
+/**
+ * A command slot containing a button, which, when clicked, shows some
+ * additional options
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChangeListener {
 
 	private static final ResourceLocation arrowLocation = new ResourceLocation(
@@ -31,10 +38,19 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 		child.addSizeChangeListener(this);
 	}
 
+	/**
+	 * 
+	 * @return Whether expanded
+	 */
 	public boolean isExpanded() {
 		return isExpanded;
 	}
 
+	/**
+	 * Sets whether expanded
+	 * 
+	 * @param expanded
+	 */
 	public void setExpanded(boolean expanded) {
 		isExpanded = expanded;
 		recalcSize();

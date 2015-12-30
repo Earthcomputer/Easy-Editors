@@ -1,7 +1,15 @@
-package net.earthcomputer.easyeditors.util;
+package net.earthcomputer.easyeditors.api;
 
 import java.util.regex.Pattern;
 
+/**
+ * A class containing a number of {@link Pattern}s useful to Easy Editors.
+ * 
+ * <b>This class is a member of the Easy Editors API</b>
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class Patterns {
 
 	public static final Pattern partialPlayerName = Pattern.compile("\\w{0,32}");

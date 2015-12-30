@@ -5,8 +5,22 @@ import java.util.List;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 
+/**
+ * A command slot which contains multiple child command slots, arranged
+ * vertically
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implements ISizeChangeListener {
-
+	
+	/**
+	 * An array of the child command slots. After modifying this array, all
+	 * children in this array must have this command slot as one of their size
+	 * change listeners (using
+	 * {@link IGuiCommandSlot#addSizeChangeListener(ISizeChangeListener)}. Also,
+	 * after modifying this array, {@link #recalcSize()} must be called
+	 */
 	protected IGuiCommandSlot[] children;
 
 	public CommandSlotVerticalArrangement(IGuiCommandSlot... children) {
@@ -34,6 +48,9 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 		return height;
 	}
 
+	/**
+	 * Recalculates the overall size of this command slot
+	 */
 	protected void recalcSize() {
 		int size = 0;
 		int i;
@@ -50,6 +67,10 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 		setHeight(size);
 	}
 
+	/**
+	 * 
+	 * @return The number of children
+	 */
 	public int size() {
 		return children.length;
 	}

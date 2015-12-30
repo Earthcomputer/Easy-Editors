@@ -2,12 +2,18 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import com.google.common.base.Predicate;
 
+import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.Patterns;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.util.Colors;
-import net.earthcomputer.easyeditors.util.Patterns;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
+/**
+ * A command slot representing a player selector
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 	private CommandSlotRadioList radioList;
@@ -44,12 +50,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.uuid"),
 						Colors.playerSelectorLabel.color, UUIDField)) {
 			@Override
-			protected int getSelectedIndexForString(String rawCommand) throws CommandSyntaxException {
-				if (Patterns.playerName.matcher(rawCommand).matches())
+			protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
+				String arg = args[index];
+				if (Patterns.playerName.matcher(arg).matches())
 					return 0;
-				else if (Patterns.UUID.matcher(rawCommand).matches())
+				else if (Patterns.UUID.matcher(arg).matches())
 					return 1;
-				else if (Patterns.playerSelector.matcher(rawCommand).matches())
+				else if (Patterns.playerSelector.matcher(arg).matches())
 					return 2;
 				else
 					throw new CommandSyntaxException();
@@ -62,6 +69,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		recalcSize();
 	}
 
+	/**
+	 * 
+	 * @return Whether this player selector is valid
+	 */
 	public boolean isValid() {
 		switch (radioList.getSelectedIndex()) {
 		case 0:

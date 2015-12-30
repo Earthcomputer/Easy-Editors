@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 
-import net.earthcomputer.easyeditors.util.GeneralUtils;
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -20,6 +20,12 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
+/**
+ * The GuiScreen for the color picker
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiColorPicker extends GuiScreen {
 
 	public static final ResourceLocation transparentBackground = new ResourceLocation(
@@ -51,10 +57,24 @@ public class GuiColorPicker extends GuiScreen {
 	 */
 	private int clicked = -1;
 
+	/**
+	 * Creates a color picker with the specified callback
+	 * 
+	 * @param previousScreen
+	 * @param callback
+	 */
 	public GuiColorPicker(GuiScreen previousScreen, IColorPickerCallback callback) {
 		this(previousScreen, callback, true);
 	}
 
+	/**
+	 * Creates a color picker with the specified callback, with enableAlpha
+	 * specified
+	 * 
+	 * @param previousScreen
+	 * @param callback
+	 * @param enableAlpha
+	 */
 	public GuiColorPicker(GuiScreen previousScreen, IColorPickerCallback callback, boolean enableAlpha) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
@@ -597,7 +617,7 @@ public class GuiColorPicker extends GuiScreen {
 	public void actionPerformed(GuiButton button) {
 		switch (button.id) {
 		case 0:
-			callback.setColor(enableAlpha ? (alpha << 24) | rgb : rgb);
+			callback.setColor((alpha << 24) | rgb);
 			mc.displayGuiScreen(previousScreen);
 			break;
 		case 1:

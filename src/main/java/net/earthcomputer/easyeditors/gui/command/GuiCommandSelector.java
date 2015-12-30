@@ -15,6 +15,13 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.resources.I18n;
 
+/**
+ * A GuiScreen which the user will use to select a command out of a list of
+ * available commands in the command editor
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiCommandSelector extends GuiScreen {
 
 	private GuiScreen previousScreen;
@@ -27,6 +34,12 @@ public class GuiCommandSelector extends GuiScreen {
 	private GuiButton cancelButton;
 	private CommandList list;
 
+	/**
+	 * Creates a command selector with the given callback
+	 * 
+	 * @param previousScreen
+	 * @param callback
+	 */
 	public GuiCommandSelector(GuiScreen previousScreen, ICommandEditorCallback callback) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;

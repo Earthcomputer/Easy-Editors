@@ -8,11 +8,11 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
-import net.earthcomputer.easyeditors.util.Colors;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -97,10 +97,9 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 	}
 
 	@Override
-	protected void drawVirtualScreen(int virtualMouseX, int virtualMouseY, float partialTicks, int scrollX, int scrollY,
+	protected void drawVirtualScreen(int mouseX, int mouseY, float partialTicks, int scrollX, int scrollY,
 			int headerHeight) {
-		commandSlotRectangle.draw(2 - scrollX, 2 - scrollY + headerHeight, virtualMouseX - scrollX,
-				virtualMouseY - scrollY + headerHeight, partialTicks);
+		commandSlotRectangle.draw(2 - scrollX, 2 - scrollY + headerHeight, mouseX, mouseY, partialTicks);
 	}
 
 	@Override
@@ -113,22 +112,18 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 	}
 
 	@Override
-	public void mouseClickedVirtual(int virtualMouseX, int virtualMouseY, int mouseButton) {
-		commandSlotRectangle.onMouseClicked(virtualMouseX - getScrollX(),
-				virtualMouseY - getScrollY() + getHeaderHeight(), mouseButton);
+	public void mouseClickedVirtual(int mouseX, int mouseY, int mouseButton) {
+		commandSlotRectangle.onMouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
-	public void mouseReleasedVirtual(int virtualMouseX, int virtualMouseY, int mouseButton) {
-		commandSlotRectangle.onMouseReleased(virtualMouseX - getScrollX(),
-				virtualMouseY - getScrollY() + getHeaderHeight(), mouseButton);
+	public void mouseReleasedVirtual(int mouseX, int mouseY, int mouseButton) {
+		commandSlotRectangle.onMouseReleased(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
-	public void mouseClickMoveVirtual(int virtualMouseX, int virtualMouseY, int clickedMouseButton,
-			long timeSinceLastClick) {
-		commandSlotRectangle.onMouseClickMove(virtualMouseX - getScrollX(),
-				virtualMouseY - getScrollY() + getHeaderHeight(), clickedMouseButton, timeSinceLastClick);
+	public void mouseClickMoveVirtual(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		commandSlotRectangle.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 	}
 
 	@Override

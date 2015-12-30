@@ -19,6 +19,12 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
+/**
+ * A replacement GUI for {@link GuiCommandBlock}
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallback {
 
 	private static final Field localCommandBlockField = ReflectionHelper.findField(GuiCommandBlock.class,
@@ -33,6 +39,10 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 	private GuiTextField trackedOutput;
 	private boolean shouldTrackOutput;
 
+	/**
+	 * Used to fix the vanilla bug where the command text field gets reset when
+	 * the window is resized
+	 */
 	private boolean hadFirstInit = false;
 
 	public GuiNewCommandBlock(GuiCommandBlock old) throws Exception {

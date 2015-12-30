@@ -6,6 +6,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 
+/**
+ * A command slot which represents a button
+ * 
+ * @author Earthcomputer
+ *
+ */
 public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 
 	private int x;
@@ -26,22 +32,44 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	public void addArgs(List<String> args) {
 	}
 
+	/**
+	 * 
+	 * @return The text displayed in the button
+	 */
 	public String getText() {
 		return wrappedButton.displayString;
 	}
 
+	/**
+	 * 
+	 * @return Whether the button is enabled
+	 */
 	public boolean isEnabled() {
 		return wrappedButton.enabled;
 	}
 
+	/**
+	 * Sets whether the button is enabled
+	 * 
+	 * @param enabled
+	 */
 	public void setEnabled(boolean enabled) {
 		wrappedButton.enabled = enabled;
 	}
 
+	/**
+	 * 
+	 * @return The text color in the button
+	 */
 	public int getTextColor() {
 		return wrappedButton.packedFGColour;
 	}
 
+	/**
+	 * Sets the text color in the button
+	 * 
+	 * @param textColor
+	 */
 	public void setTextColor(int textColor) {
 		wrappedButton.packedFGColour = textColor;
 	}
@@ -70,6 +98,9 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 		}
 	}
 
+	/**
+	 * Invoked when the button is pressed
+	 */
 	public abstract void onPress();
 
 	private static class GuiClickListenerButton extends GuiButton {

@@ -12,6 +12,14 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.MathHelper;
 
+/**
+ * Used to represent a GuiScreen whose main contents, or "virtual size", may
+ * exceed the physical size of the screen in the horizontal or vertical
+ * direction, or both
+ * 
+ * @author Earthcomputer
+ *
+ */
 public abstract class GuiTwoWayScroll extends GuiScreen {
 
 	private int headerHeight;
@@ -48,10 +56,32 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	private int xScrollBarPolicy;
 	private int yScrollBarPolicy;
 
+	/**
+	 * Never show the scroll bar
+	 */
 	public static final int SHOWN_NEVER = 0;
+	/**
+	 * Only show the scroll bar when the virtual width exceeds the physical
+	 * width
+	 */
 	public static final int SHOWN_WHEN_NEEDED = 1;
+	/**
+	 * Always show the scroll bar
+	 */
 	public static final int SHOWN_ALWAYS = 2;
 
+	/**
+	 * Creates a GuiTwoWayScroll with the given headerHeight, footerHeight,
+	 * initial virtualWidth and initial virtualHeight
+	 * 
+	 * @param headerHeight
+	 *            - The height of the header, where the title generally goes
+	 * @param footerHeight
+	 *            - The height of the footer, where the done and cancel buttons
+	 *            normally go
+	 * @param virtualWidth
+	 * @param virtualHeight
+	 */
 	public GuiTwoWayScroll(int headerHeight, int footerHeight, int virtualWidth, int virtualHeight) {
 		this.headerHeight = headerHeight;
 		this.footerHeight = footerHeight;
@@ -124,28 +154,56 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		return;
 	}
 
+	/**
+	 * 
+	 * @return The height of the header
+	 */
 	public int getHeaderHeight() {
 		return headerHeight;
 	}
 
+	/**
+	 * Sets the height of the header
+	 * 
+	 * @param headerHeight
+	 */
 	public void setHeaderHeight(int headerHeight) {
 		this.headerHeight = headerHeight;
 		refreshScrollBars();
 	}
 
+	/**
+	 * 
+	 * @return The height of the footer
+	 */
 	public int getFooterHeight() {
 		return footerHeight;
 	}
 
+	/**
+	 * Sets the height of the footer
+	 * 
+	 * @param footerHeight
+	 */
 	public void setFooterHeight(int footerHeight) {
 		this.footerHeight = footerHeight;
 		refreshScrollBars();
 	}
 
+	/**
+	 * 
+	 * @return The width of the main contents, which may exceed the physical
+	 *         width
+	 */
 	public int getVirtualWidth() {
 		return virtualWidth;
 	}
 
+	/**
+	 * Sets the width of the main contents, which may exceed the physical width
+	 * 
+	 * @param virtualWidth
+	 */
 	public void setVirtualWidth(int virtualWidth) {
 		if (virtualWidth <= 0)
 			virtualWidth = 1;
@@ -153,10 +211,21 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		refreshScrollBars();
 	}
 
+	/**
+	 * 
+	 * @return The height of the main contents, which may exceed the physical
+	 *         height
+	 */
 	public int getVirtualHeight() {
 		return virtualHeight;
 	}
 
+	/**
+	 * Sets the height of the main contents, which may exceed the physical
+	 * height
+	 * 
+	 * @param virtualHeight
+	 */
 	public void setVirtualHeight(int virtualHeight) {
 		if (virtualHeight <= 0)
 			virtualHeight = 1;
@@ -164,141 +233,292 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		refreshScrollBars();
 	}
 
+	/**
+	 * 
+	 * @return The amount scrolled horizontally
+	 */
 	public int getScrollX() {
 		return scrollX;
 	}
 
+	/**
+	 * Sets the amount scrolled horizontally
+	 * 
+	 * @param scrollX
+	 */
 	public void setScrollX(int scrollX) {
 		this.scrollX = MathHelper.clamp_int(scrollX, 0, maxScrollX);
 		refreshScrollBars();
 	}
 
+	/**
+	 * Scrolls to the right by the given amount
+	 * 
+	 * @param scrollX
+	 */
 	public void addScrollX(int scrollX) {
 		setScrollX(this.scrollX + scrollX);
 	}
 
+	/**
+	 * 
+	 * @return The amount scrolled vertically
+	 */
 	public int getScrollY() {
 		return scrollY;
 	}
 
+	/**
+	 * Sets the amount scrolled vertically
+	 * 
+	 * @param scrollY
+	 */
 	public void setScrollY(int scrollY) {
 		this.scrollY = MathHelper.clamp_int(scrollY, 0, maxScrollY);
 		refreshScrollBars();
 	}
 
+	/**
+	 * Scrolls down by the given amount
+	 * 
+	 * @param scrollY
+	 */
 	public void addScrollY(int scrollY) {
 		setScrollY(this.scrollY + scrollY);
 	}
 
+	/**
+	 * @return The maximum amount that can be scrolled horizontally
+	 */
 	public int getMaxScrollX() {
 		return maxScrollX;
 	}
 
+	/**
+	 * 
+	 * @return The maximum amount that can be scrolled vertically
+	 */
 	public int getMaxScrollY() {
 		return maxScrollY;
 	}
 
+	/**
+	 * Scrolls both horizontally and vertically at the same time, with some
+	 * performance gains
+	 * 
+	 * @param x
+	 * @param y
+	 */
 	public void scrollTo(int x, int y) {
 		scrollX = MathHelper.clamp_int(x, 0, maxScrollX);
 		scrollY = MathHelper.clamp_int(y, 0, maxScrollY);
 		refreshScrollBars();
 	}
 
+	/**
+	 * 
+	 * @return The width of the area of the main contents the user can see
+	 */
 	public int getShownWidth() {
 		return shownWidth;
 	}
 
+	/**
+	 * 
+	 * @return The height of the area of the main contents the user can see
+	 */
 	public int getShownHeight() {
 		return shownHeight;
 	}
 
+	/**
+	 * 
+	 * @return The width of the horizontal scroll bar, as it appears on the
+	 *         screen
+	 */
 	protected int getXScrollBarWidth() {
 		return xScrollBarWidth;
 	}
 
+	/**
+	 * 
+	 * @return The height of the vertical scroll bar, as it appears on the
+	 *         screen
+	 */
 	protected int getYScrollBarHeight() {
 		return yScrollBarHeight;
 	}
 
+	/**
+	 * 
+	 * @return The x-position of the left of the horizontal scroll bar, as it
+	 *         appears on the screen
+	 */
 	protected int getXScrollBarLeft() {
 		return xScrollBarLeft;
 	}
 
+	/**
+	 * 
+	 * @return The y-position of the top of the vertical scroll bar, as it
+	 *         appears on the screen
+	 */
 	protected int getYScrollBarTop() {
 		return yScrollBarTop;
 	}
 
+	/**
+	 * 
+	 * @return The x-position of the right of the horizontal scroll bar, as it
+	 *         appears on the screen
+	 */
 	protected int getXScrollBarRight() {
 		return xScrollBarRight;
 	}
 
+	/**
+	 * 
+	 * @return The y-position of the bottom of the vertical scroll bar, as it
+	 *         appears on the screen
+	 */
 	protected int getYScrollBarBottom() {
 		return yScrollBarBottom;
 	}
 
+	/**
+	 * 
+	 * @return The horizontal scroll bar policy, either {@link #SHOWN_NEVER},
+	 *         {@link #SHOWN_WHEN_NEEDED} or {@link #SHOWN_ALWAYS}
+	 */
 	public int getXScrollBarPolicy() {
 		return xScrollBarPolicy;
 	}
 
+	/**
+	 * Sets the horizontal scroll bar policy, either {@link #SHOWN_NEVER},
+	 * {@link #SHOWN_WHEN_NEEDED} or {@link #SHOWN_ALWAYS}
+	 * 
+	 * @param xScrollBarPolicy
+	 */
 	public void setXScrollBarPolicy(int xScrollBarPolicy) {
 		this.xScrollBarPolicy = xScrollBarPolicy;
 		refreshScrollBars();
 	}
 
+	/**
+	 * 
+	 * @return The vertical scroll bar policy, either {@link #SHOWN_NEVER},
+	 *         {@link #SHOWN_WHEN_NEEDED} or {@link #SHOWN_ALWAYS}
+	 */
 	public int getYScrollBarPolicy() {
 		return yScrollBarPolicy;
 	}
 
+	/**
+	 * Sets the vertical scroll bar policy, either {@link #SHOWN_NEVER},
+	 * {@link #SHOWN_WHEN_NEEDED} or {@link #SHOWN_ALWAYS}
+	 * 
+	 * @param yScrollBarPolicy
+	 */
 	public void setYScrollBarPolicy(int yScrollBarPolicy) {
 		this.yScrollBarPolicy = yScrollBarPolicy;
 		refreshScrollBars();
 	}
 
+	/**
+	 * 
+	 * @return The keycode of the key which causes the horizontal scroll bar to
+	 *         scroll left
+	 */
 	public int getLeftKey() {
 		return leftKey;
 	}
 
+	/**
+	 * Sets the key which causes the horizontal scroll bar to scroll left
+	 * 
+	 * @param leftKey
+	 */
 	public void setLeftKey(int leftKey) {
 		this.leftKey = leftKey;
 	}
 
+	/**
+	 * 
+	 * @return The keycode of the key which causes the horizontal scroll bar to
+	 *         scroll right
+	 */
 	public int getRightKey() {
 		return rightKey;
 	}
 
+	/**
+	 * Sets the key which causes the horizontal scroll bar to scroll right
+	 * 
+	 * @param rightKey
+	 */
 	public void setRightKey(int rightKey) {
 		this.rightKey = rightKey;
 	}
 
+	/**
+	 * 
+	 * @return The keycode of the key which causes the vertical scroll bar to
+	 *         scroll up
+	 */
 	public int getUpKey() {
 		return upKey;
 	}
 
+	/**
+	 * Sets the key which causes the vertical scroll bar to scroll up
+	 * 
+	 * @param upKey
+	 */
 	public void setUpKey(int upKey) {
 		this.upKey = upKey;
 	}
 
+	/**
+	 * 
+	 * @return The keycode of the key which causes the vertical scroll bar to
+	 *         scroll down
+	 */
 	public int getDownKey() {
 		return downKey;
 	}
 
+	/**
+	 * Sets the key which causes the vertical scroll bar to scroll down
+	 * 
+	 * @param downKey
+	 */
 	public void setDownKey(int downKey) {
 		this.downKey = downKey;
 	}
 
+	/**
+	 * 
+	 * @return Whether the mouse wheel can be used to scroll
+	 */
 	public boolean usesMouseWheel() {
 		return useMouseWheel;
 	}
 
+	/**
+	 * Sets whether the mouse wheel can be used to scroll
+	 * 
+	 * @param usesMouseWheel
+	 */
 	public void setUsesMouseWheel(boolean usesMouseWheel) {
 		useMouseWheel = usesMouseWheel;
 	}
 
+	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawContainerBackground();
 
-		drawVirtualScreen(mouseX + scrollX, mouseY + scrollY - headerHeight, partialTicks, scrollX, scrollY,
-				headerHeight);
+		drawVirtualScreen(mouseX, mouseY, partialTicks, scrollX, scrollY, headerHeight);
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
 		Tessellator tessellator = Tessellator.getInstance();
@@ -442,9 +662,27 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		tessellator.draw();
 	}
 
-	protected abstract void drawVirtualScreen(int virtualMouseX, int virtualMouseY, float partialTicks, int scrollX,
-			int scrollY, int headerHeight);
+	/**
+	 * Draws the main contents
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 * @param partialTicks
+	 * @param scrollX
+	 * @param scrollY
+	 * @param headerHeight
+	 */
+	protected abstract void drawVirtualScreen(int mouseX, int mouseY, float partialTicks, int scrollX, int scrollY,
+			int headerHeight);
 
+	/**
+	 * Draws the foreground. This would include the title, and anything else not
+	 * part of the main contents, excluding GuiButtons and GuiLabels
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 * @param partialTicks
+	 */
 	protected abstract void drawForeground(int mouseX, int mouseY, float partialTicks);
 
 	@Override
@@ -499,15 +737,23 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 				firstXScrollBarPos = scrollX;
 				firstMouseX = mouseX;
 			} else if (mouseY > headerHeight && mouseY < height - footerHeight) {
-				mouseClickedVirtual(mouseX + scrollX, mouseY + scrollY - headerHeight, mouseButton);
+				mouseClickedVirtual(mouseX, mouseY, mouseButton);
 			}
 		} else if (mouseY > headerHeight && mouseY < height - footerHeight) {
-			mouseClickedVirtual(mouseX + scrollX, mouseY + scrollY - headerHeight, mouseButton);
+			mouseClickedVirtual(mouseX, mouseY, mouseButton);
 		}
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
-	protected void mouseClickedVirtual(int virtualMouseX, int virtualMouseY, int mouseButton) {
+	/**
+	 * Called when the mouse is clicked inside the area where the main contents
+	 * is shown. mouseX and mouseY are physical, not relative
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 * @param mouseButton
+	 */
+	protected void mouseClickedVirtual(int mouseX, int mouseY, int mouseButton) {
 	}
 
 	@Override
@@ -516,11 +762,19 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			firstXScrollBarPos = firstYScrollBarPos = firstMouseX = firstMouseY = -1;
 		}
 		if (mouseY > headerHeight && mouseY < height - footerHeight)
-			mouseReleasedVirtual(mouseX + scrollX, mouseY + scrollY - headerHeight, state);
+			mouseReleasedVirtual(mouseX, mouseY, state);
 		super.mouseReleased(mouseX, mouseY, state);
 	}
 
-	protected void mouseReleasedVirtual(int virtualMouseX, int virtualMouseY, int releasedButton) {
+	/**
+	 * Called when the mouse is released inside the area where the main contents
+	 * is shown. mouseX and mouseY are physical, not relative
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 * @param releasedButton
+	 */
+	protected void mouseReleasedVirtual(int mouseX, int mouseY, int releasedButton) {
 	}
 
 	@Override
@@ -534,13 +788,20 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			float multiplier = (float) getShownHeight() / getYScrollBarHeight();
 			setScrollY(firstYScrollBarPos + MathHelper.ceiling_float_int(dy * multiplier));
 		} else if (mouseY > headerHeight && mouseY < height - footerHeight) {
-			mouseClickMoveVirtual(mouseX + scrollX, mouseY + scrollY - headerHeight, clickedMouseButton,
-					timeSinceLastClick);
+			mouseClickMoveVirtual(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		}
 	}
 
-	protected void mouseClickMoveVirtual(int virtualMouseX, int virtualMouseY, int clickedMouseButton,
-			long timeSinceLastClick) {
+	/**
+	 * Called when the mouse is clicked and dragged inside the area where the
+	 * main contents is shown. mouseX and mouseY are physical, not relative
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 * @param clickedMouseButton
+	 * @param timeSinceLastClick
+	 */
+	protected void mouseClickMoveVirtual(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 	}
 
 }
