@@ -1,7 +1,18 @@
 package net.earthcomputer.easyeditors.api;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -129,6 +140,144 @@ public class GeneralUtils {
 		h *= 60;
 		float s = c / M;
 		return new int[] { c == 0 ? -1 : (int) h, (int) (s * 100), (int) (M * 100) };
+	}
+
+	/**
+	 * A static alternative to
+	 * {@link net.minecraft.client.gui.Gui#drawGradientRect(int, int, int, int, int, int)
+	 * Gui.drawGradientRect(int, int, int, int, int, int)}
+	 * 
+	 * @param left
+	 * @param right
+	 * @param top
+	 * @param bottom
+	 * @param startColor
+	 * @param endColor
+	 * @param zLevel
+	 */
+	public static void drawGradientRect(int left, int right, int top, int bottom, int startColor, int endColor,
+			int zLevel) {
+		float startAlpha = (float) (startColor >> 24 & 255) / 255;
+		float startRed = (float) (startColor >> 16 & 255) / 255;
+		float startGreen = (float) (startColor >> 8 & 255) / 255;
+		float startBlue = (float) (startColor & 255) / 255;
+		float endAlpha = (float) (endColor >> 24 & 255) / 255;
+		float endRed = (float) (endColor >> 16 & 255) / 255;
+		float endGreen = (float) (endColor >> 8 & 255) / 255;
+		float endBlue = (float) (endColor & 255) / 255;
+		GlStateManager.disableTexture2D();
+		GlStateManager.enableBlend();
+		GlStateManager.disableAlpha();
+		GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+		GlStateManager.shadeModel(GL11.GL_SMOOTH);
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+		worldRenderer.startDrawingQuads();
+		worldRenderer.setColorRGBA_F(startRed, startGreen, startBlue, startAlpha);
+		worldRenderer.addVertex(right, top, zLevel);
+		worldRenderer.addVertex(left, top, zLevel);
+		worldRenderer.setColorRGBA_F(endRed, endGreen, endBlue, endAlpha);
+		worldRenderer.addVertex(left, bottom, zLevel);
+		worldRenderer.addVertex(right, bottom, zLevel);
+		tessellator.draw();
+		GlStateManager.shadeModel(GL11.GL_FLAT);
+		GlStateManager.disableBlend();
+		GlStateManager.enableAlpha();
+		GlStateManager.enableTexture2D();
+	}
+
+	/**
+	 * A static alternative to
+	 * {@link net.minecraft.client.gui.GuiScreen#drawHoveringText(List, int, int)
+	 * GuiScreen.drawHoveringText(List, int, int)}
+	 * 
+	 * @param x
+	 * @param y
+	 * @param lines
+	 */
+	public static void drawTooltip(int x, int y, String... lines) {
+		drawTooltip(x, y, Arrays.asList(lines));
+	}
+
+	/**
+	 * A static alternative to
+	 * {@link net.minecraft.client.gui.GuiScreen#drawHoveringText(List, int, int)
+	 * GuiScreen.drawHoveringText(List, int, int)}
+	 * 
+	 * @param x
+	 * @param y
+	 * @param lines
+	 */
+	public static void drawTooltip(int x, int y, List<String> lines) {
+		Minecraft mc = Minecraft.getMinecraft();
+		FontRenderer font = mc.fontRendererObj;
+		ScaledResolution res = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+		int width = res.getScaledWidth();
+		int height = res.getScaledHeight();
+
+		if (!lines.isEmpty()) {
+			GlStateManager.disableRescaleNormal();
+			RenderHelper.disableStandardItemLighting();
+			GlStateManager.disableLighting();
+			GlStateManager.disableDepth();
+			int maxLineWidth = 0;
+			for (String line : lines) {
+				int lineWidth = font.getStringWidth(line);
+
+				if (lineWidth > maxLineWidth) {
+					maxLineWidth = lineWidth;
+				}
+			}
+
+			int textX = x + 12;
+			int textY = y - 12;
+			int h = 8;
+
+			if (lines.size() > 1) {
+				h += 2 + (lines.size() - 1) * 10;
+			}
+
+			if (textX + maxLineWidth > width) {
+				textX -= 28 + maxLineWidth;
+			}
+
+			if (textY + h + 6 > height) {
+				textY = height - h - 6;
+			}
+
+			mc.getRenderItem().zLevel = 300;
+			int col1 = 0xf0100010;
+			drawGradientRect(textX - 3, textY - 4, textX + maxLineWidth + 3, textY - 3, col1, col1, 300);
+			drawGradientRect(textX - 3, textY + h + 3, textX + maxLineWidth + 3, textY + h + 4, col1, col1, 300);
+			drawGradientRect(textX - 3, textY - 3, textX + maxLineWidth + 3, textY + h + 3, col1, col1, 300);
+			drawGradientRect(textX - 4, textY - 3, textX - 3, textY + h + 3, col1, col1, 300);
+			drawGradientRect(textX + maxLineWidth + 3, textY - 3, textX + maxLineWidth + 4, textY + h + 3, col1, col1,
+					300);
+			int col2 = 0x505000ff;
+			int col3 = (col2 & 0xfefefe) >> 1 | col2 & 0xff000000;
+			drawGradientRect(textX - 3, textY - 3 + 1, textX - 3 + 1, textY + h + 3 - 1, col2, col3, 300);
+			drawGradientRect(textX + maxLineWidth + 2, textY - 3 + 1, textX + maxLineWidth + 3, textY + h + 3 - 1, col2,
+					col3, 300);
+			drawGradientRect(textX - 3, textY - 3, textX + maxLineWidth + 3, textY - 3 + 1, col2, col2, 300);
+			drawGradientRect(textX - 3, textY + h + 2, textX + maxLineWidth + 3, textY + h + 3, col3, col3, 300);
+
+			for (int i = 0; i < lines.size(); i++) {
+				String line = lines.get(i);
+				font.drawStringWithShadow(line, textX, textY, -1);
+
+				if (i == 0) {
+					textY += 2;
+				}
+
+				textY += 10;
+			}
+
+			mc.getRenderItem().zLevel = 0;
+			GlStateManager.enableLighting();
+			GlStateManager.enableDepth();
+			RenderHelper.enableStandardItemLighting();
+			GlStateManager.enableRescaleNormal();
+		}
 	}
 
 }
