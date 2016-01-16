@@ -37,7 +37,7 @@ public class Colors {
 	public static final Color invalidItemName = new Color("misc.itemName.invalid", 0xff0000,
 			"The color of an invalid item name");
 	public static final Color itemBox = new Color("box.item", 0xffffc923, true, "The color of the box of an item");
-	public static final Color itemLabel = new Color("label.item", 0xa88417, "The color of a label in a box of an item");
+	public static final Color itemLabel = new Color("label.item", 0x705d00, "The color of a label in a box of an item");
 
 	/**
 	 * 
