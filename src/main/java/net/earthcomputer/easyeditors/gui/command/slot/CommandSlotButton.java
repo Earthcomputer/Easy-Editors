@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
  * A command slot which represents a button
@@ -17,10 +18,18 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	private int x;
 	private int y;
 	private GuiClickListenerButton wrappedButton;
+	private String hoverText;
+
+	private HoverChecker hoverChecker;
 
 	public CommandSlotButton(int width, int height, String text) {
+		this(width, height, text, null);
+	}
+
+	public CommandSlotButton(int width, int height, String text, String hoverText) {
 		super(width, height);
 		wrappedButton = new GuiClickListenerButton(0, 0, width, height, text);
+		this.hoverText = hoverText;
 	}
 
 	@Override
@@ -38,6 +47,14 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	 */
 	public String getText() {
 		return wrappedButton.displayString;
+	}
+
+	/**
+	 * 
+	 * @return The text displayed when hovered
+	 */
+	public String getHoverText() {
+		return hoverText;
 	}
 
 	/**
@@ -88,7 +105,18 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 			newButton.packedFGColour = oldButton.packedFGColour;
 		}
 		wrappedButton.drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
-		
+
+		if (hoverText != null) {
+			if (hoverChecker == null)
+				hoverChecker = new HoverChecker(y, y + getHeight(), x, x + getWidth(), 1000);
+			else
+				hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
+
+			if (hoverChecker.checkHover(mouseX, mouseY)) {
+				drawTooltip(mouseX, mouseY, hoverText, 300);
+			}
+		}
+
 		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
