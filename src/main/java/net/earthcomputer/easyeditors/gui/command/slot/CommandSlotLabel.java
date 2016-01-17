@@ -6,6 +6,7 @@ import net.earthcomputer.easyeditors.api.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
  * A command slot which simply displays some text
@@ -18,16 +19,28 @@ public class CommandSlotLabel extends GuiCommandSlotImpl {
 	private FontRenderer fontRenderer;
 	private String text;
 	private int color;
+	private String hoverText;
+
+	private HoverChecker hoverChecker;
 
 	public CommandSlotLabel(FontRenderer fontRenderer, String text) {
 		this(fontRenderer, text, Colors.label.color);
 	}
 
 	public CommandSlotLabel(FontRenderer fontRenderer, String text, int color) {
+		this(fontRenderer, text, color, null);
+	}
+
+	public CommandSlotLabel(FontRenderer fontRenderer, String text, String hoverText) {
+		this(fontRenderer, text, Colors.label.color, hoverText);
+	}
+
+	public CommandSlotLabel(FontRenderer fontRenderer, String text, int color, String hoverText) {
 		super(fontRenderer.getStringWidth(text), fontRenderer.FONT_HEIGHT);
 		this.fontRenderer = fontRenderer;
 		this.text = text;
 		this.color = color;
+		this.hoverText = hoverText;
 	}
 
 	/**
@@ -64,11 +77,30 @@ public class CommandSlotLabel extends GuiCommandSlotImpl {
 		return text;
 	}
 
+	/**
+	 * 
+	 * @return The text displayed when the mouse hovers over the label
+	 */
+	public String getHoverText() {
+		return hoverText;
+	}
+
 	@Override
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
 		fontRenderer.drawString(text, x, y, color);
+
+		if (hoverText != null) {
+			if (hoverChecker == null)
+				hoverChecker = new HoverChecker(y, y + getHeight(), x, x + getWidth(), 1000);
+			else
+				hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
+
+			if (hoverChecker.checkHover(mouseX, mouseY)) {
+				drawTooltip(mouseX, mouseY, hoverText, 300);
+			}
+		}
 		
 		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
@@ -96,8 +128,37 @@ public class CommandSlotLabel extends GuiCommandSlotImpl {
 	 * @return
 	 */
 	public static IGuiCommandSlot createLabel(String text, int color, IGuiCommandSlot... describing) {
+		return createLabel(text, color, null, describing);
+	}
+
+	/**
+	 * Creates a {@link CommandSlotHorizontalArrangement} containing a label
+	 * which contains the given text and shows the given hover text, and all the
+	 * child slots in describing
+	 * 
+	 * @param text
+	 * @param hoverText
+	 * @param describing
+	 * @return
+	 */
+	public static IGuiCommandSlot createLabel(String text, String hoverText, IGuiCommandSlot... describing) {
+		return createLabel(text, Colors.label.color, hoverText, describing);
+	}
+
+	/**
+	 * Creates a {@link CommandSlotHorizontalArrangement} containing a label
+	 * which contains the given text, with the given color and shows the given
+	 * hover text, and all the child slots in describing
+	 * 
+	 * @param text
+	 * @param color
+	 * @param hoverText
+	 * @param describing
+	 * @return
+	 */
+	public static IGuiCommandSlot createLabel(String text, int color, String hoverText, IGuiCommandSlot... describing) {
 		IGuiCommandSlot[] slots = new IGuiCommandSlot[describing.length + 1];
-		slots[0] = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, text, color);
+		slots[0] = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, text, color, hoverText);
 		System.arraycopy(describing, 0, slots, 1, describing.length);
 		return new CommandSlotHorizontalArrangement(slots);
 	}

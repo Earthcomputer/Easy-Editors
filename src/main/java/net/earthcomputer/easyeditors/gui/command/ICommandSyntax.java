@@ -116,7 +116,7 @@ public abstract class ICommandSyntax {
 			playerSelector = new CommandSlotPlayerSelector();
 
 			return new IGuiCommandSlot[] {
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"),
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"), "The player to give to",
 							new CommandSlotRectangle(playerSelector, Colors.playerSelectorBox.color)),
 					CommandSlotLabel
 							.createLabel(I18n.format("gui.commandEditor.give.item"),
