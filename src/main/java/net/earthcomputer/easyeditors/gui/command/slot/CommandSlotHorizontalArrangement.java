@@ -22,16 +22,20 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 	 * An array of the child command slots. After modifying this array, all
 	 * children in this array must have this command slot as one of their size
 	 * change listeners (using
-	 * {@link IGuiCommandSlot#addSizeChangeListener(ISizeChangeListener)}. Also,
-	 * after modifying this array, {@link #recalcSize()} must be called
+	 * {@link IGuiCommandSlot#addSizeChangeListener(ISizeChangeListener)}, and
+	 * the children's parents must be modified using
+	 * {@link IGuiCommandSlot#setParent(IGuiCommandSlot)}. Also, after modifying
+	 * this array, {@link #recalcSize()} must be called
 	 */
 	protected IGuiCommandSlot[] children;
 
 	public CommandSlotHorizontalArrangement(IGuiCommandSlot... children) {
 		super(calcWidth(children), calcHeight(children));
 		this.children = children;
-		for (int i = 0; i < children.length; i++)
+		for (int i = 0; i < children.length; i++) {
 			children[i].addSizeChangeListener(this);
+			children[i].setParent(this);
+		}
 	}
 
 	private static int calcWidth(IGuiCommandSlot[] children) {
@@ -101,6 +105,8 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 			child.draw(x + width, y + getHeight() / 2 - child.getHeight() / 2, mouseX, mouseY, partialTicks);
 			width += child.getWidth() + 2;
 		}
+
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

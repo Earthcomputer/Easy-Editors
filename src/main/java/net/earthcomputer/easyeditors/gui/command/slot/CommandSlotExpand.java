@@ -36,6 +36,7 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 		super(32, 16);
 		this.child = child;
 		child.addSizeChangeListener(this);
+		child.setParent(this);
 	}
 
 	/**
@@ -88,6 +89,8 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 
 		if (isExpanded)
 			child.draw(x, y + 18, mouseX, mouseY, partialTicks);
+		
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

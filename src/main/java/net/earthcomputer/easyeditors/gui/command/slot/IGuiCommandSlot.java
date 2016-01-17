@@ -6,7 +6,8 @@ import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 
 /**
- * An element of a command syntax
+ * An element of a command syntax. Example implementations of most of these
+ * methods can be found in {@link GuiCommandSlotImpl}
  * 
  * @author Earthcomputer
  *
@@ -118,5 +119,27 @@ public interface IGuiCommandSlot {
 	 * @param timeSinceLastClick
 	 */
 	void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick);
+
+	/**
+	 * 
+	 * @return The parent of this command slot
+	 */
+	IGuiCommandSlot getParent();
+
+	/**
+	 * Sets the parent of this command slot
+	 * 
+	 * @param parent
+	 */
+	void setParent(IGuiCommandSlot parent);
+
+	/**
+	 * Draws a tooltip on top of everything else
+	 * 
+	 * @param x
+	 * @param y
+	 * @param lines
+	 */
+	void drawTooltip(int x, int y, List<String> lines);
 
 }

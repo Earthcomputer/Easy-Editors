@@ -187,6 +187,19 @@ public class GeneralUtils {
 	}
 
 	/**
+	 * Draws a tooltip, automatically splitting the string so it fits in the
+	 * specified width
+	 * 
+	 * @param x
+	 * @param y
+	 * @param text
+	 * @param maxWidth
+	 */
+	public static void drawTooltip(int x, int y, String text, int maxWidth) {
+		drawTooltip(x, y, Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(text, maxWidth));
+	}
+
+	/**
 	 * A static alternative to
 	 * {@link net.minecraft.client.gui.GuiScreen#drawHoveringText(List, int, int)
 	 * GuiScreen.drawHoveringText(List, int, int)}
@@ -247,19 +260,19 @@ public class GeneralUtils {
 
 			mc.getRenderItem().zLevel = 300;
 			int col1 = 0xf0100010;
-			drawGradientRect(textX - 3, textY - 4, textX + maxLineWidth + 3, textY - 3, col1, col1, 300);
-			drawGradientRect(textX - 3, textY + h + 3, textX + maxLineWidth + 3, textY + h + 4, col1, col1, 300);
-			drawGradientRect(textX - 3, textY - 3, textX + maxLineWidth + 3, textY + h + 3, col1, col1, 300);
-			drawGradientRect(textX - 4, textY - 3, textX - 3, textY + h + 3, col1, col1, 300);
-			drawGradientRect(textX + maxLineWidth + 3, textY - 3, textX + maxLineWidth + 4, textY + h + 3, col1, col1,
+			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY - 4, textY - 3, col1, col1, 300);
+			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY + h + 3, textY + h + 4, col1, col1, 300);
+			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY - 3, textY + h + 3, col1, col1, 300);
+			drawGradientRect(textX - 4, textX - 3, textY - 3, textY + h + 3, col1, col1, 300);
+			drawGradientRect(textX + maxLineWidth + 3, textX + maxLineWidth + 4, textY - 3, textY + h + 3, col1, col1,
 					300);
 			int col2 = 0x505000ff;
 			int col3 = (col2 & 0xfefefe) >> 1 | col2 & 0xff000000;
-			drawGradientRect(textX - 3, textY - 3 + 1, textX - 3 + 1, textY + h + 3 - 1, col2, col3, 300);
-			drawGradientRect(textX + maxLineWidth + 2, textY - 3 + 1, textX + maxLineWidth + 3, textY + h + 3 - 1, col2,
+			drawGradientRect(textX - 3, textX - 3 + 1, textY - 3 + 1, textY + h + 3 - 1, col2, col3, 300);
+			drawGradientRect(textX + maxLineWidth + 2, textX + maxLineWidth + 3, textY - 3 + 1, textY + h + 3 - 1, col2,
 					col3, 300);
-			drawGradientRect(textX - 3, textY - 3, textX + maxLineWidth + 3, textY - 3 + 1, col2, col2, 300);
-			drawGradientRect(textX - 3, textY + h + 2, textX + maxLineWidth + 3, textY + h + 3, col3, col3, 300);
+			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY - 3, textY - 3 + 1, col2, col2, 300);
+			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY + h + 2, textY + h + 3, col3, col3, 300);
 
 			for (int i = 0; i < lines.size(); i++) {
 				String line = lines.get(i);

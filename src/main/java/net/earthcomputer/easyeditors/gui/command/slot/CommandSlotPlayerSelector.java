@@ -63,8 +63,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 		};
 
-		for (IGuiCommandSlot child : children)
+		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
+			child.setParent(this);
+		}
 
 		recalcSize();
 	}

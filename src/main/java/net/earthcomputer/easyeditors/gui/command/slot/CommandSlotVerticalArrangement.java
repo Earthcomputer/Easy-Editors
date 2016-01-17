@@ -13,21 +13,25 @@ import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
  *
  */
 public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implements ISizeChangeListener {
-	
+
 	/**
 	 * An array of the child command slots. After modifying this array, all
 	 * children in this array must have this command slot as one of their size
 	 * change listeners (using
-	 * {@link IGuiCommandSlot#addSizeChangeListener(ISizeChangeListener)}. Also,
-	 * after modifying this array, {@link #recalcSize()} must be called
+	 * {@link IGuiCommandSlot#addSizeChangeListener(ISizeChangeListener)}, and
+	 * the children's parent must be modified by using
+	 * {@link IGuiCommandSlot#setParent(IGuiCommandSlot)}. Also, after modifying
+	 * this array, {@link #recalcSize()} must be called
 	 */
 	protected IGuiCommandSlot[] children;
 
 	public CommandSlotVerticalArrangement(IGuiCommandSlot... children) {
 		super(calcWidth(children), calcHeight(children));
 		this.children = children;
-		for (int i = 0; i < children.length; i++)
+		for (int i = 0; i < children.length; i++) {
 			children[i].addSizeChangeListener(this);
+			children[i].setParent(this);
+		}
 	}
 
 	private static int calcWidth(IGuiCommandSlot[] children) {
@@ -98,6 +102,8 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 			child.draw(x, y + height, mouseX, mouseY, partialTicks);
 			height += child.getHeight() + 2;
 		}
+
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

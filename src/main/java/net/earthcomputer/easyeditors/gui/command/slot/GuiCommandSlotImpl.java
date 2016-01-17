@@ -1,10 +1,13 @@
 package net.earthcomputer.easyeditors.gui.command.slot;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
 /**
@@ -18,7 +21,10 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	private int width;
 	private int height;
 
+	private IGuiCommandSlot parent;
 	private List<ISizeChangeListener> sizeChangeListeners = Lists.newArrayList();
+
+	private List<Tooltip> tooltips = Lists.newArrayList();
 
 	public GuiCommandSlotImpl(int width, int height) {
 		this.width = width;
@@ -79,5 +85,69 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 
 	@Override
 	public void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+	}
+
+	@Override
+	public IGuiCommandSlot getParent() {
+		return parent;
+	}
+
+	@Override
+	public void setParent(IGuiCommandSlot parent) {
+		this.parent = parent;
+	}
+
+	@Override
+	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		for (Tooltip tooltip : tooltips) {
+			GeneralUtils.drawTooltip(tooltip.x, tooltip.y, tooltip.lines);
+		}
+		tooltips.clear();
+	}
+
+	/**
+	 * A convenience method which draws a tooltip, splitting the text into lines
+	 * so that it fits into maxWidth
+	 * 
+	 * @param x
+	 * @param y
+	 * @param text
+	 * @param maxWidth
+	 */
+	public void drawTooltip(int x, int y, String text, int maxWidth) {
+		drawTooltip(x, y, Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(text, maxWidth));
+	}
+
+	/**
+	 * A convenience method which draws a tooltip with lines in an array instead
+	 * of a list
+	 * 
+	 * @param x
+	 * @param y
+	 * @param lines
+	 */
+	public void drawTooltip(int x, int y, String... lines) {
+		drawTooltip(x, y, Arrays.asList(lines));
+	}
+
+	@Override
+	public void drawTooltip(int x, int y, List<String> lines) {
+		if (parent == null) {
+			tooltips.add(new Tooltip(x, y, lines));
+		} else {
+			parent.drawTooltip(x, y, lines);
+		}
+	}
+
+	private static class Tooltip {
+		public Tooltip(int x, int y, List<String> lines) {
+			this.x = x;
+			this.y = y;
+			this.lines = lines;
+		}
+
+		public int x;
+		public int y;
+		public List<String> lines;
 	}
 }

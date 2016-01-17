@@ -47,8 +47,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		} else {
 			children = new IGuiCommandSlot[] { buildHeader(commandName) };
 		}
-		for (IGuiCommandSlot child : children)
+		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
+			child.setParent(this);
+		}
 		recalcSize();
 		return super.readFromArgs(args, index + 1) + 1;
 	}
@@ -115,8 +117,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 			children = new IGuiCommandSlot[syntaxChildren.length + 1];
 			children[0] = header;
 			System.arraycopy(syntaxChildren, 0, children, 1, syntaxChildren.length);
-			for (IGuiCommandSlot child : children)
+			for (IGuiCommandSlot child : children) {
 				child.addSizeChangeListener(this);
+				child.setParent(this);
+			}
 			recalcSize();
 		}
 	}

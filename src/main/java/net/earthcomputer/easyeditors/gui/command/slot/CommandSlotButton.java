@@ -88,6 +88,8 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 			newButton.packedFGColour = oldButton.packedFGColour;
 		}
 		wrappedButton.drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
+		
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

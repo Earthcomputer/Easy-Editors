@@ -75,6 +75,8 @@ public class CommandSlotItem extends GuiCommandSlotImpl implements IItemSelector
 		String str = getDisplayText();
 		fontRenderer.drawString(str, x + 18, top, str.equals(I18n.format("gui.commandEditor.noItem"))
 				? Colors.invalidItemName.color : Colors.itemName.color);
+		
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

@@ -124,6 +124,8 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 			onTextChanged();
 		}
 		wrappedTextField.drawTextBox();
+		
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	/**

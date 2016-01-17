@@ -69,6 +69,8 @@ public class CommandSlotLabel extends GuiCommandSlotImpl {
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
 		fontRenderer.drawString(text, x, y, color);
+		
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	/**

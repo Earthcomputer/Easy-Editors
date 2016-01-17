@@ -37,6 +37,7 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 		this.children = Lists.newArrayList(children);
 		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
+			child.setParent(this);
 		}
 		childTops = new int[children.length];
 		buttonTops = new int[children.length];
@@ -120,6 +121,8 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 			}
 			child.draw(x + 20, y + childTops[i], mouseX, mouseY, partialTicks);
 		}
+		
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	/**
