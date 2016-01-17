@@ -54,7 +54,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		recalcSize();
 		try {
 			return super.readFromArgs(args, index + 1) + 1;
-		} catch (Exception e) {
+		} catch (CommandSyntaxException e) {
 			IGuiCommandSlot[] syntaxChildren = commandSyntax.setupCommand();
 			for (IGuiCommandSlot child : syntaxChildren) {
 				child.addSizeChangeListener(this);
