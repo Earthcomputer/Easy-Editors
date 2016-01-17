@@ -59,13 +59,16 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 
 	@Override
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+		int amtRead;
 		if (index >= args.length) {
 			isExpanded = false;
-			return 0;
+			amtRead = 0;
 		} else {
 			isExpanded = true;
-			return child.readFromArgs(args, index);
+			amtRead = child.readFromArgs(args, index);
 		}
+		recalcSize();
+		return amtRead;
 	}
 
 	@Override
