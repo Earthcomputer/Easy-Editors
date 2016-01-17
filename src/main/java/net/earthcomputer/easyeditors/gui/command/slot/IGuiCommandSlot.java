@@ -89,8 +89,11 @@ public interface IGuiCommandSlot {
 	 * 
 	 * @param typedChar
 	 * @param keyCode
+	 * 
+	 * @return false if the parent command slot should be able to react to the
+	 *         key type, true if it should not
 	 */
-	void onKeyTyped(char typedChar, int keyCode);
+	boolean onKeyTyped(char typedChar, int keyCode);
 
 	/**
 	 * Called when a mouse button is pressed

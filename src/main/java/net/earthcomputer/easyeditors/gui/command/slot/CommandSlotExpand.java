@@ -97,9 +97,11 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 	}
 
 	@Override
-	public void onKeyTyped(char typedChar, int keyCode) {
+	public boolean onKeyTyped(char typedChar, int keyCode) {
 		if (isExpanded)
-			child.onKeyTyped(typedChar, keyCode);
+			return child.onKeyTyped(typedChar, keyCode);
+		else
+			return false;
 	}
 
 	@Override

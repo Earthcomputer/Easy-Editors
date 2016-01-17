@@ -158,8 +158,8 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	}
 
 	@Override
-	public void onKeyTyped(char typedChar, int keyCode) {
-		wrappedTextField.textboxKeyTyped(typedChar, keyCode);
+	public boolean onKeyTyped(char typedChar, int keyCode) {
+		return wrappedTextField.textboxKeyTyped(typedChar, keyCode);
 	}
 
 	@Override

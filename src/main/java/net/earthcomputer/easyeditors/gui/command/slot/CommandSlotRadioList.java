@@ -135,9 +135,11 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 	protected abstract int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException;
 
 	@Override
-	public void onKeyTyped(char typedChar, int keyCode) {
+	public boolean onKeyTyped(char typedChar, int keyCode) {
 		if (!children.isEmpty())
-			children.get(selectedIndex).onKeyTyped(typedChar, keyCode);
+			return children.get(selectedIndex).onKeyTyped(typedChar, keyCode);
+		else
+			return false;
 	}
 
 	@Override

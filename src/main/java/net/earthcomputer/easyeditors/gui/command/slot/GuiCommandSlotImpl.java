@@ -72,7 +72,8 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	}
 
 	@Override
-	public void onKeyTyped(char typedChar, int keyCode) {
+	public boolean onKeyTyped(char typedChar, int keyCode) {
+		return false;
 	}
 
 	@Override

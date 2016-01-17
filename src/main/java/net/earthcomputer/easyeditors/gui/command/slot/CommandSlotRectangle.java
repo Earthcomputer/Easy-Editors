@@ -50,8 +50,8 @@ public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeCha
 	}
 
 	@Override
-	public void onKeyTyped(char typedChar, int keyCode) {
-		child.onKeyTyped(typedChar, keyCode);
+	public boolean onKeyTyped(char typedChar, int keyCode) {
+		return child.onKeyTyped(typedChar, keyCode);
 	}
 
 	@Override

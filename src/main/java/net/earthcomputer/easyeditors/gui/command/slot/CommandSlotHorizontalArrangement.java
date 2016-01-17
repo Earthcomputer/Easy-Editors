@@ -120,10 +120,13 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 	}
 
 	@Override
-	public void onKeyTyped(char typedChar, int keyCode) {
+	public boolean onKeyTyped(char typedChar, int keyCode) {
+		boolean r = false;
 		for (IGuiCommandSlot child : children) {
-			child.onKeyTyped(typedChar, keyCode);
+			if (child.onKeyTyped(typedChar, keyCode))
+				r = true;
 		}
+		return r;
 	}
 
 	@Override

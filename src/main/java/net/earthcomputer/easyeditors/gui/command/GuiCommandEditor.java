@@ -67,7 +67,8 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 
 	@Override
 	public void keyTyped(char typedChar, int keyCode) throws IOException {
-		commandSlotRectangle.onKeyTyped(typedChar, keyCode);
+		if (commandSlotRectangle.onKeyTyped(typedChar, keyCode))
+			return;
 		if (keyCode == Keyboard.KEY_ESCAPE) {
 			actionPerformed(cancelButton);
 		} else {
