@@ -33,7 +33,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	}
 
 	@Override
-	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+	public int readFromArgs(String[] args, int index) {
 		commandName = args.length <= index ? null : args[index];
 		IGuiCommandSlot header = buildHeader(commandName);
 		String[] newArgs = new String[args.length - index - 1];
@@ -42,7 +42,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		if (commandSyntax != null) {
 			IGuiCommandSlot[] syntaxChildren = commandSyntax.setupCommand();
 			children = new IGuiCommandSlot[syntaxChildren.length + 1];
-			children[0] = buildHeader(commandName);
+			children[0] = header;
 			System.arraycopy(syntaxChildren, 0, children, 1, syntaxChildren.length);
 		} else {
 			children = new IGuiCommandSlot[] { buildHeader(commandName) };
@@ -52,7 +52,20 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 			child.setParent(this);
 		}
 		recalcSize();
-		return super.readFromArgs(args, index + 1) + 1;
+		try {
+			return super.readFromArgs(args, index + 1) + 1;
+		} catch (Exception e) {
+			IGuiCommandSlot[] syntaxChildren = commandSyntax.setupCommand();
+			for (IGuiCommandSlot child : syntaxChildren) {
+				child.addSizeChangeListener(this);
+				child.setParent(this);
+			}
+			children = new IGuiCommandSlot[syntaxChildren.length + 1];
+			children[0] = header;
+			System.arraycopy(syntaxChildren, 0, children, 1, syntaxChildren.length);
+			recalcSize();
+			return 1;
+		}
 	}
 
 	private IGuiCommandSlot buildHeader(String commandName) {
