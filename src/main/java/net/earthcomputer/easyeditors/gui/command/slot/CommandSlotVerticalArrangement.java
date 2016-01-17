@@ -45,10 +45,15 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 	}
 
 	private static int calcHeight(IGuiCommandSlot[] children) {
-		int height = children.length == 0 ? 0 : children.length * 2 - 2;
+		int height = 0;
 		for (int i = 0; i < children.length; i++) {
-			height += children[i].getHeight();
+			int h = children[i].getHeight();
+			if (h > 0) {
+				height += 2 + h;
+			}
 		}
+		if (height > 0)
+			height -= 2;
 		return height;
 	}
 
@@ -65,9 +70,15 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 		}
 		setWidth(size);
 
-		size = children.length == 0 ? 0 : children.length * 2 - 2;
-		for (i = 0; i < children.length; i++)
-			size += children[i].getHeight();
+		size = 0;
+		for (i = 0; i < children.length; i++) {
+			int h = children[i].getHeight();
+			if (h > 0) {
+				size += 2 + children[i].getHeight();
+			}
+		}
+		if (size > 0)
+			size -= 2;
 		setHeight(size);
 	}
 
@@ -99,8 +110,10 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		int height = 0;
 		for (IGuiCommandSlot child : children) {
-			child.draw(x, y + height, mouseX, mouseY, partialTicks);
-			height += child.getHeight() + 2;
+			if (child.getHeight() > 0) {
+				child.draw(x, y + height, mouseX, mouseY, partialTicks);
+				height += child.getHeight() + 2;
+			}
 		}
 
 		super.draw(x, y, mouseX, mouseY, partialTicks);

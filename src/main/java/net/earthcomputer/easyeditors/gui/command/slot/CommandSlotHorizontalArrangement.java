@@ -39,9 +39,15 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 	}
 
 	private static int calcWidth(IGuiCommandSlot[] children) {
-		int width = children.length == 0 ? 0 : children.length * 2 - 2;
-		for (int i = 0; i < children.length; i++)
-			width += children[i].getWidth();
+		int width = 0;
+		for (int i = 0; i < children.length; i++) {
+			int w = children[i].getWidth();
+			if (w > 0) {
+				width += 2 + w;
+			}
+		}
+		if (width > 0)
+			width -= 2;
 		return width;
 	}
 
@@ -59,10 +65,16 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 	 * Recalculates the overall size of this command slot
 	 */
 	protected void recalcSize() {
-		int size = children.length == 0 ? 0 : children.length * 2 - 2;
+		int size = 0;
 		int i;
-		for (i = 0; i < children.length; i++)
-			size += children[i].getWidth();
+		for (i = 0; i < children.length; i++) {
+			int w = children[i].getWidth();
+			if (w > 0) {
+				size += 2 + w;
+			}
+		}
+		if (size > 0)
+			size -= 2;
 		setWidth(size);
 
 		size = 0;
@@ -102,8 +114,10 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		int width = 0;
 		for (IGuiCommandSlot child : children) {
-			child.draw(x + width, y + getHeight() / 2 - child.getHeight() / 2, mouseX, mouseY, partialTicks);
-			width += child.getWidth() + 2;
+			if (child.getWidth() > 0) {
+				child.draw(x + width, y + getHeight() / 2 - child.getHeight() / 2, mouseX, mouseY, partialTicks);
+				width += child.getWidth() + 2;
+			}
 		}
 
 		super.draw(x, y, mouseX, mouseY, partialTicks);
