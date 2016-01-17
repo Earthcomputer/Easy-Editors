@@ -156,10 +156,10 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 	}
 
 	@Override
-	public void mouseClickedVirtual(int virtualMouseX, int virtualMouseY, int mouseButton) {
+	public void mouseClickedVirtual(int mouseX, int mouseY, int mouseButton) {
 		if (mouseButton == 0) {
-			if (virtualMouseX >= 7 && virtualMouseX < getShownWidth() - 7) {
-				int clickedSlot = virtualMouseY / 18;
+			if (mouseX >= 7 && mouseX < getShownWidth() - 7) {
+				int clickedSlot = (mouseY + getScrollY() - getHeaderHeight()) / 18;
 				if (clickedSlot >= shownItems.size())
 					clickedSlot = -1;
 				if (clickedSlot >= 0) {

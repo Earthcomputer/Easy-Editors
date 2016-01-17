@@ -9,7 +9,7 @@ import com.google.common.collect.Maps;
 import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotExpand;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotItem;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotItemStack;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
@@ -106,36 +106,29 @@ public abstract class ICommandSyntax {
 	public static class SyntaxGive extends ICommandSyntax {
 
 		private CommandSlotPlayerSelector playerSelector;
-		private CommandSlotItem item;
+		private CommandSlotItemStack item;
 		private CommandSlotExpand expand1;
 		private CommandSlotIntTextField damage;
 
 		@Override
 		public IGuiCommandSlot[] setupCommand() {
-			item = new CommandSlotItem();
+			item = new CommandSlotItemStack(1, CommandSlotItemStack.COMPONENT_ITEM,
+					CommandSlotItemStack.COMPONENT_STACK_SIZE, CommandSlotItemStack.COMPONENT_DAMAGE,
+					CommandSlotItemStack.COMPONENT_NBT);
 			playerSelector = new CommandSlotPlayerSelector();
 
 			return new IGuiCommandSlot[] {
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"),
 							I18n.format("gui.commandEditor.give.player.tooltip"),
 							new CommandSlotRectangle(playerSelector, Colors.playerSelectorBox.color)),
-					CommandSlotLabel.createLabel(
-							I18n.format(
-									"gui.commandEditor.give.item"),
-							I18n.format(
-									"gui.commandEditor.give.item.tooltip"),
-							new CommandSlotRectangle(
-									new CommandSlotVerticalArrangement(item.withButton(),
-											expand1 = new CommandSlotExpand(CommandSlotLabel.createLabel(
-													I18n.format("gui.commandEditor.item.damage"),
-													Colors.itemLabel.color,
-													damage = new CommandSlotIntTextField(50, 50, 0, Short.MAX_VALUE)))),
-											Colors.itemBox.color)) };
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.item"),
+							I18n.format("gui.commandEditor.give.item.tooltip"),
+							new CommandSlotRectangle(item, Colors.itemBox.color)) };
 		}
 
 		@Override
 		public boolean isValid() {
-			return playerSelector.isValid() && item.getItem() != null;
+			return playerSelector.isValid() && item.isValid();
 		}
 
 	}
