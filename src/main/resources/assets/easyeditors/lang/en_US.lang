@@ -5,7 +5,9 @@ gui.commandBlock.noOutput=[No Output]
 
 gui.commandEditor.commandLabel=Command:
 gui.commandEditor.give.item=Item:
+gui.commandEditor.give.item.tooltip=The item to give to the player
 gui.commandEditor.give.player=Player:
+gui.commandEditor.give.player.tooltip=The player to give to
 gui.commandEditor.item.damage=Damage
 gui.commandEditor.noCommand=[No Command]
 gui.commandEditor.noItem=[No Item]

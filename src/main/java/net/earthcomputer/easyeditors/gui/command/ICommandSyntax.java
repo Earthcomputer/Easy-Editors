@@ -116,18 +116,21 @@ public abstract class ICommandSyntax {
 			playerSelector = new CommandSlotPlayerSelector();
 
 			return new IGuiCommandSlot[] {
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"), "The player to give to",
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"),
+							I18n.format("gui.commandEditor.give.player.tooltip"),
 							new CommandSlotRectangle(playerSelector, Colors.playerSelectorBox.color)),
-					CommandSlotLabel
-							.createLabel(I18n.format("gui.commandEditor.give.item"),
-									new CommandSlotRectangle(
-											new CommandSlotVerticalArrangement(item.withButton(),
-													expand1 = new CommandSlotExpand(CommandSlotLabel
-															.createLabel(I18n.format("gui.commandEditor.item.damage"),
-																	Colors.itemLabel.color,
-																	damage = new CommandSlotIntTextField(50, 50, 0,
-																			Short.MAX_VALUE)))),
-									Colors.itemBox.color)) };
+					CommandSlotLabel.createLabel(
+							I18n.format(
+									"gui.commandEditor.give.item"),
+							I18n.format(
+									"gui.commandEditor.give.item.tooltip"),
+							new CommandSlotRectangle(
+									new CommandSlotVerticalArrangement(item.withButton(),
+											expand1 = new CommandSlotExpand(CommandSlotLabel.createLabel(
+													I18n.format("gui.commandEditor.item.damage"),
+													Colors.itemLabel.color,
+													damage = new CommandSlotIntTextField(50, 50, 0, Short.MAX_VALUE)))),
+											Colors.itemBox.color)) };
 		}
 
 		@Override
