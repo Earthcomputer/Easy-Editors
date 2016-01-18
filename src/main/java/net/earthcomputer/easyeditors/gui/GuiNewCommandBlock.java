@@ -8,7 +8,6 @@ import org.lwjgl.input.Keyboard;
 import io.netty.buffer.Unpooled;
 import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraft.client.gui.GuiScreen;
