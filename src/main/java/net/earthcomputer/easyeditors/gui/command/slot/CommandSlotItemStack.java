@@ -185,7 +185,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			stackSizeField.setText(String.valueOf(item.stackSize));
 		if (this.damageSlot != null) {
 			damageHandlers = ItemDamageHandler.getHandlers(item.getItem());
-			this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers));
+			this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item.getItem()));
 			this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
 		} else {
 			this.damage = 0;

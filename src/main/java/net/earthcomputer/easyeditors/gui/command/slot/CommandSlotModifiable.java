@@ -20,7 +20,8 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 
 	public void setChild(IGuiCommandSlot child) {
 		if (child != this.child) {
-			this.child.removeSizeChangeListener(this);
+			if (this.child != null)
+				this.child.removeSizeChangeListener(this);
 			this.child = child;
 			if (child == null) {
 				setWidth(0);

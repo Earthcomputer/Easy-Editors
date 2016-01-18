@@ -7,8 +7,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 
 /**
@@ -26,7 +31,7 @@ public abstract class ItemDamageHandler {
 	 * 
 	 * @return
 	 */
-	public abstract IGuiCommandSlot[] setupCommandSlot();
+	public abstract IGuiCommandSlot[] setupCommandSlot(Item item);
 
 	/**
 	 * Sets up the pre-existing command slots so that they represent the given
@@ -87,10 +92,10 @@ public abstract class ItemDamageHandler {
 	 * @param handlers
 	 * @return
 	 */
-	public static IGuiCommandSlot setupCommandSlot(List<ItemDamageHandler> handlers) {
+	public static IGuiCommandSlot setupCommandSlot(List<ItemDamageHandler> handlers, Item item) {
 		List<IGuiCommandSlot> slots = Lists.newArrayList();
 		for (ItemDamageHandler handler : handlers) {
-			for (IGuiCommandSlot slot : handler.setupCommandSlot()) {
+			for (IGuiCommandSlot slot : handler.setupCommandSlot(item)) {
 				slots.add(slot);
 			}
 		}
@@ -126,6 +131,43 @@ public abstract class ItemDamageHandler {
 			initialDamage = handler.getDamage(initialDamage);
 		}
 		return initialDamage;
+	}
+
+	static {
+		registerHandler(new Predicate<Item>() {
+			@Override
+			public boolean apply(Item input) {
+				return input.isDamageable();
+			}
+		}, ToolHandler.class);
+	}
+
+	public static class ToolHandler extends ItemDamageHandler {
+
+		private Item item;
+		private CommandSlotIntTextField durabilityField;
+
+		@Override
+		public IGuiCommandSlot[] setupCommandSlot(Item item) {
+			this.item = item;
+			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
+					I18n.format("gui.commandEditor.item.damage.tool.durability"), Colors.itemLabel.color,
+					durabilityField = new CommandSlotIntTextField(32, 32, 1, item.getMaxDamage() + 1),
+					new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "/ " + (item.getMaxDamage() + 1),
+							Colors.itemLabel.color)) };
+		}
+
+		@Override
+		public int setDamage(int damage) {
+			durabilityField.setText(String.valueOf(item.getMaxDamage() - damage + 1));
+			return 0;
+		}
+
+		@Override
+		public int getDamage(int initialDamage) {
+			return item.getMaxDamage() - durabilityField.getIntValue() + 1;
+		}
+
 	}
 
 }
