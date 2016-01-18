@@ -15,6 +15,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
 
 /**
  * A class for creating a user-friendly interface for manipulating item damage
@@ -74,7 +75,8 @@ public abstract class ItemDamageHandler {
 		List<ItemDamageHandler> handlers = Lists.newArrayList();
 		for (Map.Entry<Predicate<Item>, Class<? extends ItemDamageHandler>> entry : ItemDamageHandler.handlers
 				.entrySet()) {
-			if (entry.getKey().apply(item)) {
+			if (entry.getKey().apply(item)
+					&& !MinecraftForge.EVENT_BUS.post(new ItemDamageHandlerEvent(item, entry.getValue()))) {
 				try {
 					handlers.add(entry.getValue().getConstructor().newInstance());
 				} catch (Exception e) {
