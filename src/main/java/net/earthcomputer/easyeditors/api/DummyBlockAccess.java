@@ -12,9 +12,15 @@ import net.minecraft.world.biome.BiomeGenBase;
 class DummyBlockAccess implements IBlockAccess {
 
 	private IBlockState blockAtCenter;
+	private BlockPos blockPos;
 
 	public DummyBlockAccess(IBlockState blockAtCenter) {
+		this(blockAtCenter, BlockPos.ORIGIN);
+	}
+
+	public DummyBlockAccess(IBlockState blockAtCenter, BlockPos blockPos) {
 		this.blockAtCenter = blockAtCenter;
+		this.blockPos = blockPos;
 	}
 
 	@Override
@@ -29,7 +35,7 @@ class DummyBlockAccess implements IBlockAccess {
 
 	@Override
 	public IBlockState getBlockState(BlockPos pos) {
-		return pos == BlockPos.ORIGIN ? blockAtCenter : Blocks.air.getDefaultState();
+		return pos.equals(blockPos) ? blockAtCenter : Blocks.air.getDefaultState();
 	}
 
 	@Override

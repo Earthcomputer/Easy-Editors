@@ -1,15 +1,19 @@
 package net.earthcomputer.easyeditors.api;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -25,12 +29,40 @@ public class AnimatedBlockRenderer {
 	}
 
 	public void render(int x, int y) {
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		Minecraft mc = Minecraft.getMinecraft();
+		mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		Block block = this.block.getBlock();
-		IBlockAccess world = new DummyBlockAccess(this.block);
+		IBlockAccess world;
+
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
 		if (block.getRenderType() != -1) {
-			if (block.getRenderType() == 3) {
+			switch (block.getRenderType()) {
+			case 1:
+				String fluid = block.getMaterial() == Material.lava ? "lava" : "water";
+				String state;
+				if (block == BlockLiquid.getStaticBlock(block.getMaterial()))
+					state = "still";
+				else if (block == BlockLiquid.getFlowingBlock(block.getMaterial()))
+					state = "flowing";
+				else {
+					System.err.println(
+							"Invalid block with render type 1: " + Block.blockRegistry.getNameForObject(block));
+					break;
+				}
+				TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks()
+						.getAtlasSprite(String.format("minecraft:blocks/%s_%s", fluid, state));
+
+				worldRenderer.startDrawingQuads();
+				worldRenderer.addVertexWithUV(x, y + 16, 50, sprite.getMinU(), sprite.getMaxV());
+				worldRenderer.addVertexWithUV(x + 16, y + 16, 50 , sprite.getMaxU(), sprite.getMaxV());
+				worldRenderer.addVertexWithUV(x + 16, y, 50, sprite.getMaxU(), sprite.getMinV());
+				worldRenderer.addVertexWithUV(x, y, 50, sprite.getMinU(), sprite.getMinV());
+				tessellator.draw();
+				break;
+			case 3:
+				world = new DummyBlockAccess(this.block);
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(x, y, 50);
 				GlStateManager.scale(9, 9, 9);
@@ -42,20 +74,19 @@ public class AnimatedBlockRenderer {
 				GlStateManager.rotate(xRotation, 0, 1, 0);
 				GlStateManager.rotate(yRotation, 1, 0, 0);
 				GlStateManager.disableLighting();
-				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-				worldrenderer.startDrawingQuads();
-				worldrenderer.setVertexFormat(DefaultVertexFormats.BLOCK);
-				worldrenderer.setTranslation(-0.5, -0.5, -0.5);
-				BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+				worldRenderer.startDrawingQuads();
+				worldRenderer.setVertexFormat(DefaultVertexFormats.BLOCK);
+				worldRenderer.setTranslation(-0.5, -0.5, -0.5);
+				BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
 				IBakedModel ibakedmodel = blockrendererdispatcher.getModelFromBlockState(this.block, world,
 						(BlockPos) null);
 				blockrendererdispatcher.getBlockModelRenderer().renderModel(world, ibakedmodel, this.block,
-						BlockPos.ORIGIN, worldrenderer, false);
-				worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
+						BlockPos.ORIGIN, worldRenderer, false);
+				worldRenderer.setTranslation(0.0D, 0.0D, 0.0D);
 				tessellator.draw();
 				GlStateManager.enableLighting();
 				GlStateManager.popMatrix();
+				break;
 			}
 		}
 	}
