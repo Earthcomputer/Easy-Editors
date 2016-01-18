@@ -5,23 +5,15 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.IBlockAccess;
 
 /**
  * General utilities used by Easy Editors. These will work even if Easy Editors
@@ -298,36 +290,6 @@ public class GeneralUtils {
 			GlStateManager.enableDepth();
 			RenderHelper.enableStandardItemLighting();
 			GlStateManager.enableRescaleNormal();
-		}
-	}
-
-	public static void renderBlock(int x, int y, IBlockState blockState) {
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-		Block block = blockState.getBlock();
-		IBlockAccess world = new DummyBlockAccess(blockState);
-
-		if (block.getRenderType() != -1) {
-			if (block.getRenderType() == 3) {
-				GlStateManager.pushMatrix();
-				GlStateManager.translate(x, y + 1, 50);
-				GlStateManager.scale(11, 11, 11);
-				GlStateManager.rotate(30, 30, 45, 0);
-				GlStateManager.disableLighting();
-				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-				worldrenderer.startDrawingQuads();
-				worldrenderer.setVertexFormat(DefaultVertexFormats.BLOCK);
-				worldrenderer.setTranslation(0, 0.3, 0);
-				BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-				IBakedModel ibakedmodel = blockrendererdispatcher.getModelFromBlockState(blockState, world,
-						(BlockPos) null);
-				blockrendererdispatcher.getBlockModelRenderer().renderModel(world, ibakedmodel, blockState, BlockPos.ORIGIN,
-						worldrenderer, false);
-				worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
-				tessellator.draw();
-				GlStateManager.enableLighting();
-				GlStateManager.popMatrix();
-			}
 		}
 	}
 
