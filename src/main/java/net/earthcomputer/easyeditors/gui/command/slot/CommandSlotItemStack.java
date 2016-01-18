@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
  * A command slot representing an item stack
@@ -227,6 +228,8 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	private class CompItem extends GuiCommandSlotImpl {
 
+		private HoverChecker hoverChecker;
+
 		public CompItem() {
 			super(18 + Minecraft.getMinecraft().fontRendererObj.getStringWidth(I18n.format("gui.commandEditor.noItem")),
 					Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT > 16
@@ -238,6 +241,8 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 			RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
 
+			ItemStack stack = null;
+
 			if (item != null) {
 				RenderHelper.disableStandardItemLighting();
 				RenderHelper.enableGUIStandardItemLighting();
@@ -245,7 +250,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				GlStateManager.translate(0, 0, 32);
 				zLevel = 200;
 				itemRender.zLevel = 200;
-				ItemStack stack = new ItemStack(item, 1, getDamage());
+				stack = new ItemStack(item, 1, getDamage());
 				stack.setTagCompound(getNbt());
 				itemRender.renderItemAndEffectIntoGUI(stack, x, top);
 				zLevel = 0;
@@ -261,6 +266,18 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			fontRenderer.drawString(str, x + 18, top,
 					item == null ? Colors.invalidItemName.color : Colors.itemName.color);
 			setWidth(18 + fontRenderer.getStringWidth(str));
+
+			if (item != null) {
+				if (hoverChecker == null)
+					hoverChecker = new HoverChecker(y, y + getHeight(), x, x + getWidth(), 1000);
+				else
+					hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
+
+				if (hoverChecker.checkHover(mouseX, mouseY)) {
+					drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().thePlayer,
+							Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
+				}
+			}
 
 			super.draw(x, y, mouseX, mouseY, partialTicks);
 		}

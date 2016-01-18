@@ -15,7 +15,9 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -28,6 +30,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
  * A GUI which displays a list of all the items in the game for the user to
@@ -64,7 +67,10 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 	private String searchLabel;
 	private GuiTextField searchText;
 
+	private ItemStack hoveredItem;
 	private ItemStack selectedItem;
+
+	private HoverChecker hoverChecker;
 
 	/**
 	 * Creates a GuiItemSelector with the given callback, with allowSubItems set
@@ -179,9 +185,43 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 				30, 0xffffff);
 		searchText.drawTextBox();
 	}
+	
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		
+		if (mouseY < getHeaderHeight() || mouseY >= height - getFooterHeight()) {
+			hoveredItem = null;
+		} else {
+			int hoveredSlot = (mouseY + getScrollY() - getHeaderHeight()) / 18;
+			if (hoveredSlot >= shownItems.size())
+				hoveredSlot = -1;
+			if (hoveredSlot < 0) {
+				hoveredItem = null;
+			} else {
+				ItemStack stack = shownItems.get(hoveredSlot);
+				int top = hoveredSlot * 18 + getHeaderHeight() - getScrollY();
+				int bottom = top + 18;
+				if (hoverChecker == null) {
+					hoverChecker = new HoverChecker(top, bottom, 7, getShownWidth() - 7, 1000);
+				} else {
+					hoverChecker.updateBounds(top, bottom, 7, getShownWidth() - 7);
+				}
+				if (stack != hoveredItem) {
+					hoveredItem = stack;
+					hoverChecker.resetHoverTimer();
+				}
+
+				if (hoverChecker.checkHover(mouseX, mouseY)) {
+					GeneralUtils.drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().thePlayer,
+							Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
+				}
+			}
+		}
+	}
 
 	@Override
-	public void drawVirtualScreen(int virtualMouseX, int virtualMouseY, float partialTicks, int scrollX, int scrollY,
+	public void drawVirtualScreen(int mouseX, int mouseY, float partialTicks, int scrollX, int scrollY,
 			int headerHeight) {
 		int top = scrollY / 18;
 		int bottom = MathHelper.ceiling_float_int((float) (scrollY + getShownHeight()) / 18);
