@@ -7,13 +7,16 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -56,10 +59,24 @@ public class AnimatedBlockRenderer {
 
 				worldRenderer.startDrawingQuads();
 				worldRenderer.addVertexWithUV(x, y + 16, 50, sprite.getMinU(), sprite.getMaxV());
-				worldRenderer.addVertexWithUV(x + 16, y + 16, 50 , sprite.getMaxU(), sprite.getMaxV());
+				worldRenderer.addVertexWithUV(x + 16, y + 16, 50, sprite.getMaxU(), sprite.getMaxV());
 				worldRenderer.addVertexWithUV(x + 16, y, 50, sprite.getMaxU(), sprite.getMinV());
 				worldRenderer.addVertexWithUV(x, y, 50, sprite.getMinU(), sprite.getMinV());
 				tessellator.draw();
+				break;
+			case 2:
+				Item item = Item.getItemFromBlock(block);
+				if (item != null) {
+					ItemStack stack = new ItemStack(item);
+					RenderHelper.disableStandardItemLighting();
+					RenderHelper.enableGUIStandardItemLighting();
+					RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+					renderItem.zLevel = 50;
+					renderItem.renderItemAndEffectIntoGUI(stack, x, y);
+					renderItem.zLevel = 0;
+					RenderHelper.enableStandardItemLighting();
+					GlStateManager.color(0, 0, 0, 0);
+				}
 				break;
 			case 3:
 				world = new DummyBlockAccess(this.block);
