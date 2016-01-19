@@ -2,13 +2,16 @@ package net.earthcomputer.easyeditors.api;
 
 import java.lang.reflect.Method;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
+import net.earthcomputer.easyeditors.EasyEditors;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IChatComponent;
 
 /**
  * Static utilities involving the Easy Editors API.
@@ -35,6 +38,8 @@ public class EasyEditorsApi {
 
 	private static Method md_ICommandSyntax_registerCommandSyntax;
 	private static Method md_NBTTagHandler_registerHandler;
+
+	public static final Logger logger = LogManager.getLogger(EasyEditors.NAME);
 
 	static {
 		try {
@@ -72,7 +77,7 @@ public class EasyEditorsApi {
 		try {
 			md_ICommandSyntax_registerCommandSyntax.invoke(null, commandName, Class.forName(className));
 		} catch (Exception e) {
-			e.printStackTrace();
+			GeneralUtils.logStackTrace(logger, e);
 		}
 	}
 
@@ -160,7 +165,7 @@ public class EasyEditorsApi {
 		try {
 			md_NBTTagHandler_registerHandler.invoke(null, handlerType, predicate, Class.forName(handlerClassName));
 		} catch (Exception e) {
-			e.printStackTrace();
+			GeneralUtils.logStackTrace(logger, e);
 		}
 	}
 

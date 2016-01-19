@@ -9,6 +9,8 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.earthcomputer.easyeditors.api.EasyEditorsApi;
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.entity.Entity;
@@ -159,7 +161,7 @@ public abstract class NBTTagHandler {
 				try {
 					handlers.add(handler.getConstructor().newInstance());
 				} catch (Exception e) {
-					e.printStackTrace();
+					GeneralUtils.logStackTrace(EasyEditorsApi.logger, e);
 				}
 			}
 		} else {
@@ -169,7 +171,7 @@ public abstract class NBTTagHandler {
 					try {
 						handlers.add(entry.getValue().getConstructor().newInstance());
 					} catch (Exception e) {
-						e.printStackTrace();
+						GeneralUtils.logStackTrace(EasyEditorsApi.logger, e);
 					}
 				}
 			}

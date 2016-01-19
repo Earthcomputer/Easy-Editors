@@ -1,8 +1,11 @@
 package net.earthcomputer.easyeditors.api;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -290,6 +293,14 @@ public class GeneralUtils {
 			GlStateManager.enableDepth();
 			RenderHelper.enableStandardItemLighting();
 			GlStateManager.enableRescaleNormal();
+		}
+	}
+
+	public static void logStackTrace(Logger logger, Throwable throwable) {
+		StringWriter sw = new StringWriter();
+		throwable.printStackTrace(new PrintWriter(sw));
+		for (String line : sw.toString().split("\n")) {
+			logger.error(line);
 		}
 	}
 

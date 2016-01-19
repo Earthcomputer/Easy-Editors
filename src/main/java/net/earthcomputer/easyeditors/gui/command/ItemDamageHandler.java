@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.EasyEditorsApi;
+import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
@@ -80,7 +82,7 @@ public abstract class ItemDamageHandler {
 				try {
 					handlers.add(entry.getValue().getConstructor().newInstance());
 				} catch (Exception e) {
-					e.printStackTrace();
+					GeneralUtils.logStackTrace(EasyEditorsApi.logger, e);
 				}
 			}
 		}

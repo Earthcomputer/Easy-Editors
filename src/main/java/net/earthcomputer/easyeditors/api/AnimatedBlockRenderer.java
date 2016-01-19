@@ -50,8 +50,8 @@ public class AnimatedBlockRenderer {
 				else if (block == BlockLiquid.getFlowingBlock(block.getMaterial()))
 					state = "flowing";
 				else {
-					System.err.println(
-							"Invalid block with render type 1: " + Block.blockRegistry.getNameForObject(block));
+					EasyEditorsApi.logger
+							.error("Invalid block with render type 1: " + Block.blockRegistry.getNameForObject(block));
 					break;
 				}
 				TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks()
