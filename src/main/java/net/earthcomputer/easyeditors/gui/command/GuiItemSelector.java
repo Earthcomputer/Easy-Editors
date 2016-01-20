@@ -1,6 +1,7 @@
 package net.earthcomputer.easyeditors.gui.command;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -42,7 +43,7 @@ import net.minecraftforge.fml.client.config.HoverChecker;
 public class GuiItemSelector extends GuiTwoWayScroll {
 
 	private static Map<String, ItemStack> allItems = Maps.newLinkedHashMap();
-	private static LinkedHashMultimap<Object, Object> allItemsAndSubitems = LinkedHashMultimap.create();
+	private static LinkedHashMultimap<String, ItemStack> allItemsAndSubitems = LinkedHashMultimap.create();
 	private static boolean hasInitializedItems = false;
 
 	private List<ItemStack> shownItems = Lists.newArrayList();
@@ -274,9 +275,9 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 		filterText = filterText.toLowerCase();
 		shownItems.clear();
 		if (allowSubItems) {
-			for (Map.Entry entry : allItemsAndSubitems.asMap().entrySet()) {
-				String internalName = (String) entry.getKey();
-				for (ItemStack stack : (Set<ItemStack>) entry.getValue()) {
+			for (Map.Entry<String, Collection<ItemStack>> entry : allItemsAndSubitems.asMap().entrySet()) {
+				String internalName = entry.getKey();
+				for (ItemStack stack : entry.getValue()) {
 					if (doesFilterTextMatch(filterText, stack, internalName)) {
 						shownItems.add(stack);
 					}
