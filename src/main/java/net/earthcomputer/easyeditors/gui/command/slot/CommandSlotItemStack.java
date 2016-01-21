@@ -123,7 +123,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				String[] nbtArgs = new String[args.length - index - i];
 				System.arraycopy(args, index + i, nbtArgs, 0, nbtArgs.length);
 				try {
-					nbt = JsonToNBT.func_180713_a(joiner.join(nbtArgs));
+					nbt = JsonToNBT.getTagFromJson(joiner.join(nbtArgs));
 				} catch (NBTException e) {
 					throw new CommandSyntaxException();
 				}

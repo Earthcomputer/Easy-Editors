@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -175,13 +176,19 @@ public class GeneralUtils {
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-		worldRenderer.startDrawingQuads();
-		worldRenderer.setColorRGBA_F(startRed, startGreen, startBlue, startAlpha);
-		worldRenderer.addVertex(right, top, zLevel);
-		worldRenderer.addVertex(left, top, zLevel);
-		worldRenderer.setColorRGBA_F(endRed, endGreen, endBlue, endAlpha);
-		worldRenderer.addVertex(left, bottom, zLevel);
-		worldRenderer.addVertex(right, bottom, zLevel);
+		// worldRenderer.startDrawingQuads();
+		// worldRenderer.setColorRGBA_F(startRed, startGreen, startBlue,
+		// startAlpha);
+		// worldRenderer.addVertex(right, top, zLevel);
+		// worldRenderer.addVertex(left, top, zLevel);
+		// worldRenderer.setColorRGBA_F(endRed, endGreen, endBlue, endAlpha);
+		// worldRenderer.addVertex(left, bottom, zLevel);
+		// worldRenderer.addVertex(right, bottom, zLevel);
+		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+		worldRenderer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+		worldRenderer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+		worldRenderer.pos(left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+		worldRenderer.pos(right, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
 		tessellator.draw();
 		GlStateManager.shadeModel(GL11.GL_FLAT);
 		GlStateManager.disableBlend();
@@ -227,7 +234,7 @@ public class GeneralUtils {
 	public static void drawTooltip(int x, int y, List<String> lines) {
 		Minecraft mc = Minecraft.getMinecraft();
 		FontRenderer font = mc.fontRendererObj;
-		ScaledResolution res = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+		ScaledResolution res = new ScaledResolution(mc);
 		int width = res.getScaledWidth();
 		int height = res.getScaledHeight();
 

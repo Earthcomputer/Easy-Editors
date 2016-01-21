@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.IModGuiFactory;
@@ -147,6 +149,13 @@ public class GuiFactory implements IModGuiFactory {
 				this.allowAlpha = configElement.getDefault().toString().length() == 8;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see net.minecraftforge.fml.client.config.GuiConfigEntries.
+			 * ListEntryBase#drawEntry(int, int, int, int, int, int, int,
+			 * boolean)
+			 */
 			@Override
 			public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY,
 					boolean isSelected) {
@@ -166,20 +175,38 @@ public class GuiFactory implements IModGuiFactory {
 				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 				if (allowAlpha && ((color & 0xff000000) >>> 24) != 255) {
 					mc.getTextureManager().bindTexture(GuiColorPicker.transparentBackground);
-					worldRenderer.startDrawingQuads();
-					worldRenderer.addVertexWithUV(rx, y + 17, 0, 0, 16f / 16);
-					worldRenderer.addVertexWithUV(rx + 32, y + 17, 0, 32f / 16, 16f / 16);
-					worldRenderer.addVertexWithUV(rx + 32, y + 1, 0, 32f / 16, 0);
-					worldRenderer.addVertexWithUV(rx, y + 1, 0, 0, 0);
+					// worldRenderer.startDrawingQuads();
+					// worldRenderer.addVertexWithUV(rx, y + 17, 0, 0, 16f /
+					// 16);
+					// worldRenderer.addVertexWithUV(rx + 32, y + 17, 0, 32f /
+					// 16, 16f / 16);
+					// worldRenderer.addVertexWithUV(rx + 32, y + 1, 0, 32f /
+					// 16, 0);
+					// worldRenderer.addVertexWithUV(rx, y + 1, 0, 0, 0);
+					worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+					worldRenderer.pos(rx, y + 17, 0).tex(0, 16f / 16).endVertex();
+					worldRenderer.pos(rx + 32, y + 17, 0).tex(32f / 16, 16f / 16).endVertex();
+					worldRenderer.pos(rx + 32, y + 1, 0).tex(32f / 16, 0).endVertex();
+					worldRenderer.pos(rx, y + 1, 0).tex(0, 0).endVertex();
 					tessellator.draw();
 				}
 				GlStateManager.disableTexture2D();
-				worldRenderer.startDrawingQuads();
-				worldRenderer.setColorRGBA_I(color & 0x00ffffff, allowAlpha ? ((color & 0xff000000) >>> 24) : 255);
-				worldRenderer.addVertexWithUV(rx, y + 17, 0, 0, 1);
-				worldRenderer.addVertexWithUV(rx + 32, y + 17, 0, 1, 1);
-				worldRenderer.addVertexWithUV(rx + 32, y + 1, 0, 1, 0);
-				worldRenderer.addVertexWithUV(rx, y + 1, 0, 0, 0);
+				// worldRenderer.startDrawingQuads();
+				// worldRenderer.setColorRGBA_I(color & 0x00ffffff, allowAlpha ?
+				// ((color & 0xff000000) >>> 24) : 255);
+				// worldRenderer.addVertexWithUV(rx, y + 17, 0, 0, 1);
+				// worldRenderer.addVertexWithUV(rx + 32, y + 17, 0, 1, 1);
+				// worldRenderer.addVertexWithUV(rx + 32, y + 1, 0, 1, 0);
+				// worldRenderer.addVertexWithUV(rx, y + 1, 0, 0, 0);
+				int red = (color & 0x00ff0000) >> 16;
+				int green = (color & 0x0000ff00) >> 8;
+				int blue = color & 0x000000ff;
+				int alpha = (color & 0xff000000) >>> 24;
+				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldRenderer.pos(rx, y + 17, 0).tex(0, 1).color(red, green, blue, alpha).endVertex();
+				worldRenderer.pos(rx + 32, y + 17, 0).tex(1, 1).color(red, green, blue, alpha).endVertex();
+				worldRenderer.pos(rx + 32, y + 1, 0).tex(1, 0).color(red, green, blue, alpha).endVertex();
+				worldRenderer.pos(rx, y + 1, 0).tex(0, 0).color(red, green, blue, alpha).endVertex();
 				tessellator.draw();
 				GlStateManager.enableTexture2D();
 

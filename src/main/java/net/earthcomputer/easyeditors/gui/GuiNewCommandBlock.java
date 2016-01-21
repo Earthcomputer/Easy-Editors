@@ -66,7 +66,7 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 		commandText = new GuiTextField(2, fontRendererObj, width / 2 - 150, 50, 196, 20);
 		commandText.setMaxStringLength(32767);
 		commandText.setFocused(true);
-		commandText.setText(hadFirstInit ? command : theCommandBlock.getCustomName());
+		commandText.setText(hadFirstInit ? command : theCommandBlock.getCommand());
 		trackedOutput = new GuiTextField(3, fontRendererObj, width / 2 - 150, 150, 196, 20);
 		trackedOutput.setMaxStringLength(32767);
 		trackedOutput.setEnabled(false);

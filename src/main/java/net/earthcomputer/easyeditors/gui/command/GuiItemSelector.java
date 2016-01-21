@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -26,6 +27,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -236,17 +238,30 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 				GlStateManager.disableTexture2D();
 				Tessellator tessellator = Tessellator.getInstance();
 				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-				worldRenderer.startDrawingQuads();
-				worldRenderer.setColorOpaque_I(0x808080);
-				worldRenderer.addVertexWithUV(7, y + 18, 0, 0, 1);
-				worldRenderer.addVertexWithUV(getShownWidth() - 7, y + 18, 0, 1, 1);
-				worldRenderer.addVertexWithUV(getShownWidth() - 7, y - 2, 0, 1, 0);
-				worldRenderer.addVertexWithUV(7, y - 2, 0, 0, 0);
-				worldRenderer.setColorOpaque_I(0);
-				worldRenderer.addVertexWithUV(8, y + 17, 0, 0, 1);
-				worldRenderer.addVertexWithUV(getShownWidth() - 8, y + 17, 0, 1, 1);
-				worldRenderer.addVertexWithUV(getShownWidth() - 8, y - 1, 0, 1, 0);
-				worldRenderer.addVertexWithUV(8, y - 1, 0, 0, 0);
+				// worldRenderer.startDrawingQuads();
+				// worldRenderer.setColorOpaque_I(0x808080);
+				// worldRenderer.addVertexWithUV(7, y + 18, 0, 0, 1);
+				// worldRenderer.addVertexWithUV(getShownWidth() - 7, y + 18, 0,
+				// 1, 1);
+				// worldRenderer.addVertexWithUV(getShownWidth() - 7, y - 2, 0,
+				// 1, 0);
+				// worldRenderer.addVertexWithUV(7, y - 2, 0, 0, 0);
+				// worldRenderer.setColorOpaque_I(0);
+				// worldRenderer.addVertexWithUV(8, y + 17, 0, 0, 1);
+				// worldRenderer.addVertexWithUV(getShownWidth() - 8, y + 17, 0,
+				// 1, 1);
+				// worldRenderer.addVertexWithUV(getShownWidth() - 8, y - 1, 0,
+				// 1, 0);
+				// worldRenderer.addVertexWithUV(8, y - 1, 0, 0, 0);
+				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldRenderer.pos(7, y + 18, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
+				worldRenderer.pos(getShownWidth() - 7, y + 18, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
+				worldRenderer.pos(getShownWidth() - 7, y - 2, 0).tex(1, 0).color(0x80, 0x80, 0x80, 255).endVertex();
+				worldRenderer.pos(7, y - 2, 0).tex(0, 0).color(0x80, 0x80, 0x80, 255).endVertex();
+				worldRenderer.pos(8, y + 17, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
+				worldRenderer.pos(getShownWidth() - 8, y + 17, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
+				worldRenderer.pos(getShownWidth() - 8, y - 1, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
+				worldRenderer.pos(8, y - 1, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
 				tessellator.draw();
 				GlStateManager.enableTexture2D();
 			}

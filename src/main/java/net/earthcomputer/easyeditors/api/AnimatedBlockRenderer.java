@@ -1,5 +1,7 @@
 package net.earthcomputer.easyeditors.api;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -57,11 +59,20 @@ public class AnimatedBlockRenderer {
 				TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks()
 						.getAtlasSprite(String.format("minecraft:blocks/%s_%s", fluid, state));
 
-				worldRenderer.startDrawingQuads();
-				worldRenderer.addVertexWithUV(x, y + 16, 50, sprite.getMinU(), sprite.getMaxV());
-				worldRenderer.addVertexWithUV(x + 16, y + 16, 50, sprite.getMaxU(), sprite.getMaxV());
-				worldRenderer.addVertexWithUV(x + 16, y, 50, sprite.getMaxU(), sprite.getMinV());
-				worldRenderer.addVertexWithUV(x, y, 50, sprite.getMinU(), sprite.getMinV());
+				// worldRenderer.startDrawingQuads();
+				// worldRenderer.addVertexWithUV(x, y + 16, 50,
+				// sprite.getMinU(), sprite.getMaxV());
+				// worldRenderer.addVertexWithUV(x + 16, y + 16, 50,
+				// sprite.getMaxU(), sprite.getMaxV());
+				// worldRenderer.addVertexWithUV(x + 16, y, 50,
+				// sprite.getMaxU(), sprite.getMinV());
+				// worldRenderer.addVertexWithUV(x, y, 50, sprite.getMinU(),
+				// sprite.getMinV());
+				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+				worldRenderer.pos(x, y + 16, 50).tex(sprite.getMinU(), sprite.getMaxV()).endVertex();
+				worldRenderer.pos(x + 16, y + 16, 50).tex(sprite.getMaxU(), sprite.getMaxV()).endVertex();
+				worldRenderer.pos(x + 16, y, 50).tex(sprite.getMaxU(), sprite.getMinV()).endVertex();
+				worldRenderer.pos(x, y, 50).tex(sprite.getMinU(), sprite.getMinV()).endVertex();
 				tessellator.draw();
 				break;
 			case 2:
@@ -91,8 +102,9 @@ public class AnimatedBlockRenderer {
 				GlStateManager.rotate(xRotation, 0, 1, 0);
 				GlStateManager.rotate(yRotation, 1, 0, 0);
 				GlStateManager.disableLighting();
-				worldRenderer.startDrawingQuads();
-				worldRenderer.setVertexFormat(DefaultVertexFormats.BLOCK);
+				// worldRenderer.startDrawingQuads();
+				// worldRenderer.setVertexFormat(DefaultVertexFormats.BLOCK);
+				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 				worldRenderer.setTranslation(-0.5, -0.5, -0.5);
 				BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
 				IBakedModel ibakedmodel = blockrendererdispatcher.getModelFromBlockState(this.block, world,
