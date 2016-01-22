@@ -139,10 +139,6 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 			super(0, x, y, width, height, text);
 		}
 
-		public void setMouseOver(boolean mouseOver) {
-			hovered = mouseOver;
-		}
-
 	}
 
 }

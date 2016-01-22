@@ -2,7 +2,6 @@ package net.earthcomputer.easyeditors.gui.command;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -30,7 +29,6 @@ public class GuiCommandSelector extends GuiScreen {
 	private List<String> commands = Lists.newArrayList(ICommandSyntax.getSyntaxList().keySet());
 	private int selectedIndex = 0;
 
-	private GuiButton doneButton;
 	private GuiButton cancelButton;
 	private CommandList list;
 
@@ -54,8 +52,7 @@ public class GuiCommandSelector extends GuiScreen {
 	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
-		buttonList.add(
-				doneButton = new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
+		buttonList.add(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
 		list = new CommandList();

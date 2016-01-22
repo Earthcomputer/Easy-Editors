@@ -2,11 +2,11 @@ package net.earthcomputer.easyeditors.gui.command;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -33,7 +33,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.client.config.HoverChecker;
@@ -49,7 +48,6 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 
 	private static Map<String, IBlockState> allBlocks = Maps.newLinkedHashMap();
 	private static LinkedHashMultimap<String, IBlockState> allBlocksAndSubBlocks = LinkedHashMultimap.create();
-	private static Map<IBlockState, ItemStack> blockStateToItemStack = Maps.newHashMap();
 	private static boolean hasInitializedBlocks = false;
 
 	private List<IBlockState> shownBlocks = Lists.newArrayList();
@@ -64,24 +62,30 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		}
 	}
 
-	private static List<IBlockState> getVariantStates(IBlockState stateSoFar, List<IProperty> remainingProperties) {
+	private static List<IBlockState> getVariantStates(IBlockState stateSoFar,
+			List<IProperty<? extends Comparable<?>>> remainingProperties) {
 		if (remainingProperties.isEmpty())
 			return Arrays.asList(stateSoFar);
 		List<IBlockState> r = Lists.newArrayList();
-		IProperty variedProperty = remainingProperties.get(0);
+		IProperty<? extends Comparable<?>> variedProperty = remainingProperties.get(0);
 		remainingProperties = remainingProperties.subList(1, remainingProperties.size());
 		for (Object allowedValue : variedProperty.getAllowedValues()) {
-			r.addAll(getVariantStates(stateSoFar.withProperty(variedProperty, (Comparable<?>) allowedValue),
+			r.addAll(getVariantStates(stateWithProperty(stateSoFar, variedProperty, (Comparable<?>) allowedValue),
 					remainingProperties));
 		}
 		return r;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T extends Comparable<T>, V extends T> IBlockState stateWithProperty(IBlockState state,
+			IProperty<? extends Comparable<?>> prop, Comparable<?> value) {
+		return state.withProperty((IProperty<T>) prop, (V) value);
 	}
 
 	private GuiScreen previous;
 	private IBlockSelectorCallback callback;
 	private boolean allowSubBlocks;
 
-	private GuiButton doneButton;
 	private GuiButton cancelButton;
 	private String searchLabel;
 	private GuiTextField searchText;
@@ -132,8 +136,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		setFilterText("");
 		super.initGui();
 
-		buttonList.add(
-				doneButton = new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
+		buttonList.add(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
 		searchLabel = I18n.format("gui.commandEditor.selectBlock.search");
@@ -297,9 +300,9 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		filterText = filterText.toLowerCase();
 		shownBlocks.clear();
 		if (allowSubBlocks) {
-			for (Map.Entry entry : allBlocksAndSubBlocks.asMap().entrySet()) {
-				String internalName = (String) entry.getKey();
-				for (IBlockState block : (Set<IBlockState>) entry.getValue()) {
+			for (Map.Entry<String, Collection<IBlockState>> entry : allBlocksAndSubBlocks.asMap().entrySet()) {
+				String internalName = entry.getKey();
+				for (IBlockState block : entry.getValue()) {
 					if (doesFilterTextMatch(filterText, block, internalName)) {
 						shownBlocks.add(block);
 					}
@@ -382,7 +385,8 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 
 		List<String> otherLines = Lists.newArrayList();
 		for (Object obj : blockState.getProperties().entrySet()) {
-			Map.Entry<IProperty, Comparable<?>> entry = (Map.Entry<IProperty, Comparable<?>>) obj;
+			@SuppressWarnings("unchecked")
+			Map.Entry<IProperty<? extends Comparable<?>>, Comparable<?>> entry = (Map.Entry<IProperty<? extends Comparable<?>>, Comparable<?>>) obj;
 			currentLine = EnumChatFormatting.BLUE + entry.getKey().getName() + EnumChatFormatting.RESET + ": ";
 			String value = entry.getValue().toString();
 			if (entry.getValue() == Boolean.TRUE)
@@ -408,14 +412,10 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 	}
 
 	private boolean doesFilterTextMatch(final String filterText, IBlockState block, String internalName) {
-		return Iterables.any(getTooltip(block), new Predicate() {
+		return Iterables.any(getTooltip(block), new Predicate<String>() {
+			@Override
 			public boolean apply(String line) {
 				return EnumChatFormatting.getTextWithoutFormattingCodes(line).toLowerCase().contains(filterText);
-			}
-
-			@Override
-			public boolean apply(Object line) {
-				return apply((String) line);
 			}
 		});
 	}

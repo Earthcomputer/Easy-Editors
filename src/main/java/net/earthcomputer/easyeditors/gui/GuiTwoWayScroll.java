@@ -47,7 +47,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	private int firstYScrollBarPos = -1;
 	private int firstMouseX = -1;
 	private int firstMouseY = -1;
-	private boolean leftButtonDown;
 
 	private int leftKey;
 	private int rightKey;

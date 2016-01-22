@@ -138,7 +138,7 @@ public class GuiFactory implements IModGuiFactory {
 			protected final String beforeValue;
 			protected final boolean allowAlpha;
 			protected HoverChecker colorHoverChecker;
-			protected final List colorHoverTooltip = Arrays.asList(I18n.format("gui.easyeditorsconfig.colortooltip"));
+			protected final List<String> colorHoverTooltip = Arrays.asList(I18n.format("gui.easyeditorsconfig.colortooltip"));
 
 			public ColorEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
 				super(owningScreen, owningEntryList, configElement);
@@ -149,13 +149,6 @@ public class GuiFactory implements IModGuiFactory {
 				this.allowAlpha = configElement.getDefault().toString().length() == 8;
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see net.minecraftforge.fml.client.config.GuiConfigEntries.
-			 * ListEntryBase#drawEntry(int, int, int, int, int, int, int,
-			 * boolean)
-			 */
 			@Override
 			public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY,
 					boolean isSelected) {

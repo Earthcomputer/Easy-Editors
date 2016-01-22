@@ -17,7 +17,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IChatComponent;
 
 /**
  * A class which allows you to create user-friendly representations of NBT tags
@@ -152,6 +151,7 @@ public abstract class NBTTagHandler {
 	 * @param specifier
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<NBTTagHandler> constructHandlers(String handlerType, Object specifier) {
 		List<NBTTagHandler> handlers = Lists.newArrayList();
 		if (!NBTTagHandler.handlers.containsKey(handlerType))

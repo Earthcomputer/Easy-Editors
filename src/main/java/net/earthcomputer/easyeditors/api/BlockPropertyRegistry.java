@@ -10,7 +10,6 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
-import net.minecraft.block.BlockBanner.BlockBannerStanding;
 import net.minecraft.block.BlockCarpet;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockDirt;
@@ -72,22 +71,23 @@ public class BlockPropertyRegistry {
 		registerVariantProperty(BlockStoneSlabNew.VARIANT);
 	}
 
-	private static Map<Predicate<Block>, IProperty> variants = Maps.newHashMap();
+	private static Map<Predicate<Block>, IProperty<? extends Comparable<?>>> variants = Maps.newHashMap();
 
-	public static void registerVariantProperty(IProperty property) {
+	@SuppressWarnings("unchecked")
+	public static <T extends Comparable<T>> void registerVariantProperty(IProperty<T> property) {
 		registerVariantProperty((Predicate<Block>) (Predicate<?>) Predicates.alwaysTrue(), property);
 	}
 
-	public static void registerVariantProperty(Block block, IProperty property) {
+	public static <T extends Comparable<T>> void registerVariantProperty(Block block, IProperty<T> property) {
 		registerVariantProperty(Predicates.equalTo(block), property);
 	}
 
-	public static void registerVariantProperty(Predicate<Block> blockPredicate, IProperty property) {
+	public static <T extends Comparable<T>> void registerVariantProperty(Predicate<Block> blockPredicate, IProperty<T> property) {
 		variants.put(blockPredicate, property);
 	}
 
-	public static boolean isVariantProperty(Block block, IProperty property) {
-		for (Map.Entry<Predicate<Block>, IProperty> entry : variants.entrySet()) {
+	public static <T extends Comparable<T>> boolean isVariantProperty(Block block, IProperty<T> property) {
+		for (Map.Entry<Predicate<Block>, IProperty<? extends Comparable<?>>> entry : variants.entrySet()) {
 			if (entry.getKey().apply(block)) {
 				if (entry.getValue().equals(property)) {
 					return true;
@@ -97,10 +97,10 @@ public class BlockPropertyRegistry {
 		return false;
 	}
 
-	public static IProperty[] getVariantProperties(Block block) {
-		List<IProperty> variantProps = Lists.newArrayList();
-		for (Object obj : block.getDefaultState().getProperties().entrySet()) {
-			IProperty prop = (IProperty) obj;
+	@SuppressWarnings("unchecked")
+	public static IProperty<? extends Comparable<?>>[] getVariantProperties(Block block) {
+		List<IProperty<? extends Comparable<?>>> variantProps = Lists.newArrayList();
+		for (IProperty<? extends Comparable<?>> prop : block.getDefaultState().getProperties().keySet()) {
 			if (isVariantProperty(block, prop))
 				variantProps.add(prop);
 		}

@@ -173,7 +173,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 				"field_146225_q", "lineScrollOffset");
 
 		private CommandSlotTextField listener;
-		private Predicate contentFilter = Predicates.alwaysTrue();
+		private Predicate<String> contentFilter = Predicates.alwaysTrue();
 
 		public GuiTypeListenerTextField(CommandSlotTextField listener, int x, int y, int width, int height) {
 			super(0, Minecraft.getMinecraft().fontRendererObj, x, y, width, height);
@@ -249,7 +249,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		}
 
 		@Override
-		public void func_175205_a(Predicate contentFilter) {
+		public void func_175205_a(Predicate<String> contentFilter) {
 			super.func_175205_a(contentFilter);
 			this.contentFilter = contentFilter;
 		}

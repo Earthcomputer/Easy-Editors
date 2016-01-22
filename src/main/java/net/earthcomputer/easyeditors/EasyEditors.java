@@ -3,19 +3,17 @@ package net.earthcomputer.easyeditors;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.earthcomputer.easyeditors.api.ChatBlocker;
 import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.Colors.Color;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.api.GuiReplacementRegistry;
-import net.earthcomputer.easyeditors.api.Colors.Color;
 import net.earthcomputer.easyeditors.gui.GuiNewCommandBlock;
 import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -78,7 +76,8 @@ public class EasyEditors {
 
 	@EventHandler
 	public void init(FMLInitializationEvent e) {
-		FMLCommonHandler.instance().bus().register(this);
+		//FMLCommonHandler.instance().bus().register(this);
+		MinecraftForge.EVENT_BUS.register(this);
 
 		GuiReplacementRegistry.getInstance().registerReplacement(GuiCommandBlock.class, GuiNewCommandBlock.class);
 

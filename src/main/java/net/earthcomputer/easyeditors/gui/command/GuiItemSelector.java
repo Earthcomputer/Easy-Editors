@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -65,7 +64,6 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 	private IItemSelectorCallback callback;
 	private boolean allowSubItems;
 
-	private GuiButton doneButton;
 	private GuiButton cancelButton;
 	private String searchLabel;
 	private GuiTextField searchText;
@@ -116,8 +114,7 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 		setFilterText("");
 		super.initGui();
 
-		buttonList.add(
-				doneButton = new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
+		buttonList.add(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
 		searchLabel = I18n.format("gui.commandEditor.selectItem.search");
@@ -188,11 +185,11 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 				30, 0xffffff);
 		searchText.drawTextBox();
 	}
-	
+
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
-		
+
 		if (mouseY < getHeaderHeight() || mouseY >= height - getFooterHeight()) {
 			hoveredItem = null;
 		} else {
@@ -317,14 +314,10 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 	}
 
 	private boolean doesFilterTextMatch(final String filterText, ItemStack stack, String internalName) {
-		return Iterables.any(stack.getTooltip(mc.thePlayer, true), new Predicate() {
+		return Iterables.any(stack.getTooltip(mc.thePlayer, true), new Predicate<String>() {
+			@Override
 			public boolean apply(String line) {
 				return EnumChatFormatting.getTextWithoutFormattingCodes(line).toLowerCase().contains(filterText);
-			}
-
-			@Override
-			public boolean apply(Object line) {
-				return apply((String) line);
 			}
 		});
 	}

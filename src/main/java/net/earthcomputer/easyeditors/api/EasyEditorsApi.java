@@ -30,8 +30,6 @@ public class EasyEditorsApi {
 	 */
 	public static boolean isEasyEditorsActive = true;
 
-	private static Object easyEditorsInstance;
-
 	private static Class<?> cls_EasyEditors;
 	private static Class<?> cls_ICommandSyntax;
 	private static Class<?> cls_NBTTagHandler;

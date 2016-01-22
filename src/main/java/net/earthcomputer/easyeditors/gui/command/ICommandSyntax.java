@@ -7,13 +7,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.Colors;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotExpand;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotItemStack;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.crash.CrashReport;
@@ -107,8 +104,6 @@ public abstract class ICommandSyntax {
 
 		private CommandSlotPlayerSelector playerSelector;
 		private CommandSlotItemStack item;
-		private CommandSlotExpand expand1;
-		private CommandSlotIntTextField damage;
 
 		@Override
 		public IGuiCommandSlot[] setupCommand() {

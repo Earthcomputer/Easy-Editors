@@ -33,7 +33,6 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 	private GuiButton doneButton;
 	private GuiButton cancelButton;
 	private GuiButton ignoringButton;
-	private GuiButton linkToCommandEditor;
 	private GuiTextField commandText;
 	private GuiTextField trackedOutput;
 	private boolean shouldTrackOutput;
@@ -58,7 +57,7 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 				I18n.format("gui.cancel")));
 		buttonList.add(ignoringButton = new GuiButton(4, width / 2 + 150 - 100, 150, 100, 20,
 				I18n.format("gui.commandBlock.trackingOutput")));
-		buttonList.add(linkToCommandEditor = new GuiButton(5, width / 2 + 150 - 100, 50, 100, 20,
+		buttonList.add(new GuiButton(5, width / 2 + 150 - 100, 50, 100, 20,
 				I18n.format("gui.commandBlock.goToCommandEditor")));
 		String command = null;
 		if (hadFirstInit)
