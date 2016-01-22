@@ -8,6 +8,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;

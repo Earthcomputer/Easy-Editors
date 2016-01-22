@@ -60,13 +60,13 @@ public class EasyEditorsApi {
 	 * referenced directly in code where one cannot be sure whether Easy Editors
 	 * exists. Modders should also make sure that the referenced class is a
 	 * subclass of
-	 * {@link net.earthcomputer.easyeditors.gui.command.ICommandSyntax
+	 * {@link net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax
 	 * ICommandSyntax}
 	 * 
 	 * @param commandName
 	 * @param className
 	 * 
-	 * @see net.earthcomputer.easyeditors.gui.command.ICommandSyntax#registerCommandSyntax(String,
+	 * @see net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax#registerCommandSyntax(String,
 	 *      Class) ICommandSyntax.registerCommandSyntax(String, Class)
 	 */
 	public static void registerCommandSyntax(String commandName, String className) {

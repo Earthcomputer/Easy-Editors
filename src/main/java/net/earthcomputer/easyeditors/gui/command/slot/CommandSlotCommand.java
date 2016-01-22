@@ -6,7 +6,7 @@ import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiCommandSelector;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
-import net.earthcomputer.easyeditors.gui.command.ICommandSyntax;
+import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 

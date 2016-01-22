@@ -1,4 +1,4 @@
-package net.earthcomputer.easyeditors.gui.command;
+package net.earthcomputer.easyeditors.gui.command.syntax;
 
 import java.util.Collections;
 import java.util.Map;
@@ -6,13 +6,7 @@ import java.util.Map;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 
-import net.earthcomputer.easyeditors.api.Colors;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotItemStack;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.ReportedException;
 
@@ -51,7 +45,7 @@ public abstract class ICommandSyntax {
 	 * @param n
 	 * @return
 	 */
-	protected String getStringFromNthArg(String[] args, int n) {
+	public static String getStringFromNthArg(String[] args, int n) {
 		String[] stringsToJoin = new String[args.length - n];
 		System.arraycopy(args, n, stringsToJoin, 0, stringsToJoin.length);
 		return spaceJoiner.join(stringsToJoin);
@@ -98,34 +92,6 @@ public abstract class ICommandSyntax {
 
 	static {
 		registerCommandSyntax("give", SyntaxGive.class);
-	}
-
-	public static class SyntaxGive extends ICommandSyntax {
-
-		private CommandSlotPlayerSelector playerSelector;
-		private CommandSlotItemStack item;
-
-		@Override
-		public IGuiCommandSlot[] setupCommand() {
-			item = new CommandSlotItemStack(1, CommandSlotItemStack.COMPONENT_ITEM,
-					CommandSlotItemStack.COMPONENT_STACK_SIZE, CommandSlotItemStack.COMPONENT_DAMAGE,
-					CommandSlotItemStack.COMPONENT_NBT);
-			playerSelector = new CommandSlotPlayerSelector();
-
-			return new IGuiCommandSlot[] {
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"),
-							I18n.format("gui.commandEditor.give.player.tooltip"),
-							new CommandSlotRectangle(playerSelector, Colors.playerSelectorBox.color)),
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.item"),
-							I18n.format("gui.commandEditor.give.item.tooltip"),
-							new CommandSlotRectangle(item, Colors.itemBox.color)) };
-		}
-
-		@Override
-		public boolean isValid() {
-			return playerSelector.isValid() && item.isValid();
-		}
-
 	}
 
 }
