@@ -92,6 +92,7 @@ public abstract class ICommandSyntax {
 
 	static {
 		registerCommandSyntax("give", SyntaxGive.class);
+		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 
 }
