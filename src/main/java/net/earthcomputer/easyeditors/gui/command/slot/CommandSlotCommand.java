@@ -120,6 +120,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	@Override
 	public void setCommand(String rawCommand) {
 		if (!rawCommand.equals(commandName)) {
+			commandName = rawCommand;
 			IGuiCommandSlot header = buildHeader(rawCommand);
 			commandSyntax = ICommandSyntax.forCommandName(rawCommand);
 			IGuiCommandSlot[] syntaxChildren = commandSyntax.setupCommand();
