@@ -45,7 +45,7 @@ public class EasyEditorsApi {
 	static {
 		try {
 			cls_EasyEditors = Class.forName("net.earthcomputer.easyeditors.EasyEditors");
-			cls_ICommandSyntax = Class.forName("net.earthcomputer.easyeditors.gui.command.ICommandSyntax");
+			cls_ICommandSyntax = Class.forName("net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax");
 			cls_NBTTagHandler = Class.forName("net.earthcomputer.easyeditors.gui.command.NBTTagHandler");
 
 			md_ICommandSyntax_registerCommandSyntax = cls_ICommandSyntax.getMethod("registerCommandSyntax",
