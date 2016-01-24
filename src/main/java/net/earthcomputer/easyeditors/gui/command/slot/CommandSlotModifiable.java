@@ -5,6 +5,12 @@ import java.util.List;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 
+/**
+ * A command slot which wraps a child which can be changed
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeChangeListener {
 
 	private IGuiCommandSlot child;
@@ -14,10 +20,22 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 		setChild(child);
 	}
 
+	/**
+	 * 
+	 * @return The child command slot
+	 */
 	public IGuiCommandSlot getChild() {
 		return child;
 	}
 
+	/**
+	 * Sets the child command slot. There is no need for
+	 * {@link IGuiCommandSlot#addSizeChangeListener(ISizeChangeListener)} or
+	 * {@link IGuiCommandSlot#setParent(IGuiCommandSlot)} to be called on the
+	 * child: these are called automatically
+	 * 
+	 * @param child
+	 */
 	public void setChild(IGuiCommandSlot child) {
 		if (child != this.child) {
 			if (this.child != null)

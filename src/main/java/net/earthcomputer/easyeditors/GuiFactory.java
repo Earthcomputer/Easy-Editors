@@ -168,14 +168,6 @@ public class GuiFactory implements IModGuiFactory {
 				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 				if (allowAlpha && ((color & 0xff000000) >>> 24) != 255) {
 					mc.getTextureManager().bindTexture(GuiColorPicker.transparentBackground);
-					// worldRenderer.startDrawingQuads();
-					// worldRenderer.addVertexWithUV(rx, y + 17, 0, 0, 16f /
-					// 16);
-					// worldRenderer.addVertexWithUV(rx + 32, y + 17, 0, 32f /
-					// 16, 16f / 16);
-					// worldRenderer.addVertexWithUV(rx + 32, y + 1, 0, 32f /
-					// 16, 0);
-					// worldRenderer.addVertexWithUV(rx, y + 1, 0, 0, 0);
 					worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 					worldRenderer.pos(rx, y + 17, 0).tex(0, 16f / 16).endVertex();
 					worldRenderer.pos(rx + 32, y + 17, 0).tex(32f / 16, 16f / 16).endVertex();
@@ -184,13 +176,6 @@ public class GuiFactory implements IModGuiFactory {
 					tessellator.draw();
 				}
 				GlStateManager.disableTexture2D();
-				// worldRenderer.startDrawingQuads();
-				// worldRenderer.setColorRGBA_I(color & 0x00ffffff, allowAlpha ?
-				// ((color & 0xff000000) >>> 24) : 255);
-				// worldRenderer.addVertexWithUV(rx, y + 17, 0, 0, 1);
-				// worldRenderer.addVertexWithUV(rx + 32, y + 17, 0, 1, 1);
-				// worldRenderer.addVertexWithUV(rx + 32, y + 1, 0, 1, 0);
-				// worldRenderer.addVertexWithUV(rx, y + 1, 0, 0, 0);
 				int red = (color & 0x00ff0000) >> 16;
 				int green = (color & 0x0000ff00) >> 8;
 				int blue = color & 0x000000ff;

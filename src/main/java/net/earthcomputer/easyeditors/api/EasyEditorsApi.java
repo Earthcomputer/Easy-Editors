@@ -37,6 +37,9 @@ public class EasyEditorsApi {
 	private static Method md_ICommandSyntax_registerCommandSyntax;
 	private static Method md_NBTTagHandler_registerHandler;
 
+	/**
+	 * The logger, mainly for internal use
+	 */
 	public static final Logger logger = LogManager.getLogger(EasyEditors.NAME);
 
 	static {

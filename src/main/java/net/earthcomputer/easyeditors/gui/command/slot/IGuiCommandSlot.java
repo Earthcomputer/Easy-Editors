@@ -57,7 +57,17 @@ public interface IGuiCommandSlot {
 	 * @param partialTicks
 	 */
 	void draw(int x, int y, int mouseX, int mouseY, float partialTicks);
-	
+
+	/**
+	 * Draws anything which will need to be drawn over everything else, even the
+	 * header and footer
+	 * 
+	 * @param x
+	 * @param y
+	 * @param mouseX
+	 * @param mouseY
+	 * @param partialTicks
+	 */
 	void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks);
 
 	/**

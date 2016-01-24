@@ -176,14 +176,6 @@ public class GeneralUtils {
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-		// worldRenderer.startDrawingQuads();
-		// worldRenderer.setColorRGBA_F(startRed, startGreen, startBlue,
-		// startAlpha);
-		// worldRenderer.addVertex(right, top, zLevel);
-		// worldRenderer.addVertex(left, top, zLevel);
-		// worldRenderer.setColorRGBA_F(endRed, endGreen, endBlue, endAlpha);
-		// worldRenderer.addVertex(left, bottom, zLevel);
-		// worldRenderer.addVertex(right, bottom, zLevel);
 		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 		worldRenderer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
 		worldRenderer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
@@ -303,6 +295,11 @@ public class GeneralUtils {
 		}
 	}
 
+	/**
+	 * Equivalent of {@link Throwable#printStackTrace()}, but uses a logger
+	 * @param logger
+	 * @param throwable
+	 */
 	public static void logStackTrace(Logger logger, Throwable throwable) {
 		StringWriter sw = new StringWriter();
 		throwable.printStackTrace(new PrintWriter(sw));

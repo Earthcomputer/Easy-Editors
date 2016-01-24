@@ -199,12 +199,26 @@ public abstract class NBTTagHandler {
 						: new CommandSlotVerticalArrangement(slots.toArray(new IGuiCommandSlot[slots.size()])));
 	}
 
+	/**
+	 * Reads from the given NBT tag to the given NBTTagHandlers to modify the
+	 * user interface to reflect the changes in the NBT tag
+	 * 
+	 * @param nbt
+	 * @param nbtHandlers
+	 */
 	public static void readFromNBT(NBTTagCompound nbt, List<NBTTagHandler> nbtHandlers) {
 		for (NBTTagHandler handler : nbtHandlers) {
 			handler.readFromNBT(nbt);
 		}
 	}
 
+	/**
+	 * Reads from the user interface via the given NBTTagHandlers to the given
+	 * NBT tag to reflect the changes the user has made
+	 * 
+	 * @param nbt
+	 * @param nbtHandlers
+	 */
 	public static void writeToNBT(NBTTagCompound nbt, List<NBTTagHandler> nbtHandlers) {
 		for (NBTTagHandler handler : nbtHandlers) {
 			handler.writeToNBT(nbt);

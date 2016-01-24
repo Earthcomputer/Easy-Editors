@@ -76,7 +76,6 @@ public class EasyEditors {
 
 	@EventHandler
 	public void init(FMLInitializationEvent e) {
-		//FMLCommonHandler.instance().bus().register(this);
 		MinecraftForge.EVENT_BUS.register(this);
 
 		GuiReplacementRegistry.getInstance().registerReplacement(GuiCommandBlock.class, GuiNewCommandBlock.class);

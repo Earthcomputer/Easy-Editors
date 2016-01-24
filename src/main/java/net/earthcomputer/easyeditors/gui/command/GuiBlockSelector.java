@@ -16,6 +16,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import net.earthcomputer.easyeditors.api.AnimatedBlockRenderer;
 import net.earthcomputer.easyeditors.api.BlockPropertyRegistry;
@@ -38,7 +39,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
- * A GUI which displays a list of all the items in the game for the user to
+ * A GUI which displays a list of all the blocks in the game for the user to
  * select one. A search feature is included
  * 
  * @author Earthcomputer
@@ -256,21 +257,6 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 				GlStateManager.disableTexture2D();
 				Tessellator tessellator = Tessellator.getInstance();
 				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-				// worldRenderer.startDrawingQuads();
-				// worldRenderer.setColorOpaque_I(0x808080);
-				// worldRenderer.addVertexWithUV(7, y + 18, 0, 0, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 7, y + 18, 0,
-				// 1, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 7, y - 2, 0,
-				// 1, 0);
-				// worldRenderer.addVertexWithUV(7, y - 2, 0, 0, 0);
-				// worldRenderer.setColorOpaque_I(0);
-				// worldRenderer.addVertexWithUV(8, y + 17, 0, 0, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 8, y + 17, 0,
-				// 1, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 8, y - 1, 0,
-				// 1, 0);
-				// worldRenderer.addVertexWithUV(8, y - 1, 0, 0, 0);
 				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 				worldRenderer.pos(7, y + 18, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
 				worldRenderer.pos(getShownWidth() - 7, y + 18, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
@@ -326,10 +312,23 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		setScrollY(0);
 	}
 
+	/**
+	 * Finds the display name for the given block state
+	 * 
+	 * @param block
+	 * @return
+	 */
 	public static String getDisplayName(IBlockState block) {
 		return getDisplayName(String.valueOf(Block.blockRegistry.getNameForObject(block.getBlock())));
 	}
 
+	/**
+	 * Finds the display name from the given block name (e.g.
+	 * <code>"minecraft:stone"</code>)
+	 * 
+	 * @param blockName
+	 * @return
+	 */
 	public static String getDisplayName(String blockName) {
 		blockName = blockName.replace('_', ' ').trim().replaceAll("\\s+", " ");
 
@@ -361,6 +360,11 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		return blockNameBuilder.toString();
 	}
 
+	/**
+	 * Returns a list of strings to display in a tooltip describing a block state
+	 * @param blockState
+	 * @return
+	 */
 	public static List<String> getTooltip(IBlockState blockState) {
 		List<String> tooltip = Lists.newArrayList();
 
@@ -384,18 +388,18 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		tooltip.add(currentLine);
 
 		List<String> otherLines = Lists.newArrayList();
-		for (Object obj : blockState.getProperties().entrySet()) {
-			@SuppressWarnings("unchecked")
-			Map.Entry<IProperty<? extends Comparable<?>>, Comparable<?>> entry = (Map.Entry<IProperty<? extends Comparable<?>>, Comparable<?>>) obj;
-			currentLine = EnumChatFormatting.BLUE + entry.getKey().getName() + EnumChatFormatting.RESET + ": ";
-			String value = entry.getValue().toString();
-			if (entry.getValue() == Boolean.TRUE)
-				value = EnumChatFormatting.GREEN + value;
-			else if (entry.getValue() == Boolean.FALSE)
-				value = EnumChatFormatting.RED + value;
+		for (IProperty<?> prop : (advanced ? blockState.getProperties().keySet()
+				: Sets.newHashSet(BlockPropertyRegistry.getVariantProperties(blockState.getBlock())))) {
+			currentLine = EnumChatFormatting.BLUE + prop.getName() + EnumChatFormatting.RESET + ": ";
+			Comparable<?> value = blockState.getValue(prop);
+			String valueStr = value.toString();
+			if (value == Boolean.TRUE)
+				valueStr = EnumChatFormatting.GREEN + valueStr;
+			else if (value == Boolean.FALSE)
+				valueStr = EnumChatFormatting.RED + valueStr;
 			else
-				value = EnumChatFormatting.YELLOW + value;
-			currentLine += value;
+				valueStr = EnumChatFormatting.YELLOW + valueStr;
+			currentLine += valueStr;
 			otherLines.add(currentLine);
 		}
 

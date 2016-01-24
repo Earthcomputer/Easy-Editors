@@ -4,6 +4,13 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 
+/**
+ * A command slot which is not visible or editable to the user, but adds a value
+ * to the arguments
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotUneditableValue extends GuiCommandSlotImpl {
 
 	private String value;
@@ -26,10 +33,19 @@ public class CommandSlotUneditableValue extends GuiCommandSlotImpl {
 		args.add(value);
 	}
 
+	/**
+	 * 
+	 * @return The value to add to the arguments
+	 */
 	public String getValue() {
 		return value;
 	}
 
+	/**
+	 * Sets the value to add to the arguments
+	 * 
+	 * @param value
+	 */
 	public void setValue(String value) {
 		this.value = value;
 	}

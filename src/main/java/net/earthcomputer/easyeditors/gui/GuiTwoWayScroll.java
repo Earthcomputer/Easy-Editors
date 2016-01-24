@@ -530,27 +530,12 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		GlStateManager.disableAlpha();
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		GlStateManager.disableTexture2D();
-		// worldRenderer.startDrawingQuads();
-		// worldRenderer.setColorRGBA_I(0, 0);
-		// worldRenderer.addVertexWithUV(0, headerHeight + 4, 0, 0, 1);
-		// worldRenderer.addVertexWithUV(width, headerHeight + 4, 0, 1, 1);
-		// worldRenderer.setColorRGBA_I(0, 255);
-		// worldRenderer.addVertexWithUV(width, headerHeight, 0, 1, 0);
-		// worldRenderer.addVertexWithUV(0, headerHeight, 0, 0, 0);
 		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 		worldRenderer.pos(0, headerHeight + 4, 0).tex(0, 1).color(0, 0, 0, 0).endVertex();
 		worldRenderer.pos(width, headerHeight + 4, 0).tex(1, 1).color(0, 0, 0, 0).endVertex();
 		worldRenderer.pos(width, headerHeight, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
 		worldRenderer.pos(0, headerHeight, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
 		tessellator.draw();
-		// worldRenderer.startDrawingQuads();
-		// worldRenderer.setColorRGBA_I(0, 255);
-		// worldRenderer.addVertexWithUV(0, height - footerHeight, 0, 0, 1);
-		// worldRenderer.addVertexWithUV(width, height - footerHeight, 0, 1, 1);
-		// worldRenderer.setColorRGBA_I(0, 0);
-		// worldRenderer.addVertexWithUV(width, height - footerHeight - 4, 0, 1,
-		// 0);
-		// worldRenderer.addVertexWithUV(0, height - footerHeight - 4, 0, 0, 0);
 		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 		worldRenderer.pos(0, height - footerHeight, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
 		worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
@@ -570,14 +555,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		GlStateManager.disableTexture2D();
 
 		if (yScrollBarVisible) {
-			// worldRenderer.startDrawingQuads();
-			// worldRenderer.setColorRGBA_I(0, 255);
-			// worldRenderer.addVertexWithUV(width - 6, height - footerHeight,
-			// 0, 0, 1);
-			// worldRenderer.addVertexWithUV(width, height - footerHeight, 0, 1,
-			// 1);
-			// worldRenderer.addVertexWithUV(width, headerHeight, 0, 1, 0);
-			// worldRenderer.addVertexWithUV(width - 6, headerHeight, 0, 0, 0);
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(width - 6, height - footerHeight, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
 			worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
@@ -586,15 +563,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			tessellator.draw();
 		}
 		if (xScrollBarVisible) {
-			// worldRenderer.startDrawingQuads();
-			// worldRenderer.setColorRGBA_I(0, 255);
-			// worldRenderer.addVertexWithUV(0, height - footerHeight, 0, 0, 1);
-			// worldRenderer.addVertexWithUV(width, height - footerHeight, 0, 1,
-			// 1);
-			// worldRenderer.addVertexWithUV(width, height - footerHeight - 6,
-			// 0, 1, 0);
-			// worldRenderer.addVertexWithUV(0, height - footerHeight - 6, 0, 0,
-			// 0);
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(0, height - footerHeight, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
 			worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
@@ -603,16 +571,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			tessellator.draw();
 		}
 		if (xScrollBarVisible && yScrollBarVisible) {
-			// worldRenderer.startDrawingQuads();
-			// worldRenderer.setColorRGBA_I(0x404040, 255);
-			// worldRenderer.addVertexWithUV(width - 6, height - footerHeight,
-			// 0, 0, 1);
-			// worldRenderer.addVertexWithUV(width, height - footerHeight, 0, 1,
-			// 1);
-			// worldRenderer.addVertexWithUV(width, height - footerHeight - 6,
-			// 0, 1, 0);
-			// worldRenderer.addVertexWithUV(width - 6, height - footerHeight -
-			// 6, 0, 0, 0);
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(width - 6, height - footerHeight, 0).tex(0, 1).color(0x40, 0x40, 0x40, 255).endVertex();
 			worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0x40, 0x40, 0x40, 255).endVertex();
@@ -622,13 +580,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			tessellator.draw();
 		}
 		if (yScrollBarVisible) {
-			// worldRenderer.startDrawingQuads();
-			// worldRenderer.setColorRGBA_I(0x808080, 255);
-			// worldRenderer.addVertexWithUV(width - 6, yScrollBarBottom, 0, 0,
-			// 1);
-			// worldRenderer.addVertexWithUV(width, yScrollBarBottom, 0, 1, 1);
-			// worldRenderer.addVertexWithUV(width, yScrollBarTop, 0, 1, 0);
-			// worldRenderer.addVertexWithUV(width - 6, yScrollBarTop, 0, 0, 0);
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(width - 6, yScrollBarBottom, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
 			worldRenderer.pos(width, yScrollBarBottom, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
@@ -637,16 +588,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			tessellator.draw();
 		}
 		if (xScrollBarVisible) {
-			// worldRenderer.startDrawingQuads();
-			// worldRenderer.setColorRGBA_I(0x808080, 255);
-			// worldRenderer.addVertexWithUV(xScrollBarLeft, height -
-			// footerHeight, 0, 0, 1);
-			// worldRenderer.addVertexWithUV(xScrollBarRight, height -
-			// footerHeight, 0, 1, 1);
-			// worldRenderer.addVertexWithUV(xScrollBarRight, height -
-			// footerHeight - 6, 0, 1, 0);
-			// worldRenderer.addVertexWithUV(xScrollBarLeft, height -
-			// footerHeight - 6, 0, 0, 0);
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(xScrollBarLeft, height - footerHeight, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255)
 					.endVertex();
@@ -659,14 +600,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			tessellator.draw();
 		}
 		if (yScrollBarVisible) {
-			// worldRenderer.startDrawingQuads();
-			// worldRenderer.setColorRGBA_I(0xc0c0c0, 255);
-			// worldRenderer.addVertexWithUV(width - 6, yScrollBarBottom - 1, 0,
-			// 0, 1);
-			// worldRenderer.addVertexWithUV(width - 1, yScrollBarBottom - 1, 0,
-			// 1, 1);
-			// worldRenderer.addVertexWithUV(width - 1, yScrollBarTop, 0, 1, 0);
-			// worldRenderer.addVertexWithUV(width - 6, yScrollBarTop, 0, 0, 0);
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(width - 6, yScrollBarBottom - 1, 0).tex(0, 1).color(0xc0, 0xc0, 0xc0, 255).endVertex();
 			worldRenderer.pos(width - 1, yScrollBarBottom - 1, 0).tex(1, 1).color(0xc0, 0xc0, 0xc0, 255).endVertex();
@@ -675,16 +608,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			tessellator.draw();
 		}
 		if (xScrollBarVisible) {
-			// worldRenderer.startDrawingQuads();
-			// worldRenderer.setColorRGBA_I(0xc0c0c0, 255);
-			// worldRenderer.addVertexWithUV(xScrollBarLeft, height -
-			// footerHeight - 1, 0, 0, 1);
-			// worldRenderer.addVertexWithUV(xScrollBarRight - 1, height -
-			// footerHeight - 1, 0, 1, 1);
-			// worldRenderer.addVertexWithUV(xScrollBarRight - 1, height -
-			// footerHeight - 6, 0, 1, 0);
-			// worldRenderer.addVertexWithUV(xScrollBarLeft, height -
-			// footerHeight - 6, 0, 0, 0);
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(xScrollBarLeft, height - footerHeight - 1, 0).tex(0, 1).color(0xc0, 0xc0, 0xc0, 255)
 					.endVertex();
@@ -710,19 +633,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 		mc.getTextureManager().bindTexture(Gui.optionsBackground);
 		GlStateManager.color(1, 1, 1, 1);
-		// worldRenderer.startDrawingQuads();
-		// worldRenderer.setColorOpaque_I(0x202020);
-		// worldRenderer.addVertexWithUV(0, height - footerHeight, 0, (float)
-		// scrollX / 32,
-		// (float) (height - footerHeight + scrollY) / 32);
-		// worldRenderer.addVertexWithUV(width, height - footerHeight, 0,
-		// (float) (width + scrollX) / 32,
-		// (float) (height - footerHeight + scrollY) / 32);
-		// worldRenderer.addVertexWithUV(width, headerHeight, 0, (float) (width
-		// + scrollX) / 32,
-		// (float) (headerHeight + scrollY) / 32);
-		// worldRenderer.addVertexWithUV(0, headerHeight, 0, (float) scrollX /
-		// 32, (float) (headerHeight + scrollY) / 32);
 		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 		worldRenderer.pos(0, height - footerHeight, 0)
 				.tex((float) scrollX / 32, (float) (height - footerHeight + scrollY) / 32).color(0x20, 0x20, 0x20, 255)
@@ -743,14 +653,6 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 		this.mc.getTextureManager().bindTexture(Gui.optionsBackground);
 		GlStateManager.color(1, 1, 1, 1);
-		// worldRenderer.startDrawingQuads();
-		// worldRenderer.setColorRGBA_I(0x404040, 255);
-		// worldRenderer.addVertexWithUV(0, bottom, 0, 0, (float) bottom / 32);
-		// worldRenderer.addVertexWithUV(width, bottom, 0, (float) width / 32,
-		// (float) bottom / 32);
-		// worldRenderer.addVertexWithUV(width, top, 0, (float) width / 32,
-		// (float) top / 32);
-		// worldRenderer.addVertexWithUV(0, top, 0, 0, (float) top / 32);
 		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 		worldRenderer.pos(0, bottom, 0).tex(0, (float) bottom / 32).color(0x40, 0x40, 0x40, 255).endVertex();
 		worldRenderer.pos(width, bottom, 0).tex((float) width / 32, (float) bottom / 32).color(0x40, 0x40, 0x40, 255)

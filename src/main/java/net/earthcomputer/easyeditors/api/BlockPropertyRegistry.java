@@ -38,9 +38,22 @@ import net.minecraft.block.BlockWoodSlab;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.init.Blocks;
 
+/**
+ * Use this class to register stuff about the possible block states of your
+ * custom block.
+ * 
+ * <b>This class is a member of the Easy Editors API</b>
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class BlockPropertyRegistry {
 
 	static {
+		registerVanillaVariantProps();
+	}
+
+	private static void registerVanillaVariantProps() {
 		registerVariantProperty(BlockStone.VARIANT);
 		registerVariantProperty(BlockPlanks.VARIANT);
 		registerVariantProperty(BlockSapling.TYPE);
@@ -73,19 +86,57 @@ public class BlockPropertyRegistry {
 
 	private static Map<Predicate<Block>, IProperty<? extends Comparable<?>>> variants = Maps.newHashMap();
 
+	/**
+	 * Registers an IProperty to be counted as a variant property. More about
+	 * variant properties {@link #registerVariantProperty(Predicate, IProperty)
+	 * here}
+	 * 
+	 * @param property
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Comparable<T>> void registerVariantProperty(IProperty<T> property) {
 		registerVariantProperty((Predicate<Block>) (Predicate<?>) Predicates.alwaysTrue(), property);
 	}
 
+	/**
+	 * Registers an IProperty to be counted as a variant property, but only when
+	 * the block state is of the specified block. More about variant properties
+	 * {@link #registerVariantProperty(Predicate, IProperty) here}
+	 * 
+	 * @param block
+	 * @param property
+	 */
 	public static <T extends Comparable<T>> void registerVariantProperty(Block block, IProperty<T> property) {
 		registerVariantProperty(Predicates.equalTo(block), property);
 	}
 
-	public static <T extends Comparable<T>> void registerVariantProperty(Predicate<Block> blockPredicate, IProperty<T> property) {
+	/**
+	 * Registers an IProperty to be counted as a variant property, but only when
+	 * the block is allowed by the predicate. When a variant property has
+	 * different values, they will effectively produce separate blocks from an
+	 * inexperienced user's point of view. They will be listed as separate
+	 * blocks in the select-blocks screen and the property will not be included
+	 * in other ways of editing block states. These will also be the only
+	 * properties listed in the tooltip of a block state when advanced item
+	 * tooltips is off. See {@link #registerVanillaVariantProps() this method}
+	 * for a list of all the vanilla variant properties
+	 * 
+	 * @param blockPredicate
+	 * @param property
+	 */
+	public static <T extends Comparable<T>> void registerVariantProperty(Predicate<Block> blockPredicate,
+			IProperty<T> property) {
 		variants.put(blockPredicate, property);
 	}
 
+	/**
+	 * Returns whether property is a variant property when in a block state of
+	 * the given block
+	 * 
+	 * @param block
+	 * @param property
+	 * @return
+	 */
 	public static <T extends Comparable<T>> boolean isVariantProperty(Block block, IProperty<T> property) {
 		for (Map.Entry<Predicate<Block>, IProperty<? extends Comparable<?>>> entry : variants.entrySet()) {
 			if (entry.getKey().apply(block)) {
@@ -97,6 +148,13 @@ public class BlockPropertyRegistry {
 		return false;
 	}
 
+	/**
+	 * Returns an array of all the variant properties in a block state of the
+	 * given block
+	 * 
+	 * @param block
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public static IProperty<? extends Comparable<?>>[] getVariantProperties(Block block) {
 		List<IProperty<? extends Comparable<?>>> variantProps = Lists.newArrayList();

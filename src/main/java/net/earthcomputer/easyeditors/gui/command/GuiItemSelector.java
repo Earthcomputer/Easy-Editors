@@ -235,21 +235,6 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 				GlStateManager.disableTexture2D();
 				Tessellator tessellator = Tessellator.getInstance();
 				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-				// worldRenderer.startDrawingQuads();
-				// worldRenderer.setColorOpaque_I(0x808080);
-				// worldRenderer.addVertexWithUV(7, y + 18, 0, 0, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 7, y + 18, 0,
-				// 1, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 7, y - 2, 0,
-				// 1, 0);
-				// worldRenderer.addVertexWithUV(7, y - 2, 0, 0, 0);
-				// worldRenderer.setColorOpaque_I(0);
-				// worldRenderer.addVertexWithUV(8, y + 17, 0, 0, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 8, y + 17, 0,
-				// 1, 1);
-				// worldRenderer.addVertexWithUV(getShownWidth() - 8, y - 1, 0,
-				// 1, 0);
-				// worldRenderer.addVertexWithUV(8, y - 1, 0, 0, 0);
 				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 				worldRenderer.pos(7, y + 18, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
 				worldRenderer.pos(getShownWidth() - 7, y + 18, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();

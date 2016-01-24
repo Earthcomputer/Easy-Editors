@@ -68,7 +68,8 @@ public abstract class ItemDamageHandler {
 
 	/**
 	 * Returns a list of newly constructed item damage handlers for the given
-	 * item
+	 * item. Mods can prevent specific handlers from being used by listening for
+	 * {@link ItemDamageHandlerEvent}
 	 * 
 	 * @param item
 	 * @return
@@ -146,6 +147,12 @@ public abstract class ItemDamageHandler {
 		}, ToolHandler.class);
 	}
 
+	/**
+	 * The handler for use with tool durabilities
+	 * 
+	 * @author Earthcomputer
+	 *
+	 */
 	public static class ToolHandler extends ItemDamageHandler {
 
 		private Item item;
