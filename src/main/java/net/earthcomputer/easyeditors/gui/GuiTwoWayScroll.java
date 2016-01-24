@@ -728,7 +728,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 				.tex((float) scrollX / 32, (float) (height - footerHeight + scrollY) / 32).color(0x20, 0x20, 0x20, 255)
 				.endVertex();
 		worldRenderer.pos(width, height - footerHeight, 0)
-				.tex((float) (width + scrollX), (float) (height - footerHeight + scrollY) / 32)
+				.tex((float) (width + scrollX) / 32, (float) (height - footerHeight + scrollY) / 32)
 				.color(0x20, 0x20, 0x20, 255).endVertex();
 		worldRenderer.pos(width, headerHeight, 0)
 				.tex((float) (width + scrollX) / 32, (float) (headerHeight + scrollY) / 32).color(0x20, 0x20, 0x20, 255)
