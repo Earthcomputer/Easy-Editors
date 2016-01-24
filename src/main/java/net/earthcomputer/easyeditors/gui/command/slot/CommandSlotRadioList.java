@@ -121,8 +121,6 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 			}
 			child.draw(x + 20, y + childTops[i], mouseX, mouseY, partialTicks);
 		}
-		
-		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	/**

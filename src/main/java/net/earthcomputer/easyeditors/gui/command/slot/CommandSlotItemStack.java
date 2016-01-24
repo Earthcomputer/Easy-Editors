@@ -278,8 +278,6 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 							Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
 				}
 			}
-
-			super.draw(x, y, mouseX, mouseY, partialTicks);
 		}
 
 		public String getDisplayText() {

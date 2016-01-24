@@ -116,8 +116,6 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 				drawTooltip(mouseX, mouseY, hoverText, 300);
 			}
 		}
-
-		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

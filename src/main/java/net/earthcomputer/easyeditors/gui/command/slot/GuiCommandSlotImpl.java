@@ -99,7 +99,7 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	}
 
 	@Override
-	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		for (Tooltip tooltip : tooltips) {
 			GeneralUtils.drawTooltip(tooltip.x, tooltip.y, tooltip.lines);
 		}
@@ -133,11 +133,7 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 
 	@Override
 	public void drawTooltip(int x, int y, List<String> lines) {
-		if (parent == null) {
-			tooltips.add(new Tooltip(x, y, lines));
-		} else {
-			parent.drawTooltip(x, y, lines);
-		}
+		tooltips.add(new Tooltip(x, y, lines));
 	}
 
 	private static class Tooltip {

@@ -115,8 +115,6 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 				height += child.getHeight() + 2;
 			}
 		}
-
-		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

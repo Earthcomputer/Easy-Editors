@@ -58,9 +58,7 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 		Gui.drawRect(x, y, x + getWidth() - 12, y + 12, 0xff000000);
 		Gui.drawRect(x + getWidth() - 12, y, x + getWidth(), y + 12, 0xff202020);
 		drawString(fontRenderer, values[currentValue], x + 2, y + 2, 0xffffffff);
-		fontRenderer.drawString("v", x + getWidth() - 9, y + 2, 0xffd0d0d0);   
-		
-		super.draw(x, y, mouseX, mouseY, partialTicks);
+		fontRenderer.drawString("v", x + getWidth() - 9, y + 2, 0xffd0d0d0);
 	}
 	
 }

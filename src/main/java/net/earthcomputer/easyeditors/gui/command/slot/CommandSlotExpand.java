@@ -90,8 +90,6 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 
 		if (isExpanded)
 			child.draw(x, y + 18, mouseX, mouseY, partialTicks);
-		
-		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

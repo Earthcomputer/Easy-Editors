@@ -45,8 +45,6 @@ public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeCha
 		drawVerticalLine(x, y, y + getHeight(), 0xff000000);
 		drawVerticalLine(x + getWidth(), y, y + getHeight(), 0xff000000);
 		child.draw(x + 2, y + 2, mouseX, mouseY, partialTicks);
-		
-		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

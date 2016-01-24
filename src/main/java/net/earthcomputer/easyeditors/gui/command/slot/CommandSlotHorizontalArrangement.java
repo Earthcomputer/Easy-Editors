@@ -115,8 +115,6 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 				width += child.getWidth() + 2;
 			}
 		}
-
-		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

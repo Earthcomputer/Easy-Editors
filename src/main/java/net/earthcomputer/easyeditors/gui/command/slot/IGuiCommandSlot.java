@@ -57,6 +57,8 @@ public interface IGuiCommandSlot {
 	 * @param partialTicks
 	 */
 	void draw(int x, int y, int mouseX, int mouseY, float partialTicks);
+	
+	void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks);
 
 	/**
 	 * 

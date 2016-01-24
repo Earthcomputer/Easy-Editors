@@ -34,4 +34,8 @@ public class CommandSlotUneditableValue extends GuiCommandSlotImpl {
 		this.value = value;
 	}
 
+	@Override
+	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
+	}
+
 }

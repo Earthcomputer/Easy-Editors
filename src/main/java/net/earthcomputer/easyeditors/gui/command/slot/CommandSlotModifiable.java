@@ -50,8 +50,6 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		if (child != null)
 			child.draw(x, y, mouseX, mouseY, partialTicks);
-
-		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	@Override

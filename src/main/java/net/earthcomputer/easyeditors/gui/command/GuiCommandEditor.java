@@ -94,6 +94,14 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 	}
 
 	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+
+		commandSlotRectangle.drawForeground(2 - getScrollX(), 2 - getScrollY() + getHeaderHeight(), mouseX, mouseY,
+				partialTicks);
+	}
+
+	@Override
 	protected void drawVirtualScreen(int mouseX, int mouseY, float partialTicks, int scrollX, int scrollY,
 			int headerHeight) {
 		commandSlotRectangle.draw(2 - scrollX, 2 - scrollY + headerHeight, mouseX, mouseY, partialTicks);
