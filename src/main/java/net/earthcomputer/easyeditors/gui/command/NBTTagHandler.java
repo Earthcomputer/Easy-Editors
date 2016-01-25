@@ -9,14 +9,19 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants;
 
 /**
  * A class which allows you to create user-friendly representations of NBT tags
@@ -27,6 +32,16 @@ import net.minecraft.tileentity.TileEntity;
 public abstract class NBTTagHandler {
 
 	private static final Map<String, Map<Predicate<?>, Class<? extends NBTTagHandler>>> handlers = Maps.newHashMap();
+
+	static {
+		Predicate<ItemStack> alwaysTrue = new Predicate<ItemStack>() {
+			@Override
+			public boolean apply(ItemStack stack) {
+				return true;
+			}
+		};
+		registerItemStackHandler(alwaysTrue, DisplayHandler.class);
+	}
 
 	/**
 	 * Sets up the command slots that can be used to edit the handled part of
@@ -223,6 +238,48 @@ public abstract class NBTTagHandler {
 		for (NBTTagHandler handler : nbtHandlers) {
 			handler.writeToNBT(nbt);
 		}
+	}
+
+	public static class DisplayHandler extends NBTTagHandler {
+
+		private CommandSlotTextField displayName;
+
+		@Override
+		public IGuiCommandSlot[] setupCommandSlot() {
+			displayName = new CommandSlotTextField(100, 400);
+			displayName.setMaxStringLength(Short.MAX_VALUE);
+			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
+					I18n.format("gui.commandEditor.item.nbt.displayName"), Colors.itemLabel.color, displayName) };
+		}
+
+		@Override
+		public void readFromNBT(NBTTagCompound nbt) {
+			String displayName = "";
+			if (nbt != null && nbt.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
+				NBTTagCompound display = nbt.getCompoundTag("display");
+				if (display.hasKey("Name", Constants.NBT.TAG_STRING)) {
+					displayName = display.getString("Name");
+				}
+			}
+
+			this.displayName.setText(displayName);
+		}
+
+		@Override
+		public void writeToNBT(NBTTagCompound nbt) {
+			NBTTagCompound display = new NBTTagCompound();
+
+			if (!displayName.getText().isEmpty()) {
+				display.setString("Name", displayName.getText());
+			}
+
+			if (!display.hasNoTags()) {
+				if (nbt.hasKey("display", Constants.NBT.TAG_COMPOUND))
+					display.merge(nbt.getCompoundTag("display"));
+				nbt.setTag("display", display);
+			}
+		}
+
 	}
 
 }
