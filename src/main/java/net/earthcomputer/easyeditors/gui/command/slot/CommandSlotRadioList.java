@@ -150,7 +150,10 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 	}
 
 	@Override
-	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+		if (!children.isEmpty())
+			if (children.get(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton))
+				return true;
 		if (mouseButton == 0) {
 			if (mouseX >= x && mouseX < x + getWidth()) {
 				for (int i = 0; i < buttonTops.length; i++) {
@@ -165,20 +168,30 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 			}
 		}
 		if (!children.isEmpty()) {
-			children.get(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton);
+			return children.get(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton);
 		}
+		return false;
 	}
 
 	@Override
-	public void onMouseReleased(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
 		if (!children.isEmpty())
-			children.get(selectedIndex).onMouseReleased(mouseX, mouseY, mouseButton);
+			return children.get(selectedIndex).onMouseReleased(mouseX, mouseY, mouseButton);
+		return false;
 	}
 
 	@Override
-	public void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		if (!children.isEmpty())
-			children.get(selectedIndex).onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+			return children.get(selectedIndex).onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+		return false;
+	}
+	
+	@Override
+	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
+		if (!children.isEmpty())
+			return children.get(selectedIndex).onMouseScrolled(mouseX, mouseY, scrolledUp);
+		return false;
 	}
 
 	@Override

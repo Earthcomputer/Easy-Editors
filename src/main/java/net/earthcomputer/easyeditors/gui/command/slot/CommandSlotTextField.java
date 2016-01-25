@@ -161,8 +161,9 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	}
 
 	@Override
-	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		wrappedTextField.mouseClicked(mouseX, mouseY, mouseButton);
+		return false;
 	}
 
 	private static class GuiTypeListenerTextField extends GuiTextField {

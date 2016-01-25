@@ -60,18 +60,23 @@ public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeCha
 	}
 
 	@Override
-	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		child.onMouseClicked(mouseX, mouseY, mouseButton);
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+		return child.onMouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
-	public void onMouseReleased(int mouseX, int mouseY, int mouseButton) {
-		child.onMouseReleased(mouseX, mouseY, mouseButton);
+	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
+		return child.onMouseReleased(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
-	public void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		return child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	}
+
+	@Override
+	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
+		return child.onMouseScrolled(mouseX, mouseY, scrolledUp);
 	}
 
 	@Override

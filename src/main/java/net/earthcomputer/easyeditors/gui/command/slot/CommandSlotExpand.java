@@ -108,27 +108,38 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 	}
 
 	@Override
-	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (hovered) {
 			setExpanded(!isExpanded);
 			GeneralUtils.playButtonSound();
 		} else if (isExpanded) {
-			child.onMouseClicked(mouseX, mouseY, mouseButton);
+			return child.onMouseClicked(mouseX, mouseY, mouseButton);
 		}
+		return false;
 	}
 
 	@Override
-	public void onMouseReleased(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
 		if (isExpanded) {
-			child.onMouseReleased(mouseX, mouseY, mouseButton);
+			return child.onMouseReleased(mouseX, mouseY, mouseButton);
 		}
+		return false;
 	}
 
 	@Override
-	public void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		if (isExpanded) {
-			child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+			return child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		}
+		return false;
+	}
+	
+	@Override
+	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
+		if (isExpanded) {
+			return child.onMouseScrolled(mouseX, mouseY, scrolledUp);
+		}
+		return false;
 	}
 
 	private void recalcSize() {

@@ -119,11 +119,13 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	}
 
 	@Override
-	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (wrappedButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
 			wrappedButton.playPressSound(Minecraft.getMinecraft().getSoundHandler());
 			onPress();
 		}
+		
+		return false;
 	}
 
 	/**

@@ -113,8 +113,11 @@ public interface IGuiCommandSlot {
 	 * @param mouseX
 	 * @param mouseY
 	 * @param mouseButton
+	 * 
+	 * @return false if the parent command slot should be able to react to the
+	 *         mouse click, true if it should not
 	 */
-	void onMouseClicked(int mouseX, int mouseY, int mouseButton);
+	boolean onMouseClicked(int mouseX, int mouseY, int mouseButton);
 
 	/**
 	 * Called when a mouse button is released
@@ -122,8 +125,11 @@ public interface IGuiCommandSlot {
 	 * @param mouseX
 	 * @param mouseY
 	 * @param mouseButton
+	 * 
+	 * @return false if the parent command slot should be able to react to the
+	 *         mouse release, true if it should not
 	 */
-	void onMouseReleased(int mouseX, int mouseY, int mouseButton);
+	boolean onMouseReleased(int mouseX, int mouseY, int mouseButton);
 
 	/**
 	 * Called when the mouse is clicked and dragged
@@ -132,8 +138,24 @@ public interface IGuiCommandSlot {
 	 * @param mouseY
 	 * @param clickedMouseButton
 	 * @param timeSinceLastClick
+	 * 
+	 * @return false if the parent command slot should be able to react to the
+	 *         mouse drag, true if it should not
 	 */
-	void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick);
+	boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick);
+
+	/**
+	 * Called when the mouse is scrolled. If it is scrolled up, scrolledUp is
+	 * true. Otherwise, it is false
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 * @param scrolledUp
+	 * 
+	 * @return false if the parent command slot should be able to react to the
+	 *         scroll, true if it should not
+	 */
+	boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp);
 
 	/**
 	 * 

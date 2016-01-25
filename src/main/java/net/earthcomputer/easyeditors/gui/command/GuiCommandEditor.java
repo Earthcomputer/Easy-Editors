@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -117,18 +118,34 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 	}
 
 	@Override
-	public void mouseClickedVirtual(int mouseX, int mouseY, int mouseButton) {
-		commandSlotRectangle.onMouseClicked(mouseX, mouseY, mouseButton);
+	public void handleMouseInput() throws IOException {
+		int amtScrolled = Mouse.getEventDWheel();
+		if (amtScrolled != 0)
+			if (commandSlotRectangle.onMouseScrolled(Mouse.getEventX() * width / mc.displayWidth,
+					height - Mouse.getEventY() * height / mc.displayHeight - 1, amtScrolled > 0))
+				setUsesMouseWheel(false);
+
+		super.handleMouseInput();
+
+		setUsesMouseWheel(true);
 	}
 
 	@Override
-	public void mouseReleasedVirtual(int mouseX, int mouseY, int mouseButton) {
-		commandSlotRectangle.onMouseReleased(mouseX, mouseY, mouseButton);
+	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		if (!commandSlotRectangle.onMouseClicked(mouseX, mouseY, mouseButton))
+			super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
-	public void mouseClickMoveVirtual(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		commandSlotRectangle.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
+		if (!commandSlotRectangle.onMouseReleased(mouseX, mouseY, mouseButton))
+			super.mouseReleased(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		if (!commandSlotRectangle.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
+			super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 	}
 
 	@Override

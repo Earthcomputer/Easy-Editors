@@ -152,24 +152,39 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 	}
 
 	@Override
-	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		for (IGuiCommandSlot child : children) {
-			child.onMouseClicked(mouseX, mouseY, mouseButton);
+			if (child.onMouseClicked(mouseX, mouseY, mouseButton))
+				return true;
 		}
+		return false;
 	}
 
 	@Override
-	public void onMouseReleased(int mouseX, int mouseY, int mouseButton) {
+	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
 		for (IGuiCommandSlot child : children) {
-			child.onMouseReleased(mouseX, mouseY, mouseButton);
+			if (child.onMouseReleased(mouseX, mouseY, mouseButton))
+				return true;
 		}
+		return false;
 	}
 
 	@Override
-	public void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		for (IGuiCommandSlot child : children) {
-			child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+			if (child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
+				return true;
 		}
+		return false;
+	}
+	
+	@Override
+	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
+		for (IGuiCommandSlot child : children) {
+			if (child.onMouseScrolled(mouseX, mouseY, scrolledUp))
+				return true;
+		}
+		return false;
 	}
 
 }

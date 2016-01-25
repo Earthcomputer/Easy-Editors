@@ -93,25 +93,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 				r = true;
 		return r;
 	}
-
-	@Override
-	public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		for (IGuiCommandSlot child : children)
-			child.onMouseClicked(mouseX, mouseY, mouseButton);
-	}
-
-	@Override
-	public void onMouseReleased(int mouseX, int mouseY, int mouseButton) {
-		for (IGuiCommandSlot child : children)
-			child.onMouseReleased(mouseX, mouseY, mouseButton);
-	}
-
-	@Override
-	public void onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		for (IGuiCommandSlot child : children)
-			child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-	}
-
+	
 	@Override
 	public String getCommand() {
 		return commandName;
