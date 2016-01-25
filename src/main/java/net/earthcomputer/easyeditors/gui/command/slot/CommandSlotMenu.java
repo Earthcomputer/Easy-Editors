@@ -82,6 +82,8 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
+		
 		if (expanded) {
 			expandUpwards = y + 12 + values.length * 12 >= Minecraft.getMinecraft().currentScreen.height;
 			int top = expandUpwards ? y - values.length * 12 : y + 12;

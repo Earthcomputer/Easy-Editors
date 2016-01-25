@@ -124,7 +124,7 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 		int height = 0;
 		for (IGuiCommandSlot child : children) {
 			if (child.getHeight() > 0) {
-				child.draw(x, y + height, mouseX, mouseY, partialTicks);
+				child.drawForeground(x, y + height, mouseX, mouseY, partialTicks);
 				height += child.getHeight() + 2;
 			}
 		}
