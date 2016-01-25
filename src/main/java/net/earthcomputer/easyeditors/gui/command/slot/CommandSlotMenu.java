@@ -18,6 +18,11 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	private String[] values;
 	private int currentValue = 0;
+	private boolean expanded = false;
+
+	private int x;
+	private int y;
+	private boolean expandUpwards;
 
 	private FontRenderer fontRenderer;
 
@@ -67,10 +72,39 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		this.x = x;
+		this.y = y;
 		Gui.drawRect(x, y, x + getWidth() - 12, y + 12, 0xff000000);
 		Gui.drawRect(x + getWidth() - 12, y, x + getWidth(), y + 12, 0xff202020);
-		drawString(fontRenderer, values[currentValue], x + 2, y + 2, 0xffffffff);
-		fontRenderer.drawString("v", x + getWidth() - 9, y + 2, 0xffd0d0d0);
+		drawString(fontRenderer, values[currentValue], x + 2, y + 2, 0xffffff);
+		fontRenderer.drawString("v", x + getWidth() - 9, y + 2, 0xd0d0d0);
+
+		if (expanded) {
+			expandUpwards = y + 12 + values.length * 12 >= Minecraft.getMinecraft().currentScreen.height;
+
+			int top = expandUpwards ? y - values.length * 12 : y + 12;
+			for (int i = 0; i < values.length; i++) {
+				Gui.drawRect(x, top + i * 12, x + getWidth(), top + i * 12 + 12, i % 2 == 0 ? 0xe0808080 : 0xe0606060);
+				drawString(fontRenderer, values[i], x + 2, top + i * 12 + 2, 0xffffff);
+			}
+		}
+	}
+
+	@Override
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+		if (expanded) {
+			expanded = false;
+			int top = expandUpwards ? y - values.length * 12 : y + 12;
+			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= top && mouseY < top + values.length * 12) {
+				currentValue = (mouseY - top) / 12;
+				return true;
+			}
+		} else {
+			if (mouseX >= x + getWidth() - 12 && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
+				expanded = true;
+			}
+		}
+		return false;
 	}
 
 }
