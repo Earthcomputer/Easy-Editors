@@ -78,10 +78,12 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 		Gui.drawRect(x + getWidth() - 12, y, x + getWidth(), y + 12, 0xff202020);
 		drawString(fontRenderer, values[currentValue], x + 2, y + 2, 0xffffff);
 		fontRenderer.drawString("v", x + getWidth() - 9, y + 2, 0xd0d0d0);
+	}
 
+	@Override
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		if (expanded) {
 			expandUpwards = y + 12 + values.length * 12 >= Minecraft.getMinecraft().currentScreen.height;
-
 			int top = expandUpwards ? y - values.length * 12 : y + 12;
 			for (int i = 0; i < values.length; i++) {
 				Gui.drawRect(x, top + i * 12, x + getWidth(), top + i * 12 + 12, i % 2 == 0 ? 0xe0808080 : 0xe0606060);
@@ -105,6 +107,11 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
+		return expanded;
 	}
 
 }
