@@ -116,6 +116,19 @@ public class CommandSlotVerticalArrangement extends GuiCommandSlotImpl implement
 			}
 		}
 	}
+	
+	@Override
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
+		
+		int height = 0;
+		for (IGuiCommandSlot child : children) {
+			if (child.getHeight() > 0) {
+				child.draw(x, y + height, mouseX, mouseY, partialTicks);
+				height += child.getHeight() + 2;
+			}
+		}
+	}
 
 	@Override
 	public void onWidthChange(int oldWidth, int newWidth) {

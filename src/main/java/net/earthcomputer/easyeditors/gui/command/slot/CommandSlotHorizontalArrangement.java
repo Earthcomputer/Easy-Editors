@@ -118,6 +118,20 @@ public class CommandSlotHorizontalArrangement extends GuiCommandSlotImpl impleme
 	}
 
 	@Override
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
+		
+		int width = 0;
+		for (IGuiCommandSlot child : children) {
+			if (child.getWidth() > 0) {
+				child.drawForeground(x + width, y + getHeight() / 2 - child.getHeight() / 2, mouseX, mouseY,
+						partialTicks);
+				width += child.getWidth() + 2;
+			}
+		}
+	}
+
+	@Override
 	public void onWidthChange(int oldWidth, int newWidth) {
 		recalcSize();
 	}

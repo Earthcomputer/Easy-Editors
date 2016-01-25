@@ -123,6 +123,15 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 		}
 	}
 
+	@Override
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
+		
+		for (int i = 0; i < children.size(); i++) {
+			children.get(i).drawForeground(x + 20, y + childTops[i], mouseX, mouseY, partialTicks);
+		}
+	}
+
 	/**
 	 * 
 	 * @param rawCommand

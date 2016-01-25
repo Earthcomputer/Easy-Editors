@@ -48,6 +48,13 @@ public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeCha
 	}
 
 	@Override
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
+
+		child.drawForeground(x + 2, y + 2, mouseX, mouseY, partialTicks);
+	}
+
+	@Override
 	public boolean onKeyTyped(char typedChar, int keyCode) {
 		return child.onKeyTyped(typedChar, keyCode);
 	}

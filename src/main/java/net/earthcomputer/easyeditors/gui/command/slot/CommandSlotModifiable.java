@@ -69,6 +69,14 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 		if (child != null)
 			child.draw(x, y, mouseX, mouseY, partialTicks);
 	}
+	
+	@Override
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
+		
+		if (child != null)
+			child.drawForeground(x, y, mouseX, mouseY, partialTicks);
+	}
 
 	@Override
 	public boolean onKeyTyped(char typedChar, int keyCode) {

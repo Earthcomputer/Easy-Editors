@@ -91,6 +91,13 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 		if (isExpanded)
 			child.draw(x, y + 18, mouseX, mouseY, partialTicks);
 	}
+	
+	@Override
+	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
+		if (isExpanded)
+			child.drawForeground(x, y + 18, mouseX, mouseY, partialTicks);
+	}
 
 	@Override
 	public boolean onKeyTyped(char typedChar, int keyCode) {
