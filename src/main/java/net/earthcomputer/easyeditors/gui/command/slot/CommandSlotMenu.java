@@ -83,12 +83,13 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	@Override
 	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
-		
+
 		if (expanded) {
 			expandUpwards = y + 12 + values.length * 12 >= Minecraft.getMinecraft().currentScreen.height;
 			int top = expandUpwards ? y - values.length * 12 : y + 12;
 			for (int i = 0; i < values.length; i++) {
-				Gui.drawRect(x, top + i * 12, x + getWidth() - 12, top + i * 12 + 12, i % 2 == 0 ? 0xe0808080 : 0xe0606060);
+				Gui.drawRect(x, top + i * 12, x + getWidth() - 12, top + i * 12 + 12,
+						i % 2 == 0 ? 0xe0808080 : 0xe0606060);
 				drawString(fontRenderer, values[i], x + 2, top + i * 12 + 2, 0xffffff);
 			}
 		}
@@ -96,16 +97,18 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (expanded) {
-			expanded = false;
-			int top = expandUpwards ? y - values.length * 12 : y + 12;
-			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= top && mouseY < top + values.length * 12) {
-				currentValue = (mouseY - top) / 12;
-				return true;
-			}
-		} else {
-			if (mouseX >= x + getWidth() - 12 && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
-				expanded = true;
+		if (mouseButton == 0) {
+			if (expanded) {
+				expanded = false;
+				int top = expandUpwards ? y - values.length * 12 : y + 12;
+				if (mouseX >= x && mouseX < x + getWidth() && mouseY >= top && mouseY < top + values.length * 12) {
+					currentValue = (mouseY - top) / 12;
+					return true;
+				}
+			} else {
+				if (mouseX >= x + getWidth() - 12 && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
+					expanded = true;
+				}
 			}
 		}
 		return false;
