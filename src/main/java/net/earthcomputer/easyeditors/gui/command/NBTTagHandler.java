@@ -12,12 +12,15 @@ import com.google.common.collect.Maps;
 import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -41,6 +44,16 @@ public abstract class NBTTagHandler {
 			}
 		};
 		registerItemStackHandler(alwaysTrue, DisplayHandler.class);
+		registerItemStackHandler(new Predicate<ItemStack>() {
+			@Override
+			public boolean apply(ItemStack stack) {
+				if (stack == null)
+					return false;
+				Item item = stack.getItem();
+				return (item instanceof ItemArmor)
+						&& ((ItemArmor) item).getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER;
+			}
+		}, ArmorColorHandler.class);
 	}
 
 	/**
@@ -274,6 +287,42 @@ public abstract class NBTTagHandler {
 			}
 
 			if (!display.hasNoTags()) {
+				if (nbt.hasKey("display", Constants.NBT.TAG_COMPOUND))
+					display.merge(nbt.getCompoundTag("display"));
+				nbt.setTag("display", display);
+			}
+		}
+
+	}
+
+	public static class ArmorColorHandler extends NBTTagHandler {
+
+		private CommandSlotColor color;
+
+		@Override
+		public IGuiCommandSlot[] setupCommandSlot() {
+			return new IGuiCommandSlot[] {
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.leatherArmor.color"),
+							Colors.itemLabel.color, color = new CommandSlotColor(false)) };
+		}
+
+		@Override
+		public void readFromNBT(NBTTagCompound nbt) {
+			int color = 0xffffff;
+			if (nbt != null && nbt.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
+				NBTTagCompound display = nbt.getCompoundTag("display");
+				if (display.hasKey("color", Constants.NBT.TAG_INT))
+					color = display.getInteger("color");
+			}
+			this.color.setColor(color);
+		}
+
+		@Override
+		public void writeToNBT(NBTTagCompound nbt) {
+			int color = this.color.getColor() & 0xffffff;
+			if (color != 0xffffff) {
+				NBTTagCompound display = new NBTTagCompound();
+				display.setInteger("color", color);
 				if (nbt.hasKey("display", Constants.NBT.TAG_COMPOUND))
 					display.merge(nbt.getCompoundTag("display"));
 				nbt.setTag("display", display);

@@ -1,3 +1,5 @@
+gui.commandEditor.item.nbt.leatherArmor.color=Colour
+
 gui.easyeditorsconfig.colortitleline2=Click on the colours to select them more easily
 gui.easyeditorsconfig.colortooltip=Colour Picker
 gui.easyeditorsconfig.ctgy.colors=Colours
