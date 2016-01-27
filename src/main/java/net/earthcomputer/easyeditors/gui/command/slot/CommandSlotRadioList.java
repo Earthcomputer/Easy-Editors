@@ -1,12 +1,11 @@
 package net.earthcomputer.easyeditors.gui.command.slot;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.api.GeneralUtils;
-import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -18,13 +17,11 @@ import net.minecraft.util.ResourceLocation;
  * @author Earthcomputer
  *
  */
-public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements ISizeChangeListener {
+public abstract class CommandSlotRadioList extends CommandSlotCollection {
 
 	private static final ResourceLocation radioButtonLocation = new ResourceLocation(
 			"easyeditors:textures/gui/radio_button.png");
 
-	private List<IGuiCommandSlot> children;
-	private int[] childTops;
 	private int[] buttonTops;
 
 	private int selectedIndex = 0;
@@ -33,32 +30,94 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 	private int y;
 
 	public CommandSlotRadioList(IGuiCommandSlot... children) {
-		super(calcWidth(children), calcHeight(children));
-		this.children = Lists.newArrayList(children);
-		for (IGuiCommandSlot child : children) {
-			child.addSizeChangeListener(this);
-			child.setParent(this);
-		}
-		childTops = new int[children.length];
+		super(children);
 		buttonTops = new int[children.length];
-		refreshHeights();
+		refreshButtonTops();
 	}
 
-	private static int calcWidth(IGuiCommandSlot[] children) {
+	@Override
+	protected void recalcWidth() {
 		int max = 0;
-		for (IGuiCommandSlot child : children) {
+		for (IGuiCommandSlot child : this) {
 			if (child.getWidth() > max)
 				max = child.getWidth();
 		}
-		return max + 22;
+		setWidth(max + 22);
 	}
 
-	private static int calcHeight(IGuiCommandSlot[] children) {
-		int total = children.length == 0 ? 0 : children.length * 3;
-		for (IGuiCommandSlot child : children) {
+	@Override
+	protected void recalcHeight() {
+		int total = size() == 0 ? 0 : size() * 3;
+		for (IGuiCommandSlot child : this) {
 			total += child.getHeight() > 16 ? child.getHeight() : 16;
 		}
-		return total;
+		setHeight(total);
+	}
+
+	@Override
+	protected int[] getXPosChildren(int x) {
+		int[] xs = new int[size()];
+		Arrays.fill(xs, 20);
+		return xs;
+	}
+
+	@Override
+	protected int[] getYPosChildren(int y) {
+		int[] ys = new int[size()];
+		int height = 1;
+		for (int i = 0; i < ys.length; i++) {
+			IGuiCommandSlot child = getChildAt(i);
+			if (child.getHeight() > 16) {
+				ys[i] = height;
+				height += child.getHeight();
+			} else {
+				ys[i] = height + 8 - child.getHeight() / 2;
+				height += 16;
+			}
+			height += 3;
+		}
+		return ys;
+	}
+	
+	@Override
+	public void clearChildren() {
+		super.clearChildren();
+		selectedIndex = 0;
+		refreshButtonTops();
+	}
+	
+	@Override
+	public void addChild(IGuiCommandSlot child) {
+		super.addChild(child);
+		refreshButtonTops();
+	}
+	
+	@Override
+	public void addChild(int index, IGuiCommandSlot child) {
+		super.addChild(index, child);
+		if (index <= selectedIndex)
+			selectedIndex++;
+		refreshButtonTops();
+	}
+	
+	@Override
+	public void addChildren(Collection<? extends IGuiCommandSlot> children) {
+		super.addChildren(children);
+		refreshButtonTops();
+	}
+	
+	@Override
+	public void addChildren(int index, Collection<? extends IGuiCommandSlot> children) {
+		super.addChildren(index, children);
+		if (index <= selectedIndex)
+			selectedIndex += children.size();
+		refreshButtonTops();
+	}
+	
+	@Override
+	public void setChildAt(int index, IGuiCommandSlot child) {
+		super.setChildAt(index, child);
+		refreshButtonTops();
 	}
 
 	/**
@@ -83,16 +142,16 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 		if (index >= args.length)
 			throw new CommandSyntaxException();
 		selectedIndex = getSelectedIndexForString(args, index);
-		if (!children.isEmpty()) {
-			return children.get(selectedIndex).readFromArgs(args, index);
+		if (size() != 0) {
+			return getChildAt(selectedIndex).readFromArgs(args, index);
 		}
 		return 0;
 	}
 
 	@Override
 	public void addArgs(List<String> args) {
-		if (!children.isEmpty()) {
-			children.get(selectedIndex).addArgs(args);
+		if (size() != 0) {
+			getChildAt(selectedIndex).addArgs(args);
 		}
 	}
 
@@ -102,8 +161,8 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 		GlStateManager.disableFog();
 		this.x = x;
 		this.y = y;
-		for (int i = 0; i < children.size(); i++) {
-			IGuiCommandSlot child = children.get(i);
+		for (int i = 0; i < size(); i++) {
+			IGuiCommandSlot child = getChildAt(i);
 			Minecraft.getMinecraft().getTextureManager().bindTexture(radioButtonLocation);
 			GlStateManager.color(1, 1, 1, 1);
 			drawModalRectWithCustomSizedTexture(x, y + buttonTops[i], i == selectedIndex ? 16 : 0,
@@ -111,25 +170,16 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 							? 16 : 0,
 					16, 16, 32, 32);
 			if (i == selectedIndex) {
-				drawHorizontalLine(x + 18, x + getWidth() - 1, y + childTops[i] - 2, Colors.radioOutline.color);
-				drawHorizontalLine(x + 18, x + getWidth() - 1, y + childTops[i] + child.getHeight() + 1,
+				drawHorizontalLine(x + 18, x + getWidth() - 1, y + getYOfChild(y, i) - 2, Colors.radioOutline.color);
+				drawHorizontalLine(x + 18, x + getWidth() - 1, y + getYOfChild(y, i) + child.getHeight() + 1,
 						Colors.radioOutline.color);
-				drawVerticalLine(x + 18, y + childTops[i] - 2, y + childTops[i] + child.getHeight() + 1,
+				drawVerticalLine(x + 18, y + getYOfChild(y, i) - 2, y + getYOfChild(y, i) + child.getHeight() + 1,
 						Colors.radioOutline.color);
-				drawVerticalLine(x + getWidth() - 1, y + childTops[i] - 2, y + childTops[i] + child.getHeight() + 1,
-						Colors.radioOutline.color);
+				drawVerticalLine(x + getWidth() - 1, y + getYOfChild(y, i) - 2,
+						y + getYOfChild(y, i) + child.getHeight() + 1, Colors.radioOutline.color);
 			}
-			child.draw(x + 20, y + childTops[i], mouseX, mouseY, partialTicks);
 		}
-	}
-
-	@Override
-	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
-		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
-		
-		for (int i = 0; i < children.size(); i++) {
-			children.get(i).drawForeground(x + 20, y + childTops[i], mouseX, mouseY, partialTicks);
-		}
+		super.draw(x, y, mouseX, mouseY, partialTicks);
 	}
 
 	/**
@@ -143,16 +193,16 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 
 	@Override
 	public boolean onKeyTyped(char typedChar, int keyCode) {
-		if (!children.isEmpty())
-			return children.get(selectedIndex).onKeyTyped(typedChar, keyCode);
+		if (size() != 0)
+			return getChildAt(selectedIndex).onKeyTyped(typedChar, keyCode);
 		else
 			return false;
 	}
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (!children.isEmpty())
-			if (children.get(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton))
+		if (size() != 0)
+			if (getChildAt(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton))
 				return true;
 		if (mouseButton == 0) {
 			if (mouseX >= x && mouseX < x + getWidth()) {
@@ -167,66 +217,43 @@ public abstract class CommandSlotRadioList extends GuiCommandSlotImpl implements
 				}
 			}
 		}
-		if (!children.isEmpty()) {
-			return children.get(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton);
+		if (size() != 0) {
+			return getChildAt(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton);
 		}
 		return false;
 	}
 
 	@Override
 	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
-		if (!children.isEmpty())
-			return children.get(selectedIndex).onMouseReleased(mouseX, mouseY, mouseButton);
+		if (size() != 0)
+			return getChildAt(selectedIndex).onMouseReleased(mouseX, mouseY, mouseButton);
 		return false;
 	}
 
 	@Override
 	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		if (!children.isEmpty())
-			return children.get(selectedIndex).onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+		if (size() != 0)
+			return getChildAt(selectedIndex).onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		return false;
 	}
-	
+
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
-		if (!children.isEmpty())
-			return children.get(selectedIndex).onMouseScrolled(mouseX, mouseY, scrolledUp);
+		if (size() != 0)
+			return getChildAt(selectedIndex).onMouseScrolled(mouseX, mouseY, scrolledUp);
 		return false;
 	}
 
-	@Override
-	public void onWidthChange(int oldWidth, int newWidth) {
-		int max = 0;
-		for (IGuiCommandSlot child : children) {
-			if (child.getWidth() > max)
-				max = child.getWidth();
-		}
-		setWidth(max + 22);
-	}
-
-	@Override
-	public void onHeightChange(int oldHeight, int newHeight) {
-		int total = children.size() == 0 ? 0 : children.size() * 3;
-		for (IGuiCommandSlot child : children) {
-			total += child.getHeight() > 16 ? child.getHeight() : 16;
-		}
-		setHeight(total);
-		refreshHeights();
-	}
-
-	private void refreshHeights() {
-		if (children.size() != childTops.length) {
-			childTops = new int[children.size()];
-			buttonTops = new int[childTops.length];
+	private void refreshButtonTops() {
+		if (size() != buttonTops.length) {
+			buttonTops = new int[size()];
 		}
 		int height = 1;
-		for (int i = 0; i < childTops.length; i++) {
-			IGuiCommandSlot child = children.get(i);
+		for (int i = 0; i < buttonTops.length; i++) {
+			IGuiCommandSlot child = getChildAt(i);
 			if (child.getHeight() > 16) {
-				childTops[i] = height;
 				buttonTops[i] = height + child.getHeight() / 2 - 8;
 			} else {
-				childTops[i] = height + 8 - child.getHeight() / 2;
 				buttonTops[i] = height;
 			}
 			height += child.getHeight() > 16 ? child.getHeight() : 16;

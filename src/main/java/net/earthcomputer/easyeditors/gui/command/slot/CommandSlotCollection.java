@@ -150,9 +150,23 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 	public void addChildren(IGuiCommandSlot... children) {
 		addChildren(Arrays.asList(children));
 	}
+	
+	public void addChildren(int index, IGuiCommandSlot... children) {
+		addChildren(index, Arrays.asList(children));
+	}
 
 	public void addChildren(Collection<? extends IGuiCommandSlot> children) {
 		this.children.addAll(children);
+		for (IGuiCommandSlot child : children) {
+			child.addSizeChangeListener(this);
+			child.setParent(this);
+		}
+		recalcSize();
+		recalcPosChildren();
+	}
+	
+	public void addChildren(int index, Collection<? extends IGuiCommandSlot> children) {
+		this.children.addAll(index, children);
 		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
 			child.setParent(this);
@@ -213,11 +227,15 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 	protected abstract int[] getYPosChildren(int y);
 
 	protected int getXOfChild(int x, int index) {
-		return getXPosChildren(x)[index];
+		if (recalcXPosChildren)
+			xs = getXPosChildren(x);
+		return xs[index];
 	}
 
 	protected int getYOfChild(int y, int index) {
-		return getYPosChildren(y)[index];
+		if (recalcYPosChildren)
+			ys = getYPosChildren(y);
+		return ys[index];
 	}
 
 	@Override
