@@ -32,31 +32,17 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		String[] newArgs = new String[args.length - index - 1];
 		System.arraycopy(args, index + 1, newArgs, 0, newArgs.length);
 		commandSyntax = ICommandSyntax.forCommandName(commandName);
+		clearChildren();
+		addChild(header);
 		if (commandSyntax != null) {
-			IGuiCommandSlot[] syntaxChildren = commandSyntax.setupCommand();
-			children = new IGuiCommandSlot[syntaxChildren.length + 1];
-			children[0] = header;
-			System.arraycopy(syntaxChildren, 0, children, 1, syntaxChildren.length);
-		} else {
-			children = new IGuiCommandSlot[] { buildHeader(commandName) };
+			addChildren(commandSyntax.setupCommand());
 		}
-		for (IGuiCommandSlot child : children) {
-			child.addSizeChangeListener(this);
-			child.setParent(this);
-		}
-		recalcSize();
 		try {
 			return super.readFromArgs(args, index + 1) + 1;
 		} catch (CommandSyntaxException e) {
-			IGuiCommandSlot[] syntaxChildren = commandSyntax.setupCommand();
-			for (IGuiCommandSlot child : syntaxChildren) {
-				child.addSizeChangeListener(this);
-				child.setParent(this);
-			}
-			children = new IGuiCommandSlot[syntaxChildren.length + 1];
-			children[0] = header;
-			System.arraycopy(syntaxChildren, 0, children, 1, syntaxChildren.length);
-			recalcSize();
+			clearChildren();
+			addChild(header);
+			addChildren(commandSyntax.setupCommand());
 			return 1;
 		}
 	}
@@ -80,20 +66,9 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	@Override
 	public void addArgs(List<String> args) {
 		args.add(commandName);
-		for (IGuiCommandSlot child : children) {
-			child.addArgs(args);
-		}
+		super.addArgs(args);
 	}
 
-	@Override
-	public boolean onKeyTyped(char typedChar, int keyCode) {
-		boolean r = false;
-		for (IGuiCommandSlot child : children)
-			if (child.onKeyTyped(typedChar, keyCode))
-				r = true;
-		return r;
-	}
-	
 	@Override
 	public String getCommand() {
 		return commandName;
@@ -103,17 +78,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	public void setCommand(String rawCommand) {
 		if (!rawCommand.equals(commandName)) {
 			commandName = rawCommand;
-			IGuiCommandSlot header = buildHeader(rawCommand);
 			commandSyntax = ICommandSyntax.forCommandName(rawCommand);
-			IGuiCommandSlot[] syntaxChildren = commandSyntax.setupCommand();
-			children = new IGuiCommandSlot[syntaxChildren.length + 1];
-			children[0] = header;
-			System.arraycopy(syntaxChildren, 0, children, 1, syntaxChildren.length);
-			for (IGuiCommandSlot child : children) {
-				child.addSizeChangeListener(this);
-				child.setParent(this);
-			}
-			recalcSize();
+			clearChildren();
+			addChild(buildHeader(rawCommand));
+			addChildren(commandSyntax.setupCommand());
 		}
 	}
 

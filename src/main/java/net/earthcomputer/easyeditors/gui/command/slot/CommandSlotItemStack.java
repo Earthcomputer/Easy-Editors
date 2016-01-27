@@ -57,9 +57,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		}
 		final int finalDisplayComponents = displayComponents;
 
-		List<IGuiCommandSlot> children = Lists.newArrayList();
-
-		children.add(new CommandSlotHorizontalArrangement(new CompItem(), new CommandSlotButton(20, 20, "...") {
+		addChild(new CommandSlotHorizontalArrangement(new CompItem(), new CommandSlotButton(20, 20, "...") {
 			@Override
 			public void onPress() {
 				Minecraft.getMinecraft().displayGuiScreen(new GuiItemSelector(Minecraft.getMinecraft().currentScreen,
@@ -68,22 +66,14 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		}));
 
 		if ((displayComponents & COMPONENT_STACK_SIZE) != 0)
-			children.add(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.stackSize"),
+			addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.stackSize"),
 					Colors.itemLabel.color, stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)));
 
 		if ((displayComponents & COMPONENT_DAMAGE) != 0)
-			children.add(damageSlot = new CommandSlotModifiable(null));
+			addChild(damageSlot = new CommandSlotModifiable(null));
 
 		if ((displayComponents & COMPONENT_NBT) != 0)
-			children.add(nbtSlot = new CommandSlotModifiable(null));
-
-		for (IGuiCommandSlot child : children) {
-			child.addSizeChangeListener(this);
-			child.setParent(this);
-		}
-		this.children = children.toArray(new IGuiCommandSlot[children.size()]);
-
-		recalcSize();
+			addChild(nbtSlot = new CommandSlotModifiable(null));
 	}
 
 	@Override

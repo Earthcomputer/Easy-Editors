@@ -21,10 +21,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	private CommandSlotTextField UUIDField;
 
 	public CommandSlotPlayerSelector() {
-		children = new IGuiCommandSlot[2];
-
-		children[0] = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-				I18n.format("gui.commandEditor.playerSelector.selectBy"), Colors.playerSelectorSelectBy.color);
+		addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+				I18n.format("gui.commandEditor.playerSelector.selectBy"), Colors.playerSelectorSelectBy.color));
 
 		playerNameField = new CommandSlotTextField(200, 200);
 		playerNameField.setContentFilter(new Predicate<String>() {
@@ -44,7 +42,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 		});
 
-		children[1] = radioList = new CommandSlotRadioList(
+		addChild(radioList = new CommandSlotRadioList(
 				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.username"),
 						Colors.playerSelectorLabel.color, playerNameField),
 				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.uuid"),
@@ -61,14 +59,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				else
 					throw new CommandSyntaxException();
 			}
-		};
-
-		for (IGuiCommandSlot child : children) {
-			child.addSizeChangeListener(this);
-			child.setParent(this);
-		}
-
-		recalcSize();
+		});
 	}
 
 	/**
