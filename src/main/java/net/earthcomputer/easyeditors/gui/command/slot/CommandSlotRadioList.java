@@ -57,14 +57,14 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	}
 
 	@Override
-	protected int[] getXPosChildren(int x) {
+	protected int[] getXPosChildren() {
 		int[] xs = new int[size()];
 		Arrays.fill(xs, 20);
 		return xs;
 	}
 
 	@Override
-	protected int[] getYPosChildren(int y) {
+	protected int[] getYPosChildren() {
 		int[] ys = new int[size()];
 		int height = 1;
 		for (int i = 0; i < ys.length; i++) {
@@ -193,13 +193,13 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 							? 16 : 0,
 					16, 16, 32, 32);
 			if (i == selectedIndex) {
-				drawHorizontalLine(x + 18, x + getWidth() - 1, y + getYOfChild(y, i) - 2, Colors.radioOutline.color);
-				drawHorizontalLine(x + 18, x + getWidth() - 1, y + getYOfChild(y, i) + child.getHeight() + 1,
+				drawHorizontalLine(x + 18, x + getWidth() - 1, y + getYOfChild(i) - 2, Colors.radioOutline.color);
+				drawHorizontalLine(x + 18, x + getWidth() - 1, y + getYOfChild(i) + child.getHeight() + 1,
 						Colors.radioOutline.color);
-				drawVerticalLine(x + 18, y + getYOfChild(y, i) - 2, y + getYOfChild(y, i) + child.getHeight() + 1,
+				drawVerticalLine(x + 18, y + getYOfChild(i) - 2, y + getYOfChild(i) + child.getHeight() + 1,
 						Colors.radioOutline.color);
-				drawVerticalLine(x + getWidth() - 1, y + getYOfChild(y, i) - 2,
-						y + getYOfChild(y, i) + child.getHeight() + 1, Colors.radioOutline.color);
+				drawVerticalLine(x + getWidth() - 1, y + getYOfChild(i) - 2,
+						y + getYOfChild(i) + child.getHeight() + 1, Colors.radioOutline.color);
 			}
 		}
 		super.draw(x, y, mouseX, mouseY, partialTicks);

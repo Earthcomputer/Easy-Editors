@@ -56,11 +56,11 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		if (recalcXPosChildren) {
 			recalcXPosChildren = false;
-			xs = getXPosChildren(x);
+			xs = getXPosChildren();
 		}
 		if (recalcYPosChildren) {
 			recalcYPosChildren = false;
-			ys = getYPosChildren(y);
+			ys = getYPosChildren();
 		}
 		for (int i = 0; i < children.size(); i++) {
 			children.get(i).draw(x + xs[i], y + ys[i], mouseX, mouseY, partialTicks);
@@ -228,19 +228,19 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 
 	protected abstract void recalcHeight();
 
-	protected abstract int[] getXPosChildren(int x);
+	protected abstract int[] getXPosChildren();
 
-	protected abstract int[] getYPosChildren(int y);
+	protected abstract int[] getYPosChildren();
 
-	protected int getXOfChild(int x, int index) {
+	protected int getXOfChild(int index) {
 		if (recalcXPosChildren)
-			xs = getXPosChildren(x);
+			xs = getXPosChildren();
 		return xs[index];
 	}
 
-	protected int getYOfChild(int y, int index) {
+	protected int getYOfChild(int index) {
 		if (recalcYPosChildren)
-			ys = getYPosChildren(y);
+			ys = getYPosChildren();
 		return ys[index];
 	}
 

@@ -41,14 +41,14 @@ public class CommandSlotVerticalArrangement extends CommandSlotCollection {
 	}
 	
 	@Override
-	protected int[] getXPosChildren(int x) {
+	protected int[] getXPosChildren() {
 		int[] xs = new int[size()];
 		Arrays.fill(xs, 0);
 		return xs;
 	}
 	
 	@Override
-	protected int[] getYPosChildren(int y) {
+	protected int[] getYPosChildren() {
 		int[] ys = new int[size()];
 		int height = 0;
 		for (int i = 0; i < ys.length; i++) {

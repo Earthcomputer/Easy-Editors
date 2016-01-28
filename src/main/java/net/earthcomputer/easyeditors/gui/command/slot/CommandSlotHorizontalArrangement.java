@@ -39,7 +39,7 @@ public class CommandSlotHorizontalArrangement extends CommandSlotCollection {
 	}
 
 	@Override
-	protected int[] getXPosChildren(int x) {
+	protected int[] getXPosChildren() {
 		int[] xs = new int[size()];
 		int width = 0;
 		for (int i = 0; i < xs.length; i++) {
@@ -53,7 +53,7 @@ public class CommandSlotHorizontalArrangement extends CommandSlotCollection {
 	}
 
 	@Override
-	protected int[] getYPosChildren(int y) {
+	protected int[] getYPosChildren() {
 		int[] ys = new int[size()];
 		for (int i = 0; i < ys.length; i++) {
 			ys[i] = getHeight() / 2 - getChildAt(i).getHeight() / 2;
