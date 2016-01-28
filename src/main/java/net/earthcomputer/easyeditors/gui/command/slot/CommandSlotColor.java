@@ -71,10 +71,10 @@ public class CommandSlotColor extends GuiCommandSlotImpl implements IColorPicker
 			tessellator.draw();
 		}
 		Gui.drawRect(x, y, x + getWidth(), y + getHeight(), color);
-		drawHorizontalLine(x, x + getWidth(), y, 0);
-		drawHorizontalLine(x, x + getWidth(), y + getHeight(), 0);
-		drawVerticalLine(x, y, y + getHeight(), 0);
-		drawVerticalLine(x + getWidth(), y, y + getHeight(), 0);
+		drawHorizontalLine(x, x + getWidth(), y, 0xff000000);
+		drawHorizontalLine(x, x + getWidth(), y + getHeight(), 0xff000000);
+		drawVerticalLine(x, y, y + getHeight(), 0xff000000);
+		drawVerticalLine(x + getWidth(), y, y + getHeight(), 0xff000000);
 
 		if (hoverChecker == null)
 			hoverChecker = new HoverChecker(y, y + getHeight(), x, x + getWidth(), 1000);
