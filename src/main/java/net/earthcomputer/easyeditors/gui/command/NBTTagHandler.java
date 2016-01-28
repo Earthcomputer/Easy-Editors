@@ -38,7 +38,8 @@ import net.minecraftforge.common.util.Constants;
  */
 public abstract class NBTTagHandler {
 
-	private static final Map<String, Map<Predicate<?>, Class<? extends NBTTagHandler>>> handlers = Maps.newHashMap();
+	private static final Map<String, Map<Predicate<?>, Class<? extends NBTTagHandler>>> handlers = Maps
+			.newLinkedHashMap();
 
 	static {
 		Predicate<ItemStack> alwaysTrue = new Predicate<ItemStack>() {
