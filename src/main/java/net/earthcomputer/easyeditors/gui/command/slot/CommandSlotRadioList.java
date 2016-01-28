@@ -38,7 +38,8 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	@Override
 	protected void recalcWidth() {
 		int max = 0;
-		for (IGuiCommandSlot child : this) {
+		for (int i = 0; i < size(); i++) {
+			IGuiCommandSlot child = getChildAt(i);
 			if (child.getWidth() > max)
 				max = child.getWidth();
 		}
@@ -48,7 +49,8 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	@Override
 	protected void recalcHeight() {
 		int total = size() == 0 ? 0 : size() * 3;
-		for (IGuiCommandSlot child : this) {
+		for (int i = 0; i < size(); i++) {
+			IGuiCommandSlot child = getChildAt(i);
 			total += child.getHeight() > 16 ? child.getHeight() : 16;
 		}
 		setHeight(total);
@@ -78,45 +80,66 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 		}
 		return ys;
 	}
-	
+
 	@Override
 	public void clearChildren() {
 		super.clearChildren();
 		selectedIndex = 0;
 		refreshButtonTops();
 	}
-	
+
 	@Override
 	public void addChild(IGuiCommandSlot child) {
 		super.addChild(child);
 		refreshButtonTops();
 	}
-	
+
 	@Override
 	public void addChild(int index, IGuiCommandSlot child) {
 		super.addChild(index, child);
-		if (index <= selectedIndex)
+		if (index >= selectedIndex)
 			selectedIndex++;
 		refreshButtonTops();
 	}
-	
+
 	@Override
 	public void addChildren(Collection<? extends IGuiCommandSlot> children) {
 		super.addChildren(children);
 		refreshButtonTops();
 	}
-	
+
 	@Override
 	public void addChildren(int index, Collection<? extends IGuiCommandSlot> children) {
 		super.addChildren(index, children);
-		if (index <= selectedIndex)
+		if (index >= selectedIndex)
 			selectedIndex += children.size();
 		refreshButtonTops();
 	}
-	
+
 	@Override
 	public void setChildAt(int index, IGuiCommandSlot child) {
 		super.setChildAt(index, child);
+		refreshButtonTops();
+	}
+
+	@Override
+	public void removeChild(IGuiCommandSlot child) {
+		int index = getChildren().indexOf(child);
+		super.removeChild(child);
+		if (index == selectedIndex)
+			selectedIndex = 0;
+		else if (index > selectedIndex)
+			selectedIndex--;
+		refreshButtonTops();
+	}
+
+	@Override
+	public void removeChildAt(int index) {
+		super.removeChildAt(index);
+		if (index == selectedIndex)
+			selectedIndex = 0;
+		else if (index > selectedIndex)
+			selectedIndex--;
 		refreshButtonTops();
 	}
 

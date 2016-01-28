@@ -3,7 +3,6 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -17,8 +16,7 @@ import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
  * @author Earthcomputer
  *
  */
-public abstract class CommandSlotCollection extends GuiCommandSlotImpl
-		implements ISizeChangeListener, Iterable<IGuiCommandSlot> {
+public abstract class CommandSlotCollection extends GuiCommandSlotImpl implements ISizeChangeListener {
 
 	private List<IGuiCommandSlot> children;
 	private int[] xs;
@@ -81,8 +79,8 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 	@Override
 	public boolean onKeyTyped(char typedChar, int keyCode) {
 		boolean r = false;
-		for (IGuiCommandSlot child : children) {
-			if (child.onKeyTyped(typedChar, keyCode))
+		for (int i = children.size() - 1; i >= 0; i--) {
+			if (children.get(i).onKeyTyped(typedChar, keyCode))
 				r = true;
 		}
 		return r;
@@ -90,8 +88,8 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		for (IGuiCommandSlot child : children) {
-			if (child.onMouseClicked(mouseX, mouseY, mouseButton))
+		for (int i = children.size() - 1; i >= 0; i--) {
+			if (children.get(i).onMouseClicked(mouseX, mouseY, mouseButton))
 				return true;
 		}
 		return false;
@@ -99,8 +97,8 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 
 	@Override
 	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
-		for (IGuiCommandSlot child : children) {
-			if (child.onMouseReleased(mouseX, mouseY, mouseButton))
+		for (int i = children.size() - 1; i >= 0; i--) {
+			if (children.get(i).onMouseReleased(mouseX, mouseY, mouseButton))
 				return true;
 		}
 		return false;
@@ -108,8 +106,8 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 
 	@Override
 	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		for (IGuiCommandSlot child : children) {
-			if (child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
+		for (int i = children.size() - 1; i >= 0; i--) {
+			if (children.get(i).onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
 				return true;
 		}
 		return false;
@@ -117,8 +115,8 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
-		for (IGuiCommandSlot child : children) {
-			if (child.onMouseScrolled(mouseX, mouseY, scrolledUp))
+		for (int i = children.size() - 1; i >= 0; i--) {
+			if (children.get(i).onMouseScrolled(mouseX, mouseY, scrolledUp))
 				return true;
 		}
 		return false;
@@ -150,7 +148,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 	public void addChildren(IGuiCommandSlot... children) {
 		addChildren(Arrays.asList(children));
 	}
-	
+
 	public void addChildren(int index, IGuiCommandSlot... children) {
 		addChildren(index, Arrays.asList(children));
 	}
@@ -164,7 +162,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 		recalcSize();
 		recalcPosChildren();
 	}
-	
+
 	public void addChildren(int index, Collection<? extends IGuiCommandSlot> children) {
 		this.children.addAll(index, children);
 		for (IGuiCommandSlot child : children) {
@@ -183,6 +181,19 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 		recalcPosChildren();
 	}
 
+	public void removeChild(IGuiCommandSlot child) {
+		children.remove(child);
+		child.removeSizeChangeListener(this);
+		recalcSize();
+		recalcPosChildren();
+	}
+
+	public void removeChildAt(int index) {
+		children.remove(index).removeSizeChangeListener(this);
+		recalcSize();
+		recalcPosChildren();
+	}
+
 	public IGuiCommandSlot getChildAt(int index) {
 		return children.get(index);
 	}
@@ -193,11 +204,6 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl
 
 	public int size() {
 		return children.size();
-	}
-
-	@Override
-	public Iterator<IGuiCommandSlot> iterator() {
-		return children.iterator();
 	}
 
 	protected void recalcPosChildren() {
