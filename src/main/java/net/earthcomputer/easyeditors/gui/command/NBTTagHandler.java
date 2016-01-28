@@ -12,8 +12,10 @@ import com.google.common.collect.Maps;
 import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.api.Instantiator;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
@@ -23,6 +25,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 
@@ -256,22 +260,44 @@ public abstract class NBTTagHandler {
 	public static class DisplayHandler extends NBTTagHandler {
 
 		private CommandSlotTextField displayName;
+		private CommandSlotList<CommandSlotTextField> lore;
 
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
 			displayName = new CommandSlotTextField(100, 400);
 			displayName.setMaxStringLength(Short.MAX_VALUE);
-			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
-					I18n.format("gui.commandEditor.item.nbt.displayName"), Colors.itemLabel.color, displayName) };
+			lore = new CommandSlotList<CommandSlotTextField>(new Instantiator<CommandSlotTextField>() {
+				@Override
+				public CommandSlotTextField newInstance() {
+					return new CommandSlotTextField(100, 400);
+				}
+			});
+			return new IGuiCommandSlot[] {
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.displayName"),
+							Colors.itemLabel.color, displayName),
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.lore"), Colors.itemLabel.color,
+							lore) };
 		}
 
 		@Override
 		public void readFromNBT(NBTTagCompound nbt) {
 			String displayName = "";
+			lore.clearEntries();
 			if (nbt != null && nbt.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
 				NBTTagCompound display = nbt.getCompoundTag("display");
 				if (display.hasKey("Name", Constants.NBT.TAG_STRING)) {
 					displayName = display.getString("Name");
+				}
+				if (display.hasKey("Lore", Constants.NBT.TAG_LIST)) {
+					try {
+						NBTTagList lore = display.getTagList("Lore", Constants.NBT.TAG_STRING);
+						for (int i = 0; i < lore.tagCount(); i++) {
+							CommandSlotTextField textField = new CommandSlotTextField(100, 400);
+							textField.setText(lore.getStringTagAt(i));
+							this.lore.addEntry(textField);
+						}
+					} catch (Exception e) {
+					}
 				}
 			}
 
@@ -285,6 +311,13 @@ public abstract class NBTTagHandler {
 			if (!displayName.getText().isEmpty()) {
 				display.setString("Name", displayName.getText());
 			}
+
+			NBTTagList lore = new NBTTagList();
+			for (int i = 0; i < this.lore.entryCount(); i++) {
+				lore.appendTag(new NBTTagString(this.lore.getEntry(i).getText()));
+			}
+			if (!lore.hasNoTags())
+				display.setTag("Lore", lore);
 
 			if (!display.hasNoTags()) {
 				if (nbt.hasKey("display", Constants.NBT.TAG_COMPOUND))

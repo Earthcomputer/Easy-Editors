@@ -11,6 +11,7 @@ gui.commandEditor.give.player.tooltip=The player to give to
 gui.commandEditor.item.damage.tool.durability=Durability
 gui.commandEditor.item.nbt.leatherArmor.color=Color
 gui.commandEditor.item.nbt.displayName=Custom name
+gui.commandEditor.item.nbt.lore=Custom display text
 gui.commandEditor.item.stackSize=Amount
 gui.commandEditor.noCommand=[No Command]
 gui.commandEditor.noItem=[No Item]
