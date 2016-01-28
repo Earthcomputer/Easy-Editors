@@ -12,7 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
- * A class that has the capability of listening to a blocking messages in chat
+ * A class that has the capability of listening to and blocking messages in chat
  * client-side.
  * 
  * <b>This class is a member of the Easy Editors API</b>

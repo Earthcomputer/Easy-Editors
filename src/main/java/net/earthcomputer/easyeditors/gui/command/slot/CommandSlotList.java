@@ -7,11 +7,32 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.api.Instantiator;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
+/**
+ * A command slot which represents a variable-sized list of child command slots.
+ * The difference is that the user can change the size of the list and insert
+ * components themselves. Instead of refering to children as children, client
+ * code should refer to them as entries, and thus use the {@link #getEntry(int)}
+ * instead of {@link #getChildAt(int)}, {@link #entryCount()} instead of
+ * {@link #size()}, etc. Attempting to manipulate children using these methods
+ * may yield unexpected results
+ * 
+ * @author Earthcomputer
+ *
+ * @param <E>
+ */
 public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerticalArrangement {
 
 	private Instantiator<E> instantiator;
 	private List<E> entries = Lists.newArrayList();
 
+	/**
+	 * Constructs a list
+	 * 
+	 * @param instantiator
+	 *            - how to create a new entry, when the user presses a + button
+	 * @param children
+	 *            - pre-existing entries
+	 */
 	public CommandSlotList(Instantiator<E> instantiator, E... children) {
 		super();
 		this.instantiator = instantiator;
@@ -30,10 +51,17 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		});
 	}
 
+	/**
+	 * 
+	 * @return The number of entries
+	 */
 	public int entryCount() {
 		return entries.size();
 	}
 
+	/**
+	 * Clears all entries
+	 */
 	public void clearEntries() {
 		entries.clear();
 		for (int i = size() - 1; i >= 0; i--) {
@@ -43,12 +71,23 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		}
 	}
 
+	/**
+	 * Adds a new entry at the end of the list of entries
+	 * 
+	 * @param entry
+	 */
 	public void addEntry(E entry) {
 		int index = entries.size();
 		entries.add(entry);
 		addChild(index, new Entry(index));
 	}
 
+	/**
+	 * Inserts an entry before the given index
+	 * 
+	 * @param index
+	 * @param entry
+	 */
 	public void addEntry(int index, E entry) {
 		entries.add(index, entry);
 		addChild(index, new Entry(index));
@@ -62,6 +101,11 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		}
 	}
 
+	/**
+	 * Removes the given entry
+	 * 
+	 * @param entry
+	 */
 	public void removeEntry(E entry) {
 		int index = entries.indexOf(entry);
 		entries.remove(entry);
@@ -76,6 +120,11 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		}
 	}
 
+	/**
+	 * Removes the entry at the given index
+	 * 
+	 * @param index
+	 */
 	public void removeEntry(int index) {
 		entries.remove(index);
 		removeChildAt(index);
@@ -89,6 +138,11 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		}
 	}
 
+	/**
+	 * 
+	 * @param index
+	 * @return The entry at the given index
+	 */
 	public E getEntry(int index) {
 		return entries.get(index);
 	}

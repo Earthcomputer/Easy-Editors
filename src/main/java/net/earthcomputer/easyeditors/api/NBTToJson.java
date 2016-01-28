@@ -14,7 +14,9 @@ import net.minecraftforge.common.util.Constants;
  * 2: NEI has a coremod which adds spaces after commas in various toString()
  * methods<br/>
  * This class basically does the opposite of {@link net.minecraft.nbt.JsonToNBT
- * JsonToNBT}. <b>This class is a member of the Easy Editors API</b>
+ * JsonToNBT}.
+ * 
+ * <b>This class is a member of the Easy Editors API</b>
  * 
  * @author Earthcomputer
  *

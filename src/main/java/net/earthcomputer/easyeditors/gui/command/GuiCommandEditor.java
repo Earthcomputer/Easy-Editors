@@ -18,6 +18,12 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
+/**
+ * The command editor GUI
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeListener {
 
 	private static final Joiner SPACE_JOINER = Joiner.on(' ');

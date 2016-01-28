@@ -6,8 +6,17 @@ import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 
 /**
- * An element of a command syntax. Example implementations of most of these
- * methods can be found in {@link GuiCommandSlotImpl}
+ * A basic component of a command GUI. There are a number of reasons these are
+ * used instead of the standard components such as GuiButton:<br/>
+ * 1: These do not provide a consistent way of getting the width and height of a
+ * given component, each component has a separately-declared field<br/>
+ * 2: They do not provide other functionality for dealing with dimensions such
+ * as being able to listen for size changes<br/>
+ * 3: There is no consistent way to draw these components<br/>
+ * 4: There is no consistent way to let these components listen to user input,
+ * such as the keyboard and mouse<br/>
+ * 5: Command slots provide an easy way to read from and write to a list of
+ * arguments
  * 
  * @author Earthcomputer
  *

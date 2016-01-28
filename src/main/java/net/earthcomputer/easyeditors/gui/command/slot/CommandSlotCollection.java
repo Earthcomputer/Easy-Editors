@@ -122,6 +122,9 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		return false;
 	}
 
+	/**
+	 * Removes all children
+	 */
 	public void clearChildren() {
 		for (IGuiCommandSlot child : children) {
 			child.removeSizeChangeListener(this);
@@ -129,6 +132,11 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		children.clear();
 	}
 
+	/**
+	 * Adds a child to the end of this collection
+	 * 
+	 * @param child
+	 */
 	public void addChild(IGuiCommandSlot child) {
 		children.add(child);
 		child.addSizeChangeListener(this);
@@ -137,6 +145,12 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		recalcPosChildren();
 	}
 
+	/**
+	 * Insets a child before the specified index
+	 * 
+	 * @param index
+	 * @param child
+	 */
 	public void addChild(int index, IGuiCommandSlot child) {
 		children.add(index, child);
 		child.addSizeChangeListener(this);
@@ -145,14 +159,30 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		recalcPosChildren();
 	}
 
+	/**
+	 * Adds all the specified children at the end of this collection
+	 * 
+	 * @param children
+	 */
 	public void addChildren(IGuiCommandSlot... children) {
 		addChildren(Arrays.asList(children));
 	}
 
+	/**
+	 * Inserts all the specified children before the specified index
+	 * 
+	 * @param index
+	 * @param children
+	 */
 	public void addChildren(int index, IGuiCommandSlot... children) {
 		addChildren(index, Arrays.asList(children));
 	}
 
+	/**
+	 * Adds all the specified children at the end of this collection
+	 * 
+	 * @param children
+	 */
 	public void addChildren(Collection<? extends IGuiCommandSlot> children) {
 		this.children.addAll(children);
 		for (IGuiCommandSlot child : children) {
@@ -163,6 +193,12 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		recalcPosChildren();
 	}
 
+	/**
+	 * Inserts all the specified children before the specified index
+	 * 
+	 * @param index
+	 * @param children
+	 */
 	public void addChildren(int index, Collection<? extends IGuiCommandSlot> children) {
 		this.children.addAll(index, children);
 		for (IGuiCommandSlot child : children) {
@@ -173,6 +209,12 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		recalcPosChildren();
 	}
 
+	/**
+	 * Sets the child at the specified index
+	 * 
+	 * @param index
+	 * @param child
+	 */
 	public void setChildAt(int index, IGuiCommandSlot child) {
 		children.set(index, child);
 		child.addSizeChangeListener(this);
@@ -181,6 +223,11 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		recalcPosChildren();
 	}
 
+	/**
+	 * Removes the specified child from this collection
+	 * 
+	 * @param child
+	 */
 	public void removeChild(IGuiCommandSlot child) {
 		children.remove(child);
 		child.removeSizeChangeListener(this);
@@ -188,56 +235,116 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		recalcPosChildren();
 	}
 
+	/**
+	 * Removes the child at the given index from this collection
+	 * 
+	 * @param index
+	 */
 	public void removeChildAt(int index) {
 		children.remove(index).removeSizeChangeListener(this);
 		recalcSize();
 		recalcPosChildren();
 	}
 
+	/**
+	 * 
+	 * @param index
+	 * @return The child at the specified index
+	 */
 	public IGuiCommandSlot getChildAt(int index) {
 		return children.get(index);
 	}
 
+	/**
+	 * 
+	 * @return The children as a list
+	 */
 	public List<IGuiCommandSlot> getChildren() {
 		return Collections.unmodifiableList(children);
 	}
 
+	/**
+	 * 
+	 * @return The number of children
+	 */
 	public int size() {
 		return children.size();
 	}
 
+	/**
+	 * Recalculates the positions of all the children
+	 */
 	protected void recalcPosChildren() {
 		recalcXPosChildren();
 		recalcYPosChildren();
 	}
 
+	/**
+	 * Recalculates the x-positions of all the children
+	 */
 	protected void recalcXPosChildren() {
 		recalcXPosChildren = true;
 	}
 
+	/**
+	 * Recalculates the y-positions of all the children
+	 */
 	protected void recalcYPosChildren() {
 		recalcYPosChildren = true;
 	}
 
+	/**
+	 * Recalculates the overall dimensions of this collection
+	 */
 	protected void recalcSize() {
 		recalcWidth();
 		recalcHeight();
 	}
 
+	/**
+	 * Recalculates the overall width of this collection. It is expected that
+	 * the width is set using {@link #setWidth(int)}
+	 */
 	protected abstract void recalcWidth();
 
+	/**
+	 * Recalculates the overall height of this collection. It is expected that
+	 * the height is set using {@link #setHeight(int)}
+	 */
 	protected abstract void recalcHeight();
 
+	/**
+	 * Returns an array of all the x-coordinates of the children. These should
+	 * be calculated on the fly
+	 * 
+	 * @return
+	 */
 	protected abstract int[] getXPosChildren();
 
+	/**
+	 * Returns an array of all the y-coordinates of the children. These should
+	 * be calculated on the fly
+	 * 
+	 * @return
+	 */
 	protected abstract int[] getYPosChildren();
 
+	/**
+	 * 
+	 * @param index
+	 * @return The x-position of the child at the given index
+	 */
 	protected int getXOfChild(int index) {
 		if (recalcXPosChildren)
 			xs = getXPosChildren();
 		return xs[index];
 	}
 
+	/**
+	 * 
+	 * @param index
+	 * @return The y-position of the child at the given index
+	 */
 	protected int getYOfChild(int index) {
 		if (recalcYPosChildren)
 			ys = getYPosChildren();

@@ -33,9 +33,21 @@ import net.minecraftforge.fml.client.config.HoverChecker;
  */
 public class CommandSlotItemStack extends CommandSlotVerticalArrangement implements IItemSelectorCallback {
 
+	/**
+	 * The item name component
+	 */
 	public static final int COMPONENT_ITEM = 1;
+	/**
+	 * The stack size component
+	 */
 	public static final int COMPONENT_STACK_SIZE = 2;
+	/**
+	 * The item damage component
+	 */
 	public static final int COMPONENT_DAMAGE = 4;
+	/**
+	 * The NBT tag component
+	 */
 	public static final int COMPONENT_NBT = 8;
 
 	private int optionalStart;
@@ -49,6 +61,20 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	private List<NBTTagHandler> nbtHandlers = Lists.newArrayList();
 	private CommandSlotModifiable nbtSlot;
 
+	/**
+	 * Constructs a new command slot which represents an item stack
+	 * 
+	 * @param optionalStart
+	 *            - the index at which the arguments start becoming optional,
+	 *            relative to where this command slot starts reading. E.g. 0
+	 *            would mean all the arguments are optional
+	 * @param argOrder
+	 *            - The order at which the arguments are to be inputed and
+	 *            outputed. The sub-arguments are called components, and the
+	 *            constants needed for this argument are defined in this class.
+	 *            This array must contain {@link #COMPONENT_ITEM} and if it
+	 *            contains {@link #COMPONENT_NBT}, it must be the last element
+	 */
 	public CommandSlotItemStack(int optionalStart, int... argOrder) {
 		this.optionalStart = optionalStart;
 		this.argOrder = argOrder;
@@ -213,6 +239,10 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		}
 	}
 
+	/**
+	 * 
+	 * @return Whether this command slot would output a valid value
+	 */
 	public boolean isValid() {
 		return item != null && !stackSizeField.getText().isEmpty();
 	}

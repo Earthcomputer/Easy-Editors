@@ -7,20 +7,42 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
+/**
+ * A command slot which represents a checkbox
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 
 	private GuiCheckBox checkbox;
 	private String hoverText;
 	private HoverChecker hoverChecker;
 
+	/**
+	 * Constructs an empty checkbox with no text and no hover text
+	 */
 	public CommandSlotCheckbox() {
 		this(null);
 	}
 
+	/**
+	 * Constructs a checkbox with the specified text and no hover text
+	 * 
+	 * @param text
+	 */
 	public CommandSlotCheckbox(String text) {
 		this(text, null);
 	}
 
+	/**
+	 * Constructs a checkbox with the specified text and the specified hover
+	 * text. If you don't want text but want hover text, pass null into the
+	 * first argument
+	 * 
+	 * @param text
+	 * @param hoverText
+	 */
 	public CommandSlotCheckbox(String text, String hoverText) {
 		super(text == null || text.isEmpty() ? 11 : 13 + Minecraft.getMinecraft().fontRendererObj.getStringWidth(text),
 				11);
@@ -58,10 +80,19 @@ public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 		return checkbox.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY);
 	}
 
+	/**
+	 * 
+	 * @return Whether this checkbox is checked
+	 */
 	public boolean isChecked() {
 		return checkbox.isChecked();
 	}
 
+	/**
+	 * Sets whether this checkbox is checked
+	 * 
+	 * @param checked
+	 */
 	public void setChecked(boolean checked) {
 		checkbox.setIsChecked(checked);
 	}
