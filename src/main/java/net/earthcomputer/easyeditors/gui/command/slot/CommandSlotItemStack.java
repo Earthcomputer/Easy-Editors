@@ -6,6 +6,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.NBTToJson;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
 import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
@@ -161,7 +162,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				NBTTagCompound nbt = getNbt();
 				if (i < optionalStart || nbt != null)
 					maxElementToCopy = i;
-				potentialArgs.add(nbt == null ? "{}" : nbt.toString());
+				potentialArgs.add(nbt == null ? "{}" : NBTToJson.getJsonFromTag(nbt));
 				break;
 			}
 		}
