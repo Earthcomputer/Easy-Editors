@@ -89,6 +89,13 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 			return child.onMouseClicked(mouseX, mouseY, mouseButton);
 		return false;
 	}
+	
+	@Override
+	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
+		if (child != null)
+			return child.onMouseClickedForeground(mouseX, mouseY, mouseButton);
+		return false;
+	}
 
 	@Override
 	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {

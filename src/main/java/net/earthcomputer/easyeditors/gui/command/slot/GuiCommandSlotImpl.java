@@ -82,6 +82,11 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	}
 
 	@Override
+	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
+		return false;
+	}
+
+	@Override
 	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
 		return false;
 	}
@@ -90,7 +95,7 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		return false;
 	}
-	
+
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
 		return false;

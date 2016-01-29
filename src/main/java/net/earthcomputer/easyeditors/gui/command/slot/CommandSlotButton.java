@@ -2,6 +2,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
@@ -120,11 +121,12 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (wrappedButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
+		if (GuiCommandEditor.isInBounds(mouseX, mouseY)
+				&& wrappedButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
 			wrappedButton.playPressSound(Minecraft.getMinecraft().getSoundHandler());
 			onPress();
 		}
-		
+
 		return false;
 	}
 

@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -97,18 +98,22 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (mouseButton == 0) {
-			if (expanded) {
-				expanded = false;
-				int top = expandUpwards ? y - values.length * 12 : y + 12;
-				if (mouseX >= x && mouseX < x + getWidth() && mouseY >= top && mouseY < top + values.length * 12) {
-					currentValue = (mouseY - top) / 12;
-					return true;
-				}
-			} else {
-				if (mouseX >= x + getWidth() - 12 && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
-					expanded = true;
-				}
+		if (mouseButton == 0 && !expanded && GuiCommandEditor.isInBounds(mouseX, mouseY)) {
+			if (mouseX >= x + getWidth() - 12 && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
+				expanded = true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
+		if (mouseButton == 0 && expanded) {
+			expanded = false;
+			int top = expandUpwards ? y - values.length * 12 : y + 12;
+			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= top && mouseY < top + values.length * 12) {
+				currentValue = (mouseY - top) / 12;
+				return true;
 			}
 		}
 		return false;
