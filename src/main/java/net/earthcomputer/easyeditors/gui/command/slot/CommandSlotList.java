@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.Instantiator;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
 /**
@@ -25,6 +26,11 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 	private Instantiator<E> instantiator;
 	private List<E> entries = Lists.newArrayList();
 
+	private String insertHoverText = I18n.format("gui.commandEditor.list.insert");
+	private String removeHoverText = I18n.format("gui.commandEditor.list.remove");
+
+	private CommandSlotButton appendButton;
+
 	/**
 	 * Constructs a list
 	 * 
@@ -39,7 +45,7 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		for (E child : children) {
 			addEntry(child);
 		}
-		addChild(new CommandSlotButton(20, 20, "+") {
+		addChild(appendButton = new CommandSlotButton(20, 20, "+", I18n.format("gui.commandEditor.list.append")) {
 			{
 				setTextColor(GuiUtils.getColorCode('2', true));
 			}
@@ -49,6 +55,54 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 				addEntry(CommandSlotList.this.instantiator.newInstance());
 			}
 		});
+	}
+
+	/**
+	 * Sets the text shown when the append button is hovered over (the
+	 * bottommost + button)
+	 * 
+	 * @param appendHoverText
+	 * @return
+	 */
+	public CommandSlotList<E> setAppendHoverText(String appendHoverText) {
+		appendButton.setHoverText(appendHoverText);
+		return this;
+	}
+
+	/**
+	 * Sets the text shown when the insert button is hovered over (all the +
+	 * buttons except the bottommost one)
+	 * 
+	 * @param insertHoverText
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public CommandSlotList<E> setInsertHoverText(String insertHoverText) {
+		this.insertHoverText = insertHoverText;
+		for (int i = 0; i < size(); i++) {
+			IGuiCommandSlot child = getChildAt(i);
+			if (child instanceof CommandSlotList.Entry)
+				((Entry) child).setInsertHoverText(insertHoverText);
+		}
+		return this;
+	}
+
+	/**
+	 * Sets the text shown when the remove button is hovered over (the x
+	 * buttons)
+	 * 
+	 * @param removeHoverText
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public CommandSlotList<E> setRemoveHoverText(String removeHoverText) {
+		this.removeHoverText = removeHoverText;
+		for (int i = 0; i < size(); i++) {
+			IGuiCommandSlot child = getChildAt(i);
+			if (child instanceof CommandSlotList.Entry)
+				((Entry) child).setRemoveHoverText(removeHoverText);
+		}
+		return this;
 	}
 
 	/**
@@ -151,9 +205,12 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 
 		private int ind;
 
+		private CommandSlotButton insertButton;
+		private CommandSlotButton removeButton;
+
 		public Entry(int ind) {
 			this.ind = ind;
-			addChild(new CommandSlotButton(20, 20, "+") {
+			addChild(insertButton = new CommandSlotButton(20, 20, "+", insertHoverText) {
 				{
 					setTextColor(GuiUtils.getColorCode('2', true));
 				}
@@ -163,7 +220,7 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 					addEntry(Entry.this.ind, instantiator.newInstance());
 				}
 			});
-			addChild(new CommandSlotButton(20, 20, "x") {
+			addChild(removeButton = new CommandSlotButton(20, 20, "x", removeHoverText) {
 				{
 					setTextColor(GuiUtils.getColorCode('c', true));
 				}
@@ -183,6 +240,14 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 
 		public void setIndex(int ind) {
 			this.ind = ind;
+		}
+
+		public void setInsertHoverText(String insertHoverText) {
+			insertButton.setHoverText(insertHoverText);
+		}
+
+		public void setRemoveHoverText(String removeHoverText) {
+			removeButton.setHoverText(removeHoverText);
 		}
 
 	}

@@ -58,6 +58,15 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	}
 
 	/**
+	 * Sets the text displayed when hovered
+	 * 
+	 * @param hoverText
+	 */
+	public void setHoverText(String hoverText) {
+		this.hoverText = hoverText;
+	}
+
+	/**
 	 * 
 	 * @return Whether the button is enabled
 	 */
@@ -124,7 +133,7 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 			wrappedButton.playPressSound(Minecraft.getMinecraft().getSoundHandler());
 			onPress();
 		}
-		
+
 		return false;
 	}
 
