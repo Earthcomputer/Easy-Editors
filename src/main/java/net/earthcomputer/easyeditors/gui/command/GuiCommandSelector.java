@@ -150,6 +150,11 @@ public class GuiCommandSelector extends GuiScreen {
 		public int getListWidth() {
 			return GuiCommandSelector.this.width - 12;
 		}
+
+		@Override
+		public int getScrollBarX() {
+			return GuiCommandSelector.this.width - 6;
+		}
 	}
 
 }
