@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -91,7 +92,7 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 		if (isExpanded)
 			child.draw(x, y + 18, mouseX, mouseY, partialTicks);
 	}
-	
+
 	@Override
 	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
@@ -109,11 +110,19 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (hovered) {
+		if (hovered && GuiCommandEditor.isInBounds(mouseX, mouseY)) {
 			setExpanded(!isExpanded);
 			GeneralUtils.playButtonSound();
 		} else if (isExpanded) {
 			return child.onMouseClicked(mouseX, mouseY, mouseButton);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
+		if (isExpanded) {
+			return child.onMouseClickedForeground(mouseX, mouseY, mouseButton);
 		}
 		return false;
 	}
@@ -133,7 +142,7 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
 		if (isExpanded) {

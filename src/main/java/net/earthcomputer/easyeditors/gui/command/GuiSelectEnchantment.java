@@ -3,51 +3,52 @@ package net.earthcomputer.easyeditors.gui.command;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.util.ResourceLocation;
 
-/**
- * A GuiScreen which the user will use to select a command out of a list of
- * available commands in the command editor
- * 
- * @author Earthcomputer
- *
- */
-public class GuiCommandSelector extends GuiScreen {
+public class GuiSelectEnchantment extends GuiScreen {
 
 	private GuiScreen previousScreen;
-	private ICommandEditorCallback callback;
+	private IEnchantmentSelectorCallback callback;
 
-	private List<String> commands = Lists.newArrayList(ICommandSyntax.getSyntaxList().keySet());
+	private List<String> enchantments;
 	private int selectedIndex = 0;
 
 	private GuiButton cancelButton;
-	private CommandList list;
+	private EnchantmentList list;
 
-	/**
-	 * Creates a command selector with the given callback
-	 * 
-	 * @param previousScreen
-	 * @param callback
-	 */
-	public GuiCommandSelector(GuiScreen previousScreen, ICommandEditorCallback callback) {
+	public GuiSelectEnchantment(GuiScreen previousScreen, IEnchantmentSelectorCallback callback) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
-
-		Collections.sort(commands, String.CASE_INSENSITIVE_ORDER);
-
-		String selectedSyntax = callback.getCommand();
-		if (commands.contains(selectedSyntax))
-			selectedIndex = commands.indexOf(selectedSyntax);
+		enchantments = Lists.newArrayList();
+		for (ResourceLocation rl : Enchantment.func_181077_c()) {
+			enchantments.add(rl.toString());
+		}
+		Collections.sort(enchantments, String.CASE_INSENSITIVE_ORDER);
+		if (callback.getEnchantment() != -1) {
+			Set<ResourceLocation> names = Enchantment.func_181077_c();
+			Enchantment enchantment = Enchantment.getEnchantmentById(callback.getEnchantment());
+			String enchName = null;
+			for (ResourceLocation name : names) {
+				if (Enchantment.getEnchantmentByLocation(name.toString()) == enchantment) {
+					enchName = name.toString();
+					break;
+				}
+			}
+			if (enchName != null)
+				selectedIndex = enchantments.indexOf(enchName);
+		}
 	}
 
 	@Override
@@ -56,7 +57,7 @@ public class GuiCommandSelector extends GuiScreen {
 		buttonList.add(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
-		list = new CommandList();
+		list = new EnchantmentList();
 	}
 
 	@Override
@@ -68,7 +69,7 @@ public class GuiCommandSelector extends GuiScreen {
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		list.drawScreen(mouseX, mouseY, partialTicks);
 
-		String str = I18n.format("gui.commandEditor.selectCommand.title");
+		String str = I18n.format("gui.commandEditor.selectEnchantment.title");
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				15 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 
@@ -79,7 +80,7 @@ public class GuiCommandSelector extends GuiScreen {
 	public void actionPerformed(GuiButton button) {
 		switch (button.id) {
 		case 0:
-			callback.setCommand(commands.get(selectedIndex));
+			callback.setEnchantment(Enchantment.getEnchantmentByLocation(enchantments.get(selectedIndex)).effectId);
 			mc.displayGuiScreen(previousScreen);
 			break;
 		case 1:
@@ -105,15 +106,17 @@ public class GuiCommandSelector extends GuiScreen {
 		list.handleMouseInput();
 	}
 
-	private class CommandList extends GuiSlot {
-		public CommandList() {
-			super(GuiCommandSelector.this.mc, GuiCommandSelector.this.width, GuiCommandSelector.this.height, 30,
-					GuiCommandSelector.this.height - 30, GuiCommandSelector.this.fontRendererObj.FONT_HEIGHT * 4 + 6);
+	private class EnchantmentList extends GuiSlot {
+
+		public EnchantmentList() {
+			super(GuiSelectEnchantment.this.mc, GuiSelectEnchantment.this.width, GuiSelectEnchantment.this.height, 30,
+					GuiSelectEnchantment.this.height - 30,
+					GuiSelectEnchantment.this.fontRendererObj.FONT_HEIGHT * 2 + 8);
 		}
 
 		@Override
 		protected int getSize() {
-			return commands.size();
+			return enchantments.size();
 		}
 
 		@Override
@@ -128,33 +131,32 @@ public class GuiCommandSelector extends GuiScreen {
 
 		@Override
 		protected void drawBackground() {
-			GuiCommandSelector.this.drawBackground(0);
+			GuiSelectEnchantment.this.drawBackground(0);
 		}
 
 		@Override
 		protected void drawSlot(int entryID, int x, int y, int height, int mouseX, int mouseY) {
-			FontRenderer fontRenderer = GuiCommandSelector.this.fontRendererObj;
-			String commandName = commands.get(entryID);
-			fontRenderer.drawString(commandName, x + getListWidth() / 2 - fontRenderer.getStringWidth(commandName) / 2,
-					y + 2, 0xffffff);
-			String str = I18n.format("gui.commandEditor.selectCommand." + commandName + ".desc");
-			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2,
+			FontRenderer fontRenderer = GuiSelectEnchantment.this.fontRendererObj;
+			String enchantmentName = enchantments.get(entryID);
+
+			String str = I18n.format(Enchantment.getEnchantmentByLocation(enchantmentName).getName());
+			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2, y + 2,
+					0xffffff);
+			fontRenderer.drawString(enchantmentName,
+					x + getListWidth() / 2 - fontRenderer.getStringWidth(enchantmentName) / 2,
 					y + 4 + fontRenderer.FONT_HEIGHT, 0xc0c0c0);
-			str = I18n.format("gui.commandEditor.selectCommand.example",
-					I18n.format("gui.commandEditor.selectCommand." + commandName + ".example"));
-			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2,
-					y + 6 + fontRenderer.FONT_HEIGHT * 2, 0xc0c0c0);
 		}
 
 		@Override
 		public int getListWidth() {
-			return GuiCommandSelector.this.width - 12;
+			return GuiSelectEnchantment.this.width - 12;
 		}
-
+		
 		@Override
 		public int getScrollBarX() {
-			return GuiCommandSelector.this.width - 6;
+			return GuiSelectEnchantment.this.width - 6;
 		}
+
 	}
 
 }

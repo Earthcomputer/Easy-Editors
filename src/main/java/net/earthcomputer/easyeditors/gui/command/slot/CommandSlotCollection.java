@@ -88,38 +88,52 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+		boolean r = false;
 		for (int i = children.size() - 1; i >= 0; i--) {
 			if (children.get(i).onMouseClicked(mouseX, mouseY, mouseButton))
-				return true;
+				r = true;
 		}
-		return false;
+		return r;
+	}
+
+	@Override
+	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
+		boolean r = false;
+		for (int i = children.size() - 1; i >= 0; i--) {
+			if (children.get(i).onMouseClickedForeground(mouseX, mouseY, mouseButton))
+				r = true;
+		}
+		return r;
 	}
 
 	@Override
 	public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton) {
+		boolean r = false;
 		for (int i = children.size() - 1; i >= 0; i--) {
 			if (children.get(i).onMouseReleased(mouseX, mouseY, mouseButton))
-				return true;
+				r = true;
 		}
-		return false;
+		return r;
 	}
 
 	@Override
 	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		boolean r = false;
 		for (int i = children.size() - 1; i >= 0; i--) {
 			if (children.get(i).onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
-				return true;
+				r = true;
 		}
-		return false;
+		return r;
 	}
 
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
+		boolean r = false;
 		for (int i = children.size() - 1; i >= 0; i--) {
 			if (children.get(i).onMouseScrolled(mouseX, mouseY, scrolledUp))
-				return true;
+				r = true;
 		}
-		return false;
+		return r;
 	}
 
 	/**

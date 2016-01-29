@@ -117,7 +117,8 @@ public interface IGuiCommandSlot {
 	boolean onKeyTyped(char typedChar, int keyCode);
 
 	/**
-	 * Called when a mouse button is pressed
+	 * Called when a mouse button is pressed, when the command slot is in the
+	 * view
 	 * 
 	 * @param mouseX
 	 * @param mouseY
@@ -127,6 +128,18 @@ public interface IGuiCommandSlot {
 	 *         mouse click, true if it should not
 	 */
 	boolean onMouseClicked(int mouseX, int mouseY, int mouseButton);
+
+	/**
+	 * Called when a mouse button is pressed, even outside the view
+	 * 
+	 * @param mouseX
+	 * @param mouseY
+	 * @param mouseButton
+	 * @return false if the parent command slot should be able to react to this
+	 *         event, true if it should not and to cancel all onMouseClicked
+	 *         events
+	 */
+	boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton);
 
 	/**
 	 * Called when a mouse button is released

@@ -14,6 +14,7 @@ import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.api.Instantiator;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
@@ -42,13 +43,14 @@ public abstract class NBTTagHandler {
 			.newLinkedHashMap();
 
 	static {
-		Predicate<ItemStack> alwaysTrue = new Predicate<ItemStack>() {
+		class AlwaysTrue implements Predicate<ItemStack> {
 			@Override
 			public boolean apply(ItemStack stack) {
 				return true;
 			}
-		};
-		registerItemStackHandler(alwaysTrue, DisplayHandler.class);
+		}
+		registerItemStackHandler(new AlwaysTrue(), DisplayHandler.class);
+		registerItemStackHandler(new AlwaysTrue(), EnchantmentHandler.class);
 		registerItemStackHandler(new Predicate<ItemStack>() {
 			@Override
 			public boolean apply(ItemStack stack) {
@@ -360,6 +362,67 @@ public abstract class NBTTagHandler {
 				if (nbt.hasKey("display", Constants.NBT.TAG_COMPOUND))
 					display.merge(nbt.getCompoundTag("display"));
 				nbt.setTag("display", display);
+			}
+		}
+
+	}
+
+	public static class EnchantmentHandler extends NBTTagHandler {
+
+		private CommandSlotList<CommandSlotEnchantment> list;
+
+		@Override
+		public IGuiCommandSlot[] setupCommandSlot() {
+			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.ench"),
+					Colors.itemLabel.color,
+					list = new CommandSlotList<CommandSlotEnchantment>(new Instantiator<CommandSlotEnchantment>() {
+						@Override
+						public CommandSlotEnchantment newInstance() {
+							return new CommandSlotEnchantment();
+						}
+					})) };
+		}
+
+		@Override
+		public void readFromNBT(NBTTagCompound nbt) {
+			list.clearEntries();
+			if (nbt != null && nbt.hasKey("ench", Constants.NBT.TAG_LIST)) {
+				try {
+					NBTTagList enchs = nbt.getTagList("ench", Constants.NBT.TAG_COMPOUND);
+					for (int i = 0; i < enchs.tagCount(); i++) {
+						NBTTagCompound ench = enchs.getCompoundTagAt(i);
+						if (ench.hasKey("id", Constants.NBT.TAG_INT) && ench.hasKey("lvl", Constants.NBT.TAG_INT)) {
+							int enchId = ench.getInteger("id");
+							int enchLvl = ench.getInteger("lvl");
+							CommandSlotEnchantment cmdEnch = new CommandSlotEnchantment();
+							cmdEnch.setEnchantment(enchId);
+							cmdEnch.setLevel(enchLvl);
+							list.addEntry(cmdEnch);
+						}
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+
+		@Override
+		public void writeToNBT(NBTTagCompound nbt) {
+			if (list.entryCount() != 0) {
+				NBTTagList enchs = new NBTTagList();
+				for (int i = 0; i < list.entryCount(); i++) {
+					CommandSlotEnchantment cmdEnch = list.getEntry(i);
+					NBTTagCompound ench = new NBTTagCompound();
+					ench.setInteger("id", cmdEnch.getEnchantment());
+					ench.setInteger("lvl", cmdEnch.getLevel());
+					enchs.appendTag(ench);
+				}
+				if (nbt.hasKey("ench", Constants.NBT.TAG_LIST)) {
+					NBTTagList enchs1 = nbt.getTagList("ench", Constants.NBT.TAG_COMPOUND);
+					for (int i = 0; i < enchs1.tagCount(); i++) {
+						enchs.appendTag(enchs1.getCompoundTagAt(i));
+					}
+				}
+				nbt.setTag("ench", enchs);
 			}
 		}
 

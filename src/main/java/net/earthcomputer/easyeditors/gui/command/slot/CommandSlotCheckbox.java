@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.client.config.HoverChecker;
@@ -77,7 +78,8 @@ public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		return checkbox.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY);
+		return GuiCommandEditor.isInBounds(mouseX, mouseY)
+				&& checkbox.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY);
 	}
 
 	/**

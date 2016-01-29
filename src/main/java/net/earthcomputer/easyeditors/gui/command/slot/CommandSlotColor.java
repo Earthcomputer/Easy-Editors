@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.earthcomputer.easyeditors.gui.GuiColorPicker;
 import net.earthcomputer.easyeditors.gui.IColorPickerCallback;
+import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -87,7 +88,8 @@ public class CommandSlotColor extends GuiCommandSlotImpl implements IColorPicker
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (mouseButton == 0) {
-			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= y && mouseY < y + getHeight())
+			if (GuiCommandEditor.isInBounds(mouseX, mouseY) && mouseX >= x && mouseX < x + getWidth() && mouseY >= y
+					&& mouseY < y + getHeight())
 				Minecraft.getMinecraft()
 						.displayGuiScreen(new GuiColorPicker(Minecraft.getMinecraft().currentScreen, this, allowAlpha));
 		}

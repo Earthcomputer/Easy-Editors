@@ -14,6 +14,7 @@ import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -36,6 +37,14 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 
 	private CommandSlotCommand commandSlotCommand;
 	private CommandSlotRectangle commandSlotRectangle;
+
+	public static boolean isInBounds(int x, int y) {
+		if (!(Minecraft.getMinecraft().currentScreen instanceof GuiTwoWayScroll))
+			return true;
+		GuiTwoWayScroll currentScreen = (GuiTwoWayScroll) Minecraft.getMinecraft().currentScreen;
+		return x < currentScreen.getShownWidth() && y >= currentScreen.getHeaderHeight()
+				&& y < currentScreen.getHeaderHeight() + currentScreen.getShownHeight();
+	}
 
 	public GuiCommandEditor(GuiScreen previousGui, ICommandEditorCallback callback) {
 		super(30, 30, 4, 500);
@@ -138,8 +147,9 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 
 	@Override
 	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		if (!commandSlotRectangle.onMouseClicked(mouseX, mouseY, mouseButton))
-			super.mouseClicked(mouseX, mouseY, mouseButton);
+		if (!commandSlotRectangle.onMouseClickedForeground(mouseX, mouseY, mouseButton))
+			if (!commandSlotRectangle.onMouseClicked(mouseX, mouseY, mouseButton))
+				super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
