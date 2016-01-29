@@ -94,7 +94,8 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 		if ((displayComponents & COMPONENT_STACK_SIZE) != 0)
 			addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.stackSize"),
-					Colors.itemLabel.color, stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)));
+					Colors.itemLabel.color, I18n.format("gui.commandEditor.item.stackSize.tooltip"),
+					stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)));
 
 		if ((displayComponents & COMPONENT_DAMAGE) != 0)
 			addChild(damageSlot = new CommandSlotModifiable(null));

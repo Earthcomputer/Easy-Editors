@@ -274,12 +274,15 @@ public abstract class NBTTagHandler {
 				public CommandSlotTextField newInstance() {
 					return new CommandSlotTextField(100, 400);
 				}
-			});
+			}).setAppendHoverText(I18n.format("gui.commandEditor.item.nbt.lore.append"))
+					.setInsertHoverText(I18n.format("gui.commandEditor.item.nbt.lore.insert"))
+					.setRemoveHoverText(I18n.format("gui.commandEditor.item.nbt.lore.remove"));
 			return new IGuiCommandSlot[] {
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.displayName"),
-							Colors.itemLabel.color, displayName),
+							Colors.itemLabel.color, I18n.format("gui.commandEditor.item.nbt.displayName.tooltip"),
+							displayName),
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.lore"), Colors.itemLabel.color,
-							lore) };
+							I18n.format("gui.commandEditor.item.nbt.lore.tooltip"), lore) };
 		}
 
 		@Override
@@ -337,9 +340,10 @@ public abstract class NBTTagHandler {
 
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
-			return new IGuiCommandSlot[] {
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.leatherArmor.color"),
-							Colors.itemLabel.color, color = new CommandSlotColor(false)) };
+			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
+					I18n.format("gui.commandEditor.item.nbt.leatherArmor.color"), Colors.itemLabel.color,
+					I18n.format("gui.commandEditor.item.nbt.leatherArmor.color.tooltip"),
+					color = new CommandSlotColor(false)) };
 		}
 
 		@Override
@@ -374,13 +378,15 @@ public abstract class NBTTagHandler {
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
 			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.ench"),
-					Colors.itemLabel.color,
+					Colors.itemLabel.color, I18n.format("gui.commandEditor.item.nbt.ench.tooltip"),
 					list = new CommandSlotList<CommandSlotEnchantment>(new Instantiator<CommandSlotEnchantment>() {
 						@Override
 						public CommandSlotEnchantment newInstance() {
 							return new CommandSlotEnchantment();
 						}
-					})) };
+					}).setAppendHoverText(I18n.format("gui.commandEditor.item.nbt.ench.append"))
+							.setInsertHoverText(I18n.format("gui.commandEditor.item.nbt.ench.insert"))
+							.setRemoveHoverText(I18n.format("gui.commandEditor.item.nbt.ench.remove"))) };
 		}
 
 		@Override

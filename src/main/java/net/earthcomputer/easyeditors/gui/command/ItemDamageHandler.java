@@ -163,6 +163,7 @@ public abstract class ItemDamageHandler {
 			this.item = item;
 			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
 					I18n.format("gui.commandEditor.item.damage.tool.durability"), Colors.itemLabel.color,
+					I18n.format("gui.commandEditor.item.damage.tool.durability.tooltip"),
 					durabilityField = new CommandSlotIntTextField(32, 32, 1, item.getMaxDamage() + 1),
 					new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "/ " + (item.getMaxDamage() + 1),
 							Colors.itemLabel.color)) };
