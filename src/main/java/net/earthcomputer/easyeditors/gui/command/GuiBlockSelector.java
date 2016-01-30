@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +14,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import net.earthcomputer.easyeditors.api.AnimatedBlockRenderer;
 import net.earthcomputer.easyeditors.api.BlockPropertyRegistry;
@@ -361,7 +362,9 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 	}
 
 	/**
-	 * Returns a list of strings to display in a tooltip describing a block state
+	 * Returns a list of strings to display in a tooltip describing a block
+	 * state
+	 * 
 	 * @param blockState
 	 * @return
 	 */
@@ -388,8 +391,17 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		tooltip.add(currentLine);
 
 		List<String> otherLines = Lists.newArrayList();
-		for (IProperty<?> prop : (advanced ? blockState.getProperties().keySet()
-				: Sets.newHashSet(BlockPropertyRegistry.getVariantProperties(blockState.getBlock())))) {
+		// Why oh why do you have to force me to use raw types?
+		@SuppressWarnings("rawtypes")
+		Iterator<IProperty> iterator1 = blockState.getProperties().keySet().iterator();
+		Iterator<IProperty<? extends Comparable<?>>> iterator2 = Iterators
+				.forArray(BlockPropertyRegistry.getVariantProperties(blockState.getBlock()));
+		while (advanced ? iterator1.hasNext() : iterator2.hasNext()) {
+			IProperty<?> prop;
+			if (advanced)
+				prop = iterator1.next();
+			else
+				prop = iterator2.next();
 			currentLine = EnumChatFormatting.BLUE + prop.getName() + EnumChatFormatting.RESET + ": ";
 			Comparable<?> value = blockState.getValue(prop);
 			String valueStr = value.toString();
