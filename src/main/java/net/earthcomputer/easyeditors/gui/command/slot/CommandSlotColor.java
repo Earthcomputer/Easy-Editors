@@ -81,7 +81,9 @@ public class CommandSlotColor extends GuiCommandSlotImpl implements IColorPicker
 			hoverChecker = new HoverChecker(y, y + getHeight(), x, x + getWidth(), 1000);
 		else
 			hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
-		if (hoverChecker.checkHover(mouseX, mouseY))
+		if (!GuiCommandEditor.isInBounds(mouseX, mouseY))
+			hoverChecker.resetHoverTimer();
+		else if (hoverChecker.checkHover(mouseX, mouseY))
 			drawTooltip(mouseX, mouseY, I18n.format("gui.easyeditorsconfig.colortooltip"));
 	}
 

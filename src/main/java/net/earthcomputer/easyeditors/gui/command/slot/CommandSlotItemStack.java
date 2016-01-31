@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.api.NBTToJson;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
 import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.ItemDamageHandler;
@@ -295,7 +296,9 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				else
 					hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
 
-				if (hoverChecker.checkHover(mouseX, mouseY)) {
+				if (!GuiCommandEditor.isInBounds(mouseX, mouseY))
+					hoverChecker.resetHoverTimer();
+				else if (hoverChecker.checkHover(mouseX, mouseY)) {
 					drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().thePlayer,
 							Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
 				}
