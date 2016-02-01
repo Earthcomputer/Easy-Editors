@@ -245,7 +245,17 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	 * @return Whether this command slot would output a valid value
 	 */
 	public boolean isValid() {
-		return item != null && !stackSizeField.getText().isEmpty();
+		if (item == null || !stackSizeField.isValid())
+			return false;
+		for (ItemDamageHandler damageHandler : damageHandlers) {
+			if (!damageHandler.isValid())
+				return false;
+		}
+		for (NBTTagHandler nbtHandler : nbtHandlers) {
+			if (!nbtHandler.isValid())
+				return false;
+		}
+		return true;
 	}
 
 	private class CompItem extends GuiCommandSlotImpl {

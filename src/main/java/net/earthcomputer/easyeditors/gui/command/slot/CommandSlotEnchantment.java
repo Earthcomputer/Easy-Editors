@@ -46,4 +46,8 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		enchantmentLevel.setText(String.valueOf(level));
 	}
 
+	public boolean isValid() {
+		return Enchantment.getEnchantmentById(enchantmentId) != null && enchantmentLevel.isValid();
+	}
+
 }

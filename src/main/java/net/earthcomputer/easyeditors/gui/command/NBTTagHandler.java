@@ -87,6 +87,12 @@ public abstract class NBTTagHandler {
 	public abstract void writeToNBT(NBTTagCompound nbt);
 
 	/**
+	 * 
+	 * @return Whether the command slots can be read to produce valid results
+	 */
+	public abstract boolean isValid();
+
+	/**
 	 * Registers an NBTTagHandler which deals with NBT tags specific to the
 	 * given class of TileEntity. Modders should instead use
 	 * {@link net.earthcomputer.easyeditors.api.EasyEditorsApi#registerTileEntityNBTHandler(Class, String)
@@ -332,6 +338,11 @@ public abstract class NBTTagHandler {
 			}
 		}
 
+		@Override
+		public boolean isValid() {
+			return true;
+		}
+
 	}
 
 	public static class ArmorColorHandler extends NBTTagHandler {
@@ -367,6 +378,11 @@ public abstract class NBTTagHandler {
 					display.merge(nbt.getCompoundTag("display"));
 				nbt.setTag("display", display);
 			}
+		}
+
+		@Override
+		public boolean isValid() {
+			return true;
 		}
 
 	}
@@ -430,6 +446,16 @@ public abstract class NBTTagHandler {
 				}
 				nbt.setTag("ench", enchs);
 			}
+		}
+
+		@Override
+		public boolean isValid() {
+			for (int i = 0; i < list.entryCount(); i++) {
+				CommandSlotEnchantment ench = list.getEntry(i);
+				if (!ench.isValid())
+					return false;
+			}
+			return true;
 		}
 
 	}

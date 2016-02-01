@@ -55,6 +55,12 @@ public abstract class ItemDamageHandler {
 	public abstract int getDamage(int initialDamage);
 
 	/**
+	 * 
+	 * @return Whether the command slots can be read to produce a valid output
+	 */
+	public abstract boolean isValid();
+
+	/**
 	 * Registers an item damage handler which is active if
 	 * <code>itemPredicate.apply</code> returns true
 	 * 
@@ -178,6 +184,11 @@ public abstract class ItemDamageHandler {
 		@Override
 		public int getDamage(int initialDamage) {
 			return item.getMaxDamage() - durabilityField.getIntValue() + 1;
+		}
+
+		@Override
+		public boolean isValid() {
+			return durabilityField.isValid();
 		}
 
 	}
