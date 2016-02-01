@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -107,7 +108,9 @@ public class CommandSlotLabel extends GuiCommandSlotImpl {
 			else
 				hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
 
-			if (hoverChecker.checkHover(mouseX, mouseY)) {
+			if (!GuiCommandEditor.isInBounds(mouseX, mouseY))
+				hoverChecker.resetHoverTimer();
+			else if (hoverChecker.checkHover(mouseX, mouseY)) {
 				drawTooltip(mouseX, mouseY, hoverText, 300);
 			}
 		}

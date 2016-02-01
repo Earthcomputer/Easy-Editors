@@ -72,8 +72,12 @@ public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 		checkbox.yPosition = y;
 		checkbox.drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
 
-		if (hoverText != null && hoverChecker.checkHover(mouseX, mouseY))
-			drawTooltip(mouseX, mouseY, hoverText);
+		if (hoverText != null) {
+			if (!GuiCommandEditor.isInBounds(mouseX, mouseY))
+				hoverChecker.resetHoverTimer();
+			else if (hoverChecker.checkHover(mouseX, mouseY))
+				drawTooltip(mouseX, mouseY, hoverText);
+		}
 	}
 
 	@Override
