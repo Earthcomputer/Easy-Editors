@@ -8,15 +8,19 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
+import net.earthcomputer.easyeditors.api.EntityRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -297,6 +301,7 @@ public class GeneralUtils {
 
 	/**
 	 * Equivalent of {@link Throwable#printStackTrace()}, but uses a logger
+	 * 
 	 * @param logger
 	 * @param throwable
 	 */
@@ -305,6 +310,65 @@ public class GeneralUtils {
 		throwable.printStackTrace(new PrintWriter(sw));
 		for (String line : sw.toString().split("\n")) {
 			logger.error(line);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends Entity> void renderEntityAt(Entity entity, int x, int y, int width, int height,
+			float baseScale, int mouseX, int mouseY) {
+		ICustomEntityRenderer<T> customRenderer = (ICustomEntityRenderer<T>) EntityRendererRegistry
+				.findCustomRenderer(entity);
+		if (customRenderer != null) {
+			customRenderer.renderEntity((T) entity, x, y, width, height, baseScale, mouseX, mouseY);
+		} else if (entity instanceof EntityLivingBase) {
+			EntityLivingBase eLiving = (EntityLivingBase) entity;
+			int scale = (int) (Math.min(width, height) / baseScale
+					/ Math.max(Math.max(eLiving.width, eLiving.height), eLiving.getYOffset()));
+			GL11.glDisable(3042);
+			GL11.glDepthMask(true);
+			GL11.glEnable(2929);
+			GL11.glEnable(3008);
+			GL11.glPushMatrix();
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			GL11.glEnable(2903);
+			GL11.glTranslatef(x, y, 150.0F);
+			GL11.glScalef(-scale, scale, scale);
+			GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
+			float f2 = eLiving.renderYawOffset;
+			float f3 = eLiving.rotationYaw;
+			float f4 = eLiving.rotationPitch;
+			float f5 = eLiving.prevRotationYawHead;
+			float f6 = eLiving.rotationYawHead;
+			GL11.glRotatef(135.0F, 0.0F, 1.0F, 0.0F);
+			RenderHelper.enableStandardItemLighting();
+			GL11.glRotatef(-135.0F, 0.0F, 1.0F, 0.0F);
+			GL11.glRotatef(-(float) Math.atan(mouseY / 40.0F) * 20.0F, 1.0F, 0.0F, 0.0F);
+
+			eLiving.renderYawOffset = ((float) Math.atan(mouseX / 40.0F) * 20.0F);
+			eLiving.rotationYaw = ((float) Math.atan(mouseX / 40.0F) * 40.0F);
+			eLiving.rotationPitch = (-(float) Math.atan(mouseY / 40.0F) * 20.0F);
+			eLiving.rotationYawHead = eLiving.rotationYaw;
+			eLiving.prevRotationYawHead = eLiving.rotationYaw;
+			GL11.glTranslatef(0.0F, (float) eLiving.getYOffset(), 0.0F);
+			try {
+				Minecraft.getMinecraft().getRenderManager().playerViewY = 180.0F;
+				Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(eLiving, 0.0D, 0.0D, 0.0D, 0.0F,
+						1.0F);
+
+			} finally {
+				eLiving.renderYawOffset = f2;
+				eLiving.rotationYaw = f3;
+				eLiving.rotationPitch = f4;
+				eLiving.prevRotationYawHead = f5;
+				eLiving.rotationYawHead = f6;
+				RenderHelper.disableStandardItemLighting();
+				GL11.glDisable(32826);
+				OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+				GL11.glDisable(3553);
+				OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
+				GL11.glTranslatef(0.0F, 0.0F, 20.0F);
+				GL11.glPopMatrix();
+			}
 		}
 	}
 

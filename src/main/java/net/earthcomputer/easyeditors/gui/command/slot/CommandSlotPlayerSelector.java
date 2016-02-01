@@ -19,6 +19,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	private CommandSlotRadioList radioList;
 	private CommandSlotTextField playerNameField;
 	private CommandSlotTextField UUIDField;
+	private CmdPlayerSelector playerSelector;
 
 	public CommandSlotPlayerSelector() {
 		addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
@@ -42,11 +43,15 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 		});
 
+		playerSelector = new CmdPlayerSelector();
+
 		addChild(radioList = new CommandSlotRadioList(
 				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.username"),
 						Colors.playerSelectorLabel.color, playerNameField),
 				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.uuid"),
-						Colors.playerSelectorLabel.color, UUIDField)) {
+						Colors.playerSelectorLabel.color, UUIDField),
+				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.selector"),
+						Colors.playerSelectorLabel.color, playerSelector)) {
 			@Override
 			protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
 				String arg = args[index];
@@ -72,9 +77,28 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			return Patterns.playerName.matcher(playerNameField.getText()).matches();
 		case 1:
 			return Patterns.UUID.matcher(UUIDField.getText()).matches();
+		case 2:
+			return playerSelector.isValid();
 		default:
 			return false;
 		}
+	}
+
+	private class CmdPlayerSelector extends CommandSlotVerticalArrangement {
+
+		private CommandSlotMenu selectorType;
+		private CommandSlotEntity targetEntity;
+
+		public CmdPlayerSelector() {
+			addChild(new CommandSlotHorizontalArrangement(
+					selectorType = new CommandSlotMenu("Nearest", "Furthest", "All", "Random"),
+					targetEntity = new CommandSlotEntity()));
+		}
+		
+		public boolean isValid() {
+			return targetEntity.isValid();
+		}
+
 	}
 
 }
