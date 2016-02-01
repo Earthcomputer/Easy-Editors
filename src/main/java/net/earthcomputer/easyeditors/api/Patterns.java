@@ -21,7 +21,7 @@ public class Patterns {
 	public static final Pattern partialUUID = Pattern
 			.compile("[0-9a-fA-F]{0,8}-(?:[0-9a-fA-F]{0,4}-){3}[0-9a-fA-F]{0,12}");
 
-	public static final Pattern playerSelector = Pattern.compile("@([pare])(?:\\[([\\w=,!-]*)\\])?");
+	public static final Pattern playerSelector = Pattern.compile("@([pare])(?:\\[([\\w\\.=,!-]*)\\])?");
 
 	public static final Pattern partialInteger = Pattern.compile("[+-]?[0-9]*");
 
