@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;

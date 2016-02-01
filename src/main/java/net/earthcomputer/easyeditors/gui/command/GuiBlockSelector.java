@@ -19,9 +19,9 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import net.earthcomputer.easyeditors.api.AnimatedBlockRenderer;
 import net.earthcomputer.easyeditors.api.BlockPropertyRegistry;
-import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.AnimatedBlockRenderer;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;

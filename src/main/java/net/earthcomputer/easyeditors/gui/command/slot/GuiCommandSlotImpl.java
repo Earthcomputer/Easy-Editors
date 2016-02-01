@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

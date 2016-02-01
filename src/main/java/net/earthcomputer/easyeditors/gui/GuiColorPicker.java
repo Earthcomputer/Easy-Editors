@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 
-import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;

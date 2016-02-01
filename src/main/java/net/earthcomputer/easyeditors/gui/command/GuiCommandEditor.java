@@ -9,7 +9,7 @@ import org.lwjgl.input.Mouse;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand;

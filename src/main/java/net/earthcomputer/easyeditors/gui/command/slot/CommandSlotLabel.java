@@ -2,7 +2,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
-import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.util.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;

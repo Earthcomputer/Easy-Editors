@@ -2,8 +2,8 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import com.google.common.base.Predicate;
 
-import net.earthcomputer.easyeditors.api.Colors;
-import net.earthcomputer.easyeditors.api.Patterns;
+import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;

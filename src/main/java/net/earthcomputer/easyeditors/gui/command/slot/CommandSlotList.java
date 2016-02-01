@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.api.Instantiator;
+import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.GuiUtils;
 

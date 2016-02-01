@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.api.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiColorPicker;
 import net.earthcomputer.easyeditors.gui.IColorPickerCallback;
 import net.minecraft.client.Minecraft;

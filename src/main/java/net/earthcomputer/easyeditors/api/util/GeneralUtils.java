@@ -1,4 +1,4 @@
-package net.earthcomputer.easyeditors.api;
+package net.earthcomputer.easyeditors.api.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

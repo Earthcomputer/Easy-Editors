@@ -9,10 +9,10 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import net.earthcomputer.easyeditors.api.Colors;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
-import net.earthcomputer.easyeditors.api.GeneralUtils;
-import net.earthcomputer.easyeditors.api.Instantiator;
+import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;

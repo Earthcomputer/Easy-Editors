@@ -3,10 +3,10 @@ package net.earthcomputer.easyeditors;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.earthcomputer.easyeditors.api.Colors;
-import net.earthcomputer.easyeditors.api.Colors.Color;
+import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.Colors.Color;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
-import net.earthcomputer.easyeditors.api.GeneralUtils;
 import net.earthcomputer.easyeditors.api.GuiReplacementRegistry;
 import net.earthcomputer.easyeditors.gui.GuiNewCommandBlock;
 import net.minecraft.client.gui.GuiCommandBlock;

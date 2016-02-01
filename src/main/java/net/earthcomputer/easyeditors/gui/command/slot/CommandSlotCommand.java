@@ -2,7 +2,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
-import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiCommandSelector;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;

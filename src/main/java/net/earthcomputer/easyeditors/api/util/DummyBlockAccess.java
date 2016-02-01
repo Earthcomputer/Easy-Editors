@@ -1,4 +1,4 @@
-package net.earthcomputer.easyeditors.api;
+package net.earthcomputer.easyeditors.api.util;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;

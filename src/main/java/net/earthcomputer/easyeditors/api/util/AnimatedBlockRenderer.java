@@ -1,7 +1,8 @@
-package net.earthcomputer.easyeditors.api;
+package net.earthcomputer.easyeditors.api.util;
 
 import org.lwjgl.opengl.GL11;
 
+import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;

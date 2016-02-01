@@ -9,6 +9,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import net.earthcomputer.easyeditors.EasyEditors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;

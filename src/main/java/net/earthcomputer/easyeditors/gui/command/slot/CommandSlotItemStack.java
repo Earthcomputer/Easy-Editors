@@ -5,8 +5,8 @@ import java.util.List;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.api.Colors;
-import net.earthcomputer.easyeditors.api.NBTToJson;
+import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.NBTToJson;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
 import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;

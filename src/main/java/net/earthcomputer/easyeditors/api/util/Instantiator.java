@@ -1,4 +1,4 @@
-package net.earthcomputer.easyeditors.api;
+package net.earthcomputer.easyeditors.api.util;
 
 /**
  * Used whenever Easy Editors needs to create a new instance of something, but

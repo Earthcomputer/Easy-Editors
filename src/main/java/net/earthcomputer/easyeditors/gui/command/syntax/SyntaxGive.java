@@ -1,6 +1,6 @@
 package net.earthcomputer.easyeditors.gui.command.syntax;
 
-import net.earthcomputer.easyeditors.api.Colors;
+import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotItemStack;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
