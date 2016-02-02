@@ -224,9 +224,6 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (size() != 0)
-			if (getChildAt(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton))
-				return true;
 		if (mouseButton == 0) {
 			if (mouseX >= x && mouseX < x + getWidth()) {
 				for (int i = 0; i < buttonTops.length; i++) {
@@ -243,6 +240,13 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 		if (size() != 0) {
 			return getChildAt(selectedIndex).onMouseClicked(mouseX, mouseY, mouseButton);
 		}
+		return false;
+	}
+	
+	@Override
+	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
+		if (size() != 0)
+			return getChildAt(selectedIndex).onMouseClickedForeground(mouseX, mouseY, mouseButton);
 		return false;
 	}
 
