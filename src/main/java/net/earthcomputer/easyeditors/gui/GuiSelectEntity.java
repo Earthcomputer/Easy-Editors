@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.FakeWorld;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -18,6 +19,7 @@ import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -36,10 +38,19 @@ public class GuiSelectEntity extends GuiScreen {
 	private EList list;
 
 	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback) {
+		this(previousScreen, callback, false, false);
+	}
+
+	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
+			boolean includeLightning) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 
 		entities = Lists.newArrayList(EntityList.getEntityNameList());
+		if (includePlayer)
+			entities.add("Player");
+		if (!includeLightning)
+			entities.remove("LightningBolt");
 		Collections.sort(entities, new Comparator<String>() {
 			@Override
 			public int compare(String s1, String s2) {
@@ -51,8 +62,7 @@ public class GuiSelectEntity extends GuiScreen {
 			selectedIndex = entities.indexOf(callback.getEntity());
 
 		theWorld = new FakeWorld();
-		theEntity = EntityList.createEntityByName(entities.get(selectedIndex), theWorld);
-		theEntity.posY = 100;
+		theEntity = createEntity(selectedIndex);
 	}
 
 	@Override
@@ -79,8 +89,7 @@ public class GuiSelectEntity extends GuiScreen {
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		GeneralUtils.renderEntityAt(theEntity, width * 3 / 4, height / 2, width / 2 - 12, 300, 1.8f, mouseX,
-				mouseY);
+		GeneralUtils.renderEntityAt(theEntity, width * 3 / 4, height / 2, width / 2 - 120, 150, mouseX, mouseY);
 	}
 
 	@Override
@@ -120,6 +129,17 @@ public class GuiSelectEntity extends GuiScreen {
 		return entity;
 	}
 
+	private Entity createEntity(int slotIndex) {
+		String entityName = entities.get(slotIndex);
+		if ("Player".equals(entityName)) {
+			return Minecraft.getMinecraft().thePlayer;
+		} else if ("LightningBolt".equals(entityName)) {
+			return new EntityLightningBolt(theWorld, 0, 0, 0);
+		} else {
+			return EntityList.createEntityByName(entityName, theWorld);
+		}
+	}
+
 	private class EList extends GuiSlot {
 		public EList() {
 			super(GuiSelectEntity.this.mc, GuiSelectEntity.this.width / 2, GuiSelectEntity.this.height, 30,
@@ -134,8 +154,7 @@ public class GuiSelectEntity extends GuiScreen {
 		@Override
 		protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {
 			selectedIndex = slotIndex;
-			theEntity = EntityList.createEntityByName(entities.get(slotIndex), theWorld);
-			theEntity.posY = 100;
+			theEntity = createEntity(slotIndex);
 		}
 
 		@Override

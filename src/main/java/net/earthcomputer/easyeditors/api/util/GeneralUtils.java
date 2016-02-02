@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -314,60 +315,73 @@ public class GeneralUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Entity> void renderEntityAt(Entity entity, int x, int y, int width, int height,
-			float baseScale, int mouseX, int mouseY) {
+	public static <T extends Entity> void renderEntityAt(Entity entity, int x, int y, int width, int height, int mouseX,
+			int mouseY) {
 		ICustomEntityRenderer<T> customRenderer = (ICustomEntityRenderer<T>) EntityRendererRegistry
 				.findCustomRenderer(entity);
 		if (customRenderer != null) {
-			customRenderer.renderEntity((T) entity, x, y, width, height, baseScale, mouseX, mouseY);
+			customRenderer.renderEntity((T) entity, x, y, width, height, mouseX, mouseY);
 		} else if (entity instanceof EntityLivingBase) {
 			EntityLivingBase eLiving = (EntityLivingBase) entity;
-			int scale = (int) (Math.min(width, height) / baseScale
-					/ Math.max(Math.max(eLiving.width, eLiving.height), eLiving.getYOffset()));
-			GL11.glDisable(3042);
-			GL11.glDepthMask(true);
-			GL11.glEnable(2929);
-			GL11.glEnable(3008);
-			GL11.glPushMatrix();
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			GL11.glEnable(2903);
-			GL11.glTranslatef(x, y, 150.0F);
-			GL11.glScalef(-scale, scale, scale);
-			GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
-			float f2 = eLiving.renderYawOffset;
-			float f3 = eLiving.rotationYaw;
-			float f4 = eLiving.rotationPitch;
-			float f5 = eLiving.prevRotationYawHead;
-			float f6 = eLiving.rotationYawHead;
-			GL11.glRotatef(135.0F, 0.0F, 1.0F, 0.0F);
+			boolean isWidthRestricting = (float) eLiving.width / width > (float) eLiving.height / height;
+			float scale = isWidthRestricting ? (float) width / eLiving.width : (float) height / eLiving.height;
+			mouseX -= x;
+			mouseY -= y - 50;
+			GlStateManager.disableBlend();
+			GlStateManager.depthMask(true);
+			GlStateManager.enableDepth();
+			GlStateManager.enableAlpha();
+			GlStateManager.pushMatrix();
+			GlStateManager.enableColorMaterial();
+			GlStateManager.color(1, 1, 1, 1);
+			if (isWidthRestricting)
+				height = (int) (width * eLiving.height / eLiving.width);
+			else
+				width = (int) (height * eLiving.width / eLiving.height);
+			GlStateManager.translate(x, y + height / 2, 150);
+			GlStateManager.scale(-scale, scale, scale);
+			GlStateManager.rotate(180, 0, 0, 1);
+			float prevRotationYawOffset = eLiving.renderYawOffset;
+			float prevRotationYaw = eLiving.rotationYaw;
+			float prevRotationPitch = eLiving.rotationPitch;
+			float prevPrevRotationYawHead = eLiving.prevRotationYawHead;
+			float prevRotationYawHead = eLiving.rotationYawHead;
+			GlStateManager.rotate(135, 0, 1, 0);
 			RenderHelper.enableStandardItemLighting();
-			GL11.glRotatef(-135.0F, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(-(float) Math.atan(mouseY / 40.0F) * 20.0F, 1.0F, 0.0F, 0.0F);
-
-			eLiving.renderYawOffset = ((float) Math.atan(mouseX / 40.0F) * 20.0F);
-			eLiving.rotationYaw = ((float) Math.atan(mouseX / 40.0F) * 40.0F);
-			eLiving.rotationPitch = (-(float) Math.atan(mouseY / 40.0F) * 20.0F);
+			GlStateManager.rotate(-135, 0, 1, 0);
+			GlStateManager.rotate(((float) Math.atan((double) ((float) mouseY / 40))) * 20, 1, 0, 0);
+			eLiving.renderYawOffset = -(float) Math.atan((double) ((float) mouseX / 40)) * 20;
+			eLiving.rotationYaw = -(float) Math.atan((double) ((float) mouseX / 40)) * 40;
+			eLiving.rotationPitch = ((float) Math.atan((double) ((float) mouseY / 40))) * 20;
 			eLiving.rotationYawHead = eLiving.rotationYaw;
 			eLiving.prevRotationYawHead = eLiving.rotationYaw;
-			GL11.glTranslatef(0.0F, (float) eLiving.getYOffset(), 0.0F);
+			GlStateManager.translate(0, 0, 0);
+			RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
+			rendermanager.setPlayerViewY(180);
+			rendermanager.setRenderShadow(false);
+			boolean errored = false;
 			try {
-				Minecraft.getMinecraft().getRenderManager().playerViewY = 180.0F;
-				Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(eLiving, 0.0D, 0.0D, 0.0D, 0.0F,
-						1.0F);
-
-			} finally {
-				eLiving.renderYawOffset = f2;
-				eLiving.rotationYaw = f3;
-				eLiving.rotationPitch = f4;
-				eLiving.prevRotationYawHead = f5;
-				eLiving.rotationYawHead = f6;
-				RenderHelper.disableStandardItemLighting();
-				GL11.glDisable(32826);
-				OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-				GL11.glDisable(3553);
-				OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
-				GL11.glTranslatef(0.0F, 0.0F, 20.0F);
-				GL11.glPopMatrix();
+				rendermanager.renderEntityWithPosYaw(eLiving, 0, 0, 0, 0, 1);
+			} catch (Exception e) {
+				errored = true;
+			}
+			rendermanager.setRenderShadow(true);
+			eLiving.renderYawOffset = prevRotationYawOffset;
+			eLiving.rotationYaw = prevRotationYaw;
+			eLiving.rotationPitch = prevRotationPitch;
+			eLiving.prevRotationYawHead = prevPrevRotationYawHead;
+			eLiving.rotationYawHead = prevRotationYawHead;
+			GlStateManager.popMatrix();
+			RenderHelper.disableStandardItemLighting();
+			GlStateManager.disableRescaleNormal();
+			GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+			GlStateManager.disableTexture2D();
+			GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+			if (errored) {
+				FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+				String str = "Error drawing entity";
+				fontRenderer.drawStringWithShadow(str, x - fontRenderer.getStringWidth(str) / 2,
+						y - 4, 0xff0000);
 			}
 		}
 	}

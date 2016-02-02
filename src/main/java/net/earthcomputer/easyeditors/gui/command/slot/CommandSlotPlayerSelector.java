@@ -92,9 +92,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		public CmdPlayerSelector() {
 			addChild(new CommandSlotHorizontalArrangement(
 					selectorType = new CommandSlotMenu("Nearest", "Furthest", "All", "Random"),
-					targetEntity = new CommandSlotEntity()));
+					targetEntity = new CommandSlotEntity(true, false)));
 		}
-		
+
 		public boolean isValid() {
 			return targetEntity.isValid();
 		}
