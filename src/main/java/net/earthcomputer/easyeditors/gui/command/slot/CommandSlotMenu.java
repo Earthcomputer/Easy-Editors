@@ -124,4 +124,37 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 		return expanded;
 	}
 
+	/**
+	 * 
+	 * @return The selected word
+	 */
+	public String getCurrentValue() {
+		return values[currentValue];
+	}
+
+	/**
+	 * 
+	 * @return The index in the menu of the selected word
+	 */
+	public int getCurrentIndex() {
+		return currentValue;
+	}
+
+	/**
+	 * Sets the index of the selected word (changes the selected word)
+	 * 
+	 * @param index
+	 */
+	public void setCurrentIndex(int index) {
+		this.currentValue = index;
+	}
+	
+	/**
+	 * 
+	 * @return The number of words available for selection
+	 */
+	public int wordCount() {
+		return values.length;
+	}
+
 }
