@@ -91,7 +91,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		public CmdPlayerSelector() {
 			addChild(new CommandSlotHorizontalArrangement(
-					selectorType = new CommandSlotMenu("Nearest", "Furthest", "All", "Random"),
+					selectorType = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.nearest"),
+							I18n.format("gui.commandEditor.playerSelector.farthest"),
+							I18n.format("gui.commandEditor.playerSelector.all"),
+							I18n.format("gui.commandEditor.playerSelector.random")),
 					targetEntity = new CommandSlotEntity(true, false)));
 		}
 
