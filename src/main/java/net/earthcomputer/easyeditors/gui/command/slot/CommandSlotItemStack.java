@@ -58,9 +58,9 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	private CommandSlotIntTextField stackSizeField;
 	private List<ItemDamageHandler> damageHandlers = Lists.newArrayList();
-	private CommandSlotModifiable damageSlot;
+	private CommandSlotModifiable<IGuiCommandSlot> damageSlot;
 	private List<NBTTagHandler> nbtHandlers = Lists.newArrayList();
-	private CommandSlotModifiable nbtSlot;
+	private CommandSlotModifiable<IGuiCommandSlot> nbtSlot;
 
 	/**
 	 * Constructs a new command slot which represents an item stack
@@ -99,10 +99,10 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 					stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)));
 
 		if ((displayComponents & COMPONENT_DAMAGE) != 0)
-			addChild(damageSlot = new CommandSlotModifiable(null));
+			addChild(damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
 
 		if ((displayComponents & COMPONENT_NBT) != 0)
-			addChild(nbtSlot = new CommandSlotModifiable(null));
+			addChild(nbtSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
 	}
 
 	@Override
