@@ -134,6 +134,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotExpand expand;
 		private CommandSlotIntTextField countField;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableCountField;
+		private CommandSlotCheckbox nameInverted;
+		private CommandSlotTextField entityName;
 
 		public CmdPlayerSelector() {
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
@@ -174,6 +176,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 								countField = new CommandSlotIntTextField(50, 50, 1))));
 				countField.setText("1");
 			}
+
+			specifics.addChild(new CommandSlotHorizontalArrangement(
+					new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+							I18n.format("gui.commandEditor.playerSelector.entityName"),
+							Colors.playerSelectorLabel.color),
+					nameInverted = new CommandSlotCheckbox(
+							I18n.format("gui.commandEditor.playerSelector.entityNameInverted")),
+					entityName = new CommandSlotTextField(200, 200)));
 
 			addChild(expand = new CommandSlotExpand(specifics));
 		}
@@ -273,6 +283,18 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					this.expand.setExpanded(true);
 			}
 
+			this.entityName.setText("");
+			this.nameInverted.setChecked(false);
+			if (specifiers.containsKey("name")) {
+				String name = specifiers.get("name");
+				if (name.startsWith("!")) {
+					name = name.substring(1);
+					this.nameInverted.setChecked(true);
+				}
+				this.entityName.setText(name);
+				this.expand.setExpanded(true);
+			}
+
 			return 1;
 		}
 
@@ -326,6 +348,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (!selectorType.equals("e") || !targetType.isEmpty()) {
 					specifiers.put("type", targetType);
 				}
+			}
+
+			// name
+			if (!this.entityName.getText().isEmpty()) {
+				String name = this.entityName.getText();
+				if (this.nameInverted.isChecked())
+					name = "!" + name;
+				specifiers.put("name", name);
 			}
 
 			// Build final string
