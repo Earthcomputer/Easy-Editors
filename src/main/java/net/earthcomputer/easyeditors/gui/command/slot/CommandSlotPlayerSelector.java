@@ -169,18 +169,22 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				String[] specifierStrings = specifiersString.split(",");
 				int i;
 				for (i = 0; i < specifierStrings.length; i++) {
-					if (!specifierStrings[i].contains("="))
+					if (specifierStrings[i].contains("="))
 						break;
 					String key = null;
 					switch (i) {
 					case 0:
 						key = "x";
+						break;
 					case 1:
 						key = "y";
+						break;
 					case 2:
 						key = "z";
+						break;
 					case 3:
 						key = "r";
+						break;
 					}
 					if (key != null)
 						specifiers.put(key, specifierStrings[i]);
