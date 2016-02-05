@@ -40,6 +40,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	}
 
 	public CommandSlotPlayerSelector(int flags) {
+		this.flags = flags;
+
 		addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				I18n.format("gui.commandEditor.playerSelector.selectBy"), Colors.playerSelectorSelectBy.color));
 
@@ -98,8 +100,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		addChild(radioList);
-
-		this.flags = flags;
 	}
 
 	/**
@@ -132,14 +132,25 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotCheckbox targetInverted;
 		private CommandSlotEntity targetEntity;
 		private CommandSlotExpand expand;
-		private CommandSlotModifiable<CommandSlotIntTextField> countField;
+		private CommandSlotIntTextField countField;
+		private CommandSlotModifiable<IGuiCommandSlot> modifiableCountField;
 
 		public CmdPlayerSelector() {
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
 			row.addChild(selectorType = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.nearest"),
 					I18n.format("gui.commandEditor.playerSelector.farthest"),
 					I18n.format("gui.commandEditor.playerSelector.all"),
-					I18n.format("gui.commandEditor.playerSelector.random")));
+					I18n.format("gui.commandEditor.playerSelector.random")) {
+				@Override
+				protected void onChanged(String to) {
+					if ((flags & ONE_ONLY) == 0) {
+						if (getCurrentIndex() == 2)
+							modifiableCountField.setChild(null);
+						else
+							modifiableCountField.setChild(countField);
+					}
+				}
+			});
 			if ((flags & PLAYERS_ONLY) == 0) {
 				row.addChild(targetInverted = new CommandSlotCheckbox(
 						I18n.format("gui.commandEditor.playerSelector.targetInverted")));
@@ -156,10 +167,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			CommandSlotVerticalArrangement specifics = new CommandSlotVerticalArrangement();
 
-			specifics.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.count"),
-					Colors.playerSelectorLabel.color, countField = new CommandSlotModifiable<CommandSlotIntTextField>(
-							new CommandSlotIntTextField(50, 50, 1))));
-			countField.getChild().setText("1");
+			if ((flags & ONE_ONLY) == 0) {
+				specifics.addChild(
+						modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(CommandSlotLabel.createLabel(
+								I18n.format("gui.commandEditor.playerSelector.count"), Colors.playerSelectorLabel.color,
+								countField = new CommandSlotIntTextField(50, 50, 1))));
+				countField.setText("1");
+			}
 
 			addChild(expand = new CommandSlotExpand(specifics));
 		}
@@ -253,8 +267,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			this.expand.setExpanded(false);
 			if (c < 0)
 				c = -c;
-			if (c != 0) {
-				this.countField.getChild().setText(String.valueOf(c));
+			if (c != 0 && (flags & ONE_ONLY) == 0) {
+				this.countField.setText(String.valueOf(c));
 				if (c != 1)
 					this.expand.setExpanded(true);
 			}
@@ -281,7 +295,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			} else if (this.targetEntity != null
 					&& (!this.targetEntity.getEntity().equals("Player") || this.targetInverted.isChecked())) {
 				selectorType = "e";
-			} else if (this.selectorType.getCurrentIndex() == 2) {
+			} else if (this.selectorType.getCurrentIndex() == 2 && (flags & ONE_ONLY) == 0) {
 				selectorType = "a";
 			} else {
 				selectorType = "p";
@@ -289,13 +303,15 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			// c
 			int arg;
-			if (this.countField.getChild() == null)
+			if ((flags & ONE_ONLY) != 0)
+				arg = 1;
+			else if (this.selectorType.getCurrentIndex() == 2)
 				arg = 0;
 			else
-				arg = this.countField.getChild().getIntValue();
+				arg = this.countField.getIntValue();
 			if (this.selectorType.getCurrentIndex() == 1)
 				arg = -arg;
-			if (((selectorType.equals("p") || selectorType.equals("r")) && arg != 1)
+			if (((selectorType.equals("p") || selectorType.equals("r") || (flags & ONE_ONLY) != 0) && arg != 1)
 					|| ((selectorType.equals("a") || selectorType.equals("e")) && arg != 0))
 				specifiers.put("c", String.valueOf(arg));
 
@@ -348,7 +364,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						return false;
 				}
 			}
-			if (countField.getChild() != null && !countField.getChild().isValid())
+			if (selectorType.getCurrentIndex() != 2 && (flags & ONE_ONLY) == 0 && !countField.isValid())
 				return false;
 			return true;
 		}
