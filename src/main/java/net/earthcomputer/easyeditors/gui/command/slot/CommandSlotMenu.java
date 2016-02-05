@@ -56,7 +56,10 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 		boolean foundValue = false;
 		for (int i = 0; i < values.length; i++) {
 			if (args[index].equals(values[i])) {
-				currentValue = i;
+				if (i != currentValue) {
+					currentValue = i;
+					onChanged(args[index]);
+				}
 				foundValue = true;
 				break;
 			}
@@ -112,7 +115,11 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 			expanded = false;
 			int top = expandUpwards ? y - values.length * 12 : y + 12;
 			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= top && mouseY < top + values.length * 12) {
-				currentValue = (mouseY - top) / 12;
+				int index = (mouseY - top) / 12;
+				if (index != currentValue) {
+					currentValue = index;
+					onChanged(values[index]);
+				}
 				return true;
 			}
 		}
@@ -122,6 +129,14 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
 		return expanded;
+	}
+
+	/**
+	 * Called when the selected value is changed
+	 * 
+	 * @param to
+	 */
+	protected void onChanged(String to) {
 	}
 
 	/**
@@ -147,8 +162,9 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	 */
 	public void setCurrentIndex(int index) {
 		this.currentValue = index;
+		onChanged(values[index]);
 	}
-	
+
 	/**
 	 * 
 	 * @return The number of words available for selection

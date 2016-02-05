@@ -122,7 +122,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		if (x != this.x || y != this.y) {
 			this.x = x;
 			this.y = y;
-			onTextChanged();
+			privateOnTextChanged();
 		}
 		wrappedTextField.drawTextBox();
 	}
@@ -141,6 +141,9 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	 * Called when the text in the text field changes
 	 */
 	protected void onTextChanged() {
+	}
+
+	private void privateOnTextChanged() {
 		GuiTypeListenerTextField oldTextField = wrappedTextField;
 		GuiTypeListenerTextField newTextField = wrappedTextField = new GuiTypeListenerTextField(this, x + 1, y + 1,
 				MathHelper.clamp_int(
@@ -154,6 +157,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		newTextField.setFocused(oldTextField.isFocused());
 		newTextField.func_175205_a(oldTextField.contentFilter);
 		setWidth(newTextField.width + 2);
+		onTextChanged();
 	}
 
 	@Override
@@ -198,7 +202,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 			super.setText(text);
 			text = getText();
 			if (!oldText.equals(text))
-				listener.onTextChanged();
+				listener.privateOnTextChanged();
 		}
 
 		public void setTextDangerously(String text) {
@@ -211,7 +215,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 			super.writeText(text);
 			text = getText();
 			if (!oldText.equals(text))
-				listener.onTextChanged();
+				listener.privateOnTextChanged();
 		}
 
 		@Override
@@ -228,7 +232,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 				setSelectionPos(oldSelectionEnd);
 				setLineScrollOffset(oldLineScrollOffset);
 			} else if (!oldText.equals(newText)) {
-				listener.onTextChanged();
+				listener.privateOnTextChanged();
 			}
 		}
 
@@ -237,7 +241,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 			String oldText = getText();
 			super.setMaxStringLength(maxStringLength);
 			if (!oldText.equals(getText()))
-				listener.onTextChanged();
+				listener.privateOnTextChanged();
 		}
 
 		public void setMaxStringLengthDangerously(int maxStringLength) {

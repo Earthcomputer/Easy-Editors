@@ -33,9 +33,12 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 
 	@Override
 	public void setEnchantment(int id) {
-		this.enchantmentId = id;
-		enchantmentName.setColor(0);
-		enchantmentName.setText(I18n.format(Enchantment.getEnchantmentById(id).getName()));
+		if (id != this.enchantmentId) {
+			this.enchantmentId = id;
+			enchantmentName.setColor(0);
+			enchantmentName.setText(I18n.format(Enchantment.getEnchantmentById(id).getName()));
+			onChanged();
+		}
 	}
 
 	public int getLevel() {
@@ -43,7 +46,13 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 	}
 
 	public void setLevel(int level) {
-		enchantmentLevel.setText(String.valueOf(level));
+		if (level >= 1 && level <= 100 && level != enchantmentLevel.getIntValue()) {
+			enchantmentLevel.setText(String.valueOf(level));
+			onChanged();
+		}
+	}
+
+	protected void onChanged() {
 	}
 
 	public boolean isValid() {

@@ -82,8 +82,12 @@ public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		return GuiCommandEditor.isInBounds(mouseX, mouseY)
+		boolean checkedBefore = isChecked();
+		boolean r = GuiCommandEditor.isInBounds(mouseX, mouseY)
 				&& checkbox.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY);
+		if (isChecked() != checkedBefore)
+			onChecked(isChecked());
+		return r;
 	}
 
 	/**
@@ -100,7 +104,18 @@ public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 	 * @param checked
 	 */
 	public void setChecked(boolean checked) {
-		checkbox.setIsChecked(checked);
+		if (checked != isChecked()) {
+			checkbox.setIsChecked(checked);
+			onChecked(checked);
+		}
+	}
+
+	/**
+	 * Called when this checkbox is checked or unchecked
+	 * 
+	 * @param checked
+	 */
+	protected void onChecked(boolean checked) {
 	}
 
 }
