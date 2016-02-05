@@ -101,9 +101,9 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (mouseButton == 0 && !expanded && GuiCommandEditor.isInBounds(mouseX, mouseY)) {
-			if (mouseX >= x + getWidth() - 12 && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
-				expanded = true;
+		if (mouseButton == 0 && GuiCommandEditor.isInBounds(mouseX, mouseY)) {
+			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
+				expanded = !expanded;
 			}
 		}
 		return false;
@@ -111,10 +111,11 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
-		if (mouseButton == 0 && expanded) {
+		if (mouseButton == 0 && expanded
+				&& (mouseX < x || mouseX >= x + getWidth() || mouseY < y || mouseY >= y + 12)) {
 			expanded = false;
 			int top = expandUpwards ? y - values.length * 12 : y + 12;
-			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= top && mouseY < top + values.length * 12) {
+			if (mouseX >= x && mouseX < x + getWidth() - 12 && mouseY >= top && mouseY < top + values.length * 12) {
 				int index = (mouseY - top) / 12;
 				if (index != currentValue) {
 					currentValue = index;
