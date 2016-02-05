@@ -35,6 +35,7 @@ gui.commandEditor.noEntity=[No Entity]
 gui.commandEditor.noItem=[No Item]
 gui.commandEditor.playerSelector.all=All
 gui.commandEditor.playerSelector.farthest=Farthest
+gui.commandEditor.playerSelector.targetInverted=Not
 gui.commandEditor.playerSelector.nearest=Nearest
 gui.commandEditor.playerSelector.random=Random
 gui.commandEditor.playerSelector.selectBy=Select By:

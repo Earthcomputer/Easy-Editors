@@ -42,7 +42,7 @@ public class GuiSelectEntity extends GuiScreen {
 	}
 
 	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
-			boolean includeLightning) {
+			boolean includeLightning, String... additionalOptions) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 
@@ -51,6 +51,8 @@ public class GuiSelectEntity extends GuiScreen {
 			entities.add("Player");
 		if (!includeLightning)
 			entities.remove("LightningBolt");
+		for (String additionalOption : additionalOptions)
+			entities.add(additionalOption);
 		Collections.sort(entities, new Comparator<String>() {
 			@Override
 			public int compare(String s1, String s2) {
