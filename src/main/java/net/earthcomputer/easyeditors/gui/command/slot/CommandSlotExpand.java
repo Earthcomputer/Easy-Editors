@@ -88,6 +88,7 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 		GlStateManager.disableDepth();
 		Minecraft.getMinecraft().getTextureManager().bindTexture(arrowLocation);
 		Gui.drawModalRectWithCustomSizedTexture(x + 8, y, isExpanded ? 16 : 0, hovered ? 16 : 0, 16, 16, 32, 32);
+		GlStateManager.enableDepth();
 
 		if (isExpanded)
 			child.draw(x, y + 18, mouseX, mouseY, partialTicks);
