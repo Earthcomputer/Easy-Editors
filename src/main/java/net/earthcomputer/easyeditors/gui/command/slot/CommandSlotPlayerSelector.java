@@ -200,10 +200,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						specifiers.put(key, specifierStrings[i]);
 				}
 				for (; i < specifierStrings.length; i++) {
-					String[] keyValue = specifierStrings[i].split("=");
-					if (keyValue.length != 2)
+					int equalsIndex = specifierStrings[i].indexOf('=');
+					if (equalsIndex == -1)
 						throw new CommandSyntaxException();
-					specifiers.put(keyValue[0], keyValue[1]);
+					specifiers.put(specifierStrings[i].substring(0, equalsIndex),
+							specifierStrings[i].substring(equalsIndex + 1));
 				}
 			}
 
@@ -277,8 +278,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			// Decide p/a/r/e
 			if (this.selectorType.getCurrentIndex() == 3) {
 				selectorType = "r";
-			} else if (this.targetEntity != null && !this.targetEntity.getEntity().equals("Player")
-					&& !this.targetInverted.isChecked()) {
+			} else if (this.targetEntity != null
+					&& (!this.targetEntity.getEntity().equals("Player") || this.targetInverted.isChecked())) {
 				selectorType = "e";
 			} else if (this.selectorType.getCurrentIndex() == 2) {
 				selectorType = "a";
@@ -297,6 +298,19 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			if (((selectorType.equals("p") || selectorType.equals("r")) && arg != 1)
 					|| ((selectorType.equals("a") || selectorType.equals("e")) && arg != 0))
 				specifiers.put("c", String.valueOf(arg));
+
+			// type
+			if (this.targetEntity != null
+					&& (!this.targetEntity.getEntity().equals("Player") || this.targetInverted.isChecked())) {
+				String targetType = targetEntity.getEntity();
+				if (targetType.equals("Anything"))
+					targetType = "";
+				if (this.targetInverted.isChecked())
+					targetType = "!" + targetType;
+				if (!selectorType.equals("e") || !targetType.isEmpty()) {
+					specifiers.put("type", targetType);
+				}
+			}
 
 			// Build final string
 			StringBuilder builder = new StringBuilder("@").append(selectorType);
@@ -324,8 +338,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		public boolean isValid() {
-			if (targetEntity != null && !targetEntity.isValid())
-				return false;
+			if (targetEntity != null) {
+				if (!targetEntity.isValid())
+					return false;
+				else if (targetEntity.getEntity().equals("Anything")) {
+					if (selectorType.getCurrentIndex() == 3)
+						return false;
+					else if (targetInverted.isChecked())
+						return false;
+				}
+			}
 			if (countField.getChild() != null && !countField.getChild().isValid())
 				return false;
 			return true;
