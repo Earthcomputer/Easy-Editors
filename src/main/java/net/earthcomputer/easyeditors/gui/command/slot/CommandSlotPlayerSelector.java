@@ -73,7 +73,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					return Patterns.partialPlayerName.matcher(input).matches();
 				}
 			});
-			radioList.addChild(playerNameField);
+			radioList.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.username"),
+					Colors.playerSelectorLabel.color, playerNameField));
 		}
 
 		if ((flags & DISALLOW_UUID) == 0) {
@@ -86,12 +87,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					return Patterns.partialUUID.matcher(input).matches();
 				}
 			});
-			radioList.addChild(UUIDField);
+			radioList.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.uuid"),
+					Colors.playerSelectorLabel.color, UUIDField));
 		}
 
 		if ((flags & DISALLOW_SELECTOR) == 0) {
 			playerSelector = new CmdPlayerSelector();
-			radioList.addChild(playerSelector);
+			radioList.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.selector"),
+					Colors.playerSelectorLabel.color, playerSelector));
 		}
 
 		addChild(radioList);
@@ -128,6 +131,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotMenu selectorType;
 		private CommandSlotCheckbox targetInverted;
 		private CommandSlotEntity targetEntity;
+		private CommandSlotExpand expand;
 		private CommandSlotModifiable<CommandSlotIntTextField> countField;
 
 		public CmdPlayerSelector() {
@@ -150,8 +154,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 			addChild(row);
 
-			addChild(countField = new CommandSlotModifiable<CommandSlotIntTextField>(
-					new CommandSlotIntTextField(50, 50)));
+			CommandSlotVerticalArrangement specifics = new CommandSlotVerticalArrangement();
+
+			specifics.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.count"),
+					Colors.playerSelectorLabel.color, countField = new CommandSlotModifiable<CommandSlotIntTextField>(
+							new CommandSlotIntTextField(50, 50, 1))));
+			countField.getChild().setText("1");
+
+			addChild(expand = new CommandSlotExpand(specifics));
 		}
 
 		@Override
@@ -239,10 +249,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				this.targetEntity.setEntity(targetType);
 			}
 
+			this.expand.setExpanded(false);
 			if (c < 0)
 				c = -c;
-			if (this.countField.getChild() != null)
+			if (c != 0) {
 				this.countField.getChild().setText(String.valueOf(c));
+				if (c != 1)
+					this.expand.setExpanded(true);
+			}
 
 			return 1;
 		}
