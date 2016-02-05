@@ -575,7 +575,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			worldRenderer.pos(width - 6, height - footerHeight, 0).tex(0, 1).color(0x40, 0x40, 0x40, 255).endVertex();
 			worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0x40, 0x40, 0x40, 255).endVertex();
 			worldRenderer.pos(width, height - footerHeight - 6, 0).tex(1, 0).color(0x40, 0x40, 0x40, 255).endVertex();
-			worldRenderer.pos(height - 6, height - footerHeight - 6, 0).tex(0, 0).color(0x40, 0x40, 0x40, 255)
+			worldRenderer.pos(width - 6, height - footerHeight - 6, 0).tex(0, 0).color(0x40, 0x40, 0x40, 255)
 					.endVertex();
 			tessellator.draw();
 		}
