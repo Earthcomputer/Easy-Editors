@@ -3,7 +3,6 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -101,7 +100,7 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (mouseButton == 0 && GuiCommandEditor.isInBounds(mouseX, mouseY)) {
+		if (mouseButton == 0 && getContext().isMouseInBounds(mouseX, mouseY)) {
 			if (mouseX >= x && mouseX < x + getWidth() && mouseY >= y && mouseY < y + 12) {
 				expanded = !expanded;
 			}

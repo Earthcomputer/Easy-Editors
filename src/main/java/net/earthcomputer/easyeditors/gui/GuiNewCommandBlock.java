@@ -111,7 +111,7 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 				break;
 
 			case 5:
-				mc.displayGuiScreen(new GuiCommandEditor(this, this));
+				mc.displayGuiScreen(new GuiCommandEditor(this, this, theCommandBlock));
 				break;
 			}
 		}

@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 
 /**
  * A command slot which wraps a child which can be changed
@@ -50,6 +51,7 @@ public class CommandSlotModifiable<T extends IGuiCommandSlot> extends GuiCommand
 				setHeight(child.getHeight());
 				child.addSizeChangeListener(this);
 				child.setParent(this);
+				child.setContext(getContext());
 			}
 		}
 	}
@@ -117,6 +119,13 @@ public class CommandSlotModifiable<T extends IGuiCommandSlot> extends GuiCommand
 		if (child != null)
 			return child.onMouseScrolled(mouseX, mouseY, scrolledUp);
 		return false;
+	}
+
+	@Override
+	public void setContext(ICommandSlotContext context) {
+		super.setContext(context);
+		if (child != null)
+			child.setContext(context);
 	}
 
 	@Override

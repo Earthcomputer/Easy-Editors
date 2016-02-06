@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 
 /**
  * A basic component of a command GUI. There are a number of reasons these are
@@ -191,6 +192,19 @@ public interface IGuiCommandSlot {
 	 * @param parent
 	 */
 	void setParent(IGuiCommandSlot parent);
+
+	/**
+	 * 
+	 * @return The context of this command slot
+	 */
+	ICommandSlotContext getContext();
+
+	/**
+	 * Sets the context of this command slot
+	 * 
+	 * @param context
+	 */
+	void setContext(ICommandSlotContext context);
 
 	/**
 	 * Draws a tooltip on top of everything else

@@ -7,7 +7,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
@@ -167,7 +166,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (GuiCommandEditor.isInBounds(mouseX, mouseY) && mouseX >= wrappedTextField.xPosition
+		if (getContext().isMouseInBounds(mouseX, mouseY) && mouseX >= wrappedTextField.xPosition
 				&& mouseX < wrappedTextField.xPosition + wrappedTextField.width && mouseY >= wrappedTextField.yPosition
 				&& mouseY < wrappedTextField.yPosition + wrappedTextField.height)
 			wrappedTextField.mouseClicked(mouseX, mouseY, mouseButton);

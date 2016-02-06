@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -111,7 +111,7 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (hovered && GuiCommandEditor.isInBounds(mouseX, mouseY)) {
+		if (hovered && getContext().isMouseInBounds(mouseX, mouseY)) {
 			setExpanded(!isExpanded);
 			GeneralUtils.playButtonSound();
 		} else if (isExpanded) {
@@ -150,6 +150,12 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 			return child.onMouseScrolled(mouseX, mouseY, scrolledUp);
 		}
 		return false;
+	}
+
+	@Override
+	public void setContext(ICommandSlotContext context) {
+		super.setContext(context);
+		child.setContext(context);
 	}
 
 	private void recalcSize() {

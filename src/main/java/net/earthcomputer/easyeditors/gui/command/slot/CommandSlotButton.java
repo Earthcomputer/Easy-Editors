@@ -2,7 +2,6 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
-import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
@@ -122,7 +121,7 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 			else
 				hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
 
-			if (!GuiCommandEditor.isInBounds(mouseX, mouseY))
+			if (getContext().isMouseInBounds(mouseX, mouseY))
 				hoverChecker.resetHoverTimer();
 			else if (hoverChecker.checkHover(mouseX, mouseY)) {
 				drawTooltip(mouseX, mouseY, hoverText, 300);
@@ -132,7 +131,7 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (GuiCommandEditor.isInBounds(mouseX, mouseY)
+		if (getContext().isMouseInBounds(mouseX, mouseY)
 				&& wrappedButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
 			wrappedButton.playPressSound(Minecraft.getMinecraft().getSoundHandler());
 			onPress();

@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 
 /**
  * A command slot which contains a number of child command slots
@@ -136,6 +137,14 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		return r;
 	}
 
+	@Override
+	public void setContext(ICommandSlotContext context) {
+		super.setContext(context);
+		for (IGuiCommandSlot child : children) {
+			child.setContext(context);
+		}
+	}
+
 	/**
 	 * Removes all children
 	 */
@@ -155,6 +164,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		children.add(child);
 		child.addSizeChangeListener(this);
 		child.setParent(this);
+		child.setContext(getContext());
 		recalcSize();
 		recalcPosChildren();
 	}
@@ -169,6 +179,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		children.add(index, child);
 		child.addSizeChangeListener(this);
 		child.setParent(this);
+		child.setContext(getContext());
 		recalcSize();
 		recalcPosChildren();
 	}
@@ -202,6 +213,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
 			child.setParent(this);
+			child.setContext(getContext());
 		}
 		recalcSize();
 		recalcPosChildren();
@@ -218,6 +230,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
 			child.setParent(this);
+			child.setContext(getContext());
 		}
 		recalcSize();
 		recalcPosChildren();
@@ -233,6 +246,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		children.set(index, child);
 		child.addSizeChangeListener(this);
 		child.setParent(this);
+		child.setContext(getContext());
 		recalcSize();
 		recalcPosChildren();
 	}

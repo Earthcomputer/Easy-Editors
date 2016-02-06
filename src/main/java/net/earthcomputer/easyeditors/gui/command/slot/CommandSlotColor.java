@@ -6,7 +6,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.earthcomputer.easyeditors.gui.GuiColorPicker;
 import net.earthcomputer.easyeditors.gui.IColorPickerCallback;
-import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -81,7 +80,7 @@ public class CommandSlotColor extends GuiCommandSlotImpl implements IColorPicker
 			hoverChecker = new HoverChecker(y, y + getHeight(), x, x + getWidth(), 1000);
 		else
 			hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
-		if (!GuiCommandEditor.isInBounds(mouseX, mouseY))
+		if (!getContext().isMouseInBounds(mouseX, mouseY))
 			hoverChecker.resetHoverTimer();
 		else if (hoverChecker.checkHover(mouseX, mouseY))
 			drawTooltip(mouseX, mouseY, I18n.format("gui.easyeditorsconfig.colortooltip"));
@@ -90,7 +89,7 @@ public class CommandSlotColor extends GuiCommandSlotImpl implements IColorPicker
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (mouseButton == 0) {
-			if (GuiCommandEditor.isInBounds(mouseX, mouseY) && mouseX >= x && mouseX < x + getWidth() && mouseY >= y
+			if (getContext().isMouseInBounds(mouseX, mouseY) && mouseX >= x && mouseX < x + getWidth() && mouseY >= y
 					&& mouseY < y + getHeight())
 				Minecraft.getMinecraft()
 						.displayGuiScreen(new GuiColorPicker(Minecraft.getMinecraft().currentScreen, this, allowAlpha));
