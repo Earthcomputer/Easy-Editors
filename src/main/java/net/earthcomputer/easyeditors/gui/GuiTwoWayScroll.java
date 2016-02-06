@@ -611,7 +611,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 			worldRenderer.pos(xScrollBarLeft, height - footerHeight - 1, 0).tex(0, 1).color(0xc0, 0xc0, 0xc0, 255)
 					.endVertex();
-			worldRenderer.pos(xScrollBarRight, height - footerHeight - 1, 0).tex(1, 1).color(0xc0, 0xc0, 0xc0, 255)
+			worldRenderer.pos(xScrollBarRight - 1, height - footerHeight - 1, 0).tex(1, 1).color(0xc0, 0xc0, 0xc0, 255)
 					.endVertex();
 			worldRenderer.pos(xScrollBarRight - 1, height - footerHeight - 6, 0).tex(1, 0).color(0xc0, 0xc0, 0xc0, 255)
 					.endVertex();
