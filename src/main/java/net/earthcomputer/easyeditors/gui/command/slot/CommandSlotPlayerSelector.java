@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
@@ -140,6 +139,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotIntTextField originX;
 		private CommandSlotIntTextField originY;
 		private CommandSlotIntTextField originZ;
+		private CommandSlotIntTextField boundsDX;
+		private CommandSlotIntTextField boundsDY;
+		private CommandSlotIntTextField boundsDZ;
 
 		public CmdPlayerSelector() {
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
@@ -186,6 +188,17 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					Colors.playerSelectorLabel.color));
 			row.addChild(originZ = new CommandSlotIntTextField(30, 100));
 			specifics.addChild(row);
+
+			specifics.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.bounds"), Colors.playerSelectorLabel.color));
+			CommandSlotVerticalArrangement column = new CommandSlotVerticalArrangement();
+			column.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDX"),
+					Colors.playerSelectorLabel.color, boundsDX = new CommandSlotIntTextField(30, 100)));
+			column.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDY"),
+					Colors.playerSelectorLabel.color, boundsDY = new CommandSlotIntTextField(30, 100)));
+			column.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDZ"),
+					Colors.playerSelectorLabel.color, boundsDZ = new CommandSlotIntTextField(30, 100)));
+			specifics.addChild(new CommandSlotRectangle(column, Colors.playerSelectorBox.color));
 
 			if ((flags & ONE_ONLY) == 0) {
 				specifics.addChild(
@@ -322,15 +335,20 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			this.originX.setText("");
 			this.originY.setText("");
 			this.originZ.setText("");
+			if (specifiers.containsKey("x"))
+				this.originX.setText(String.valueOf(parseInt(specifiers.get("x"))));
+			if (specifiers.containsKey("y"))
+				this.originY.setText(String.valueOf(parseInt(specifiers.get("y"))));
+			if (specifiers.containsKey("z"))
+				this.originZ.setText(String.valueOf(parseInt(specifiers.get("z"))));
 			if (specifiers.containsKey("dx") || specifiers.containsKey("dy") || specifiers.containsKey("dz")) {
-
+				if (specifiers.containsKey("dx"))
+					this.boundsDX.setText(String.valueOf(parseInt(specifiers.get("dx"))));
+				if (specifiers.containsKey("dy"))
+					this.boundsDY.setText(String.valueOf(parseInt(specifiers.get("dy"))));
+				if (specifiers.containsKey("dz"))
+					this.boundsDZ.setText(String.valueOf(parseInt(specifiers.get("dz"))));
 			} else {
-				if (specifiers.containsKey("x"))
-					this.originX.setText(String.valueOf(parseInt(specifiers.get("x"))));
-				if (specifiers.containsKey("y"))
-					this.originY.setText(String.valueOf(parseInt(specifiers.get("y"))));
-				if (specifiers.containsKey("z"))
-					this.originZ.setText(String.valueOf(parseInt(specifiers.get("z"))));
 			}
 
 			return 1;
@@ -396,17 +414,26 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				specifiers.put("name", name);
 			}
 
-			// x/y/z/dx/dy/dz
-			if (Predicates.alwaysFalse().apply(null)) {
+			// x/y/z
+			if (!this.originX.getText().isEmpty())
+				specifiers.put("x", this.originX.getText());
+			if (!this.originY.getText().isEmpty())
+				specifiers.put("y", this.originY.getText());
+			if (!this.originZ.getText().isEmpty())
+				specifiers.put("z", this.originZ.getText());
 
+			if (!this.boundsDX.getText().isEmpty() || !this.boundsDY.getText().isEmpty()
+					|| !this.boundsDZ.getText().isEmpty()) {
+				// dx/dy/dz
+				if (!this.boundsDX.getText().isEmpty())
+					specifiers.put("dx", this.boundsDX.getText());
+				if (!this.boundsDY.getText().isEmpty())
+					specifiers.put("dy", this.boundsDY.getText());
+				if (!this.boundsDZ.getText().isEmpty())
+					specifiers.put("dz", this.boundsDZ.getText());
 			} else {
-				// x/y/z/r/rm
-				if (!this.originX.getText().isEmpty())
-					specifiers.put("x", this.originX.getText());
-				if (!this.originY.getText().isEmpty())
-					specifiers.put("y", this.originY.getText());
-				if (!this.originZ.getText().isEmpty())
-					specifiers.put("z", this.originZ.getText());
+				// r/rm
+
 			}
 
 			// Build final string
