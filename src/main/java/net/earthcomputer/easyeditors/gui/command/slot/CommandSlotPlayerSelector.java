@@ -184,6 +184,12 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					nameInverted = new CommandSlotCheckbox(
 							I18n.format("gui.commandEditor.playerSelector.entityNameInverted")),
 					entityName = new CommandSlotTextField(200, 200)));
+			entityName.setContentFilter(new Predicate<String>() {
+				@Override
+				public boolean apply(String input) {
+					return Patterns.partialPlayerName.matcher(input).matches();
+				}
+			});
 
 			addChild(expand = new CommandSlotExpand(specifics));
 		}
