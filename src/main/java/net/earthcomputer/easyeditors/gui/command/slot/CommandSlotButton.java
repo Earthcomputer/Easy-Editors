@@ -121,7 +121,7 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 			else
 				hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
 
-			if (getContext().isMouseInBounds(mouseX, mouseY))
+			if (!getContext().isMouseInBounds(mouseX, mouseY))
 				hoverChecker.resetHoverTimer();
 			else if (hoverChecker.checkHover(mouseX, mouseY)) {
 				drawTooltip(mouseX, mouseY, hoverText, 300);
