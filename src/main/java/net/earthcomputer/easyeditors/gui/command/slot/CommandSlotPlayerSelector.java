@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
@@ -136,6 +137,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableCountField;
 		private CommandSlotCheckbox nameInverted;
 		private CommandSlotTextField entityName;
+		private CommandSlotIntTextField originX;
+		private CommandSlotIntTextField originY;
+		private CommandSlotIntTextField originZ;
 
 		public CmdPlayerSelector() {
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
@@ -168,6 +172,20 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			addChild(row);
 
 			CommandSlotVerticalArrangement specifics = new CommandSlotVerticalArrangement();
+
+			row = new CommandSlotHorizontalArrangement();
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.origin"), Colors.playerSelectorLabel.color));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
+					Colors.playerSelectorLabel.color));
+			row.addChild(originX = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
+					Colors.playerSelectorLabel.color));
+			row.addChild(originY = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
+					Colors.playerSelectorLabel.color));
+			row.addChild(originZ = new CommandSlotIntTextField(30, 100));
+			specifics.addChild(row);
 
 			if ((flags & ONE_ONLY) == 0) {
 				specifics.addChild(
@@ -301,6 +319,20 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				this.expand.setExpanded(true);
 			}
 
+			this.originX.setText("");
+			this.originY.setText("");
+			this.originZ.setText("");
+			if (specifiers.containsKey("dx") || specifiers.containsKey("dy") || specifiers.containsKey("dz")) {
+
+			} else {
+				if (specifiers.containsKey("x"))
+					this.originX.setText(String.valueOf(parseInt(specifiers.get("x"))));
+				if (specifiers.containsKey("y"))
+					this.originY.setText(String.valueOf(parseInt(specifiers.get("y"))));
+				if (specifiers.containsKey("z"))
+					this.originZ.setText(String.valueOf(parseInt(specifiers.get("z"))));
+			}
+
 			return 1;
 		}
 
@@ -362,6 +394,19 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (this.nameInverted.isChecked())
 					name = "!" + name;
 				specifiers.put("name", name);
+			}
+
+			// x/y/z/dx/dy/dz
+			if (Predicates.alwaysFalse().apply(null)) {
+
+			} else {
+				// x/y/z/r/rm
+				if (!this.originX.getText().isEmpty())
+					specifiers.put("x", this.originX.getText());
+				if (!this.originY.getText().isEmpty())
+					specifiers.put("y", this.originY.getText());
+				if (!this.originZ.getText().isEmpty())
+					specifiers.put("z", this.originZ.getText());
 			}
 
 			// Build final string

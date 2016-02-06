@@ -40,6 +40,7 @@ gui.commandEditor.playerSelector.entityNameInverted=Not
 gui.commandEditor.playerSelector.farthest=Farthest
 gui.commandEditor.playerSelector.targetInverted=Not
 gui.commandEditor.playerSelector.nearest=Nearest
+gui.commandEditor.playerSelector.origin=Origin
 gui.commandEditor.playerSelector.random=Random
 gui.commandEditor.playerSelector.selectBy=Select By:
 gui.commandEditor.playerSelector.selector=Selector
