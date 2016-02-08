@@ -665,7 +665,7 @@ public class GuiColorPicker extends GuiScreen {
 	}
 
 	private void updateAlphaClick(int dy) {
-		dy = MathHelper.clamp_int(0, dy, 64);
+		dy = MathHelper.clamp_int(dy, 0, 64);
 		dy = 64 - dy;
 		alpha = dy * 255 / 64;
 	}
