@@ -137,7 +137,7 @@ public class GuiColorPicker extends GuiScreen {
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		drawDefaultBackground();
+		drawBackground(0);
 
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
