@@ -152,41 +152,64 @@ public class GeneralUtils {
 	}
 
 	/**
-	 * A static alternative to
-	 * {@link net.minecraft.client.gui.Gui#drawGradientRect(int, int, int, int, int, int)
-	 * Gui.drawGradientRect(int, int, int, int, int, int)}
+	 * Draws a rectangle with possibly different colors in different corners
 	 * 
 	 * @param left
-	 * @param right
 	 * @param top
+	 * @param right
 	 * @param bottom
-	 * @param startColor
-	 * @param endColor
+	 * @param coltl
+	 *            - the color of the top left corner
+	 * @param coltr
+	 *            - the color of the top right corner
+	 * @param colbl
+	 *            - the color of the bottom left corner
+	 * @param colbr
+	 *            - the color of the bottom right corner
+	 */
+	public static void drawGradientRect(int left, int top, int right, int bottom, int coltl, int coltr, int colbl,
+			int colbr) {
+		drawGradientRect(left, top, right, bottom, coltl, coltr, colbl, colbr, 0);
+	}
+
+	/**
+	 * Draws a rectangle with possibly different colors in different corners
+	 * 
+	 * @param left
+	 * @param top
+	 * @param right
+	 * @param bottom
+	 * @param coltl
+	 *            - the color of the top left corner
+	 * @param coltr
+	 *            - the color of the top right corner
+	 * @param colbl
+	 *            - the color of the bottom left corner
+	 * @param colbr
+	 *            - the color of the bottom right corner
 	 * @param zLevel
 	 */
-	public static void drawGradientRect(int left, int right, int top, int bottom, int startColor, int endColor,
-			int zLevel) {
-		float startAlpha = (float) (startColor >> 24 & 255) / 255;
-		float startRed = (float) (startColor >> 16 & 255) / 255;
-		float startGreen = (float) (startColor >> 8 & 255) / 255;
-		float startBlue = (float) (startColor & 255) / 255;
-		float endAlpha = (float) (endColor >> 24 & 255) / 255;
-		float endRed = (float) (endColor >> 16 & 255) / 255;
-		float endGreen = (float) (endColor >> 8 & 255) / 255;
-		float endBlue = (float) (endColor & 255) / 255;
+	public static void drawGradientRect(int left, int top, int right, int bottom, int coltl, int coltr, int colbl,
+			int colbr, int zLevel) {
 		GlStateManager.disableTexture2D();
 		GlStateManager.enableBlend();
 		GlStateManager.disableAlpha();
 		GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
+
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-		worldRenderer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-		worldRenderer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-		worldRenderer.pos(left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-		worldRenderer.pos(right, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+		worldRenderer.pos(right, top, zLevel).color((coltr & 0x00ff0000) >> 16, (coltr & 0x0000ff00) >> 8,
+				(coltr & 0x000000ff), (coltr & 0xff000000) >>> 24).endVertex();
+		worldRenderer.pos(left, top, zLevel).color((coltl & 0x00ff0000) >> 16, (coltl & 0x0000ff00) >> 8,
+				(coltl & 0x000000ff), (coltl & 0xff000000) >>> 24).endVertex();
+		worldRenderer.pos(left, bottom, zLevel).color((colbl & 0x00ff0000) >> 16, (colbl & 0x0000ff00) >> 8,
+				(colbl & 0x000000ff), (colbl & 0xff000000) >>> 24).endVertex();
+		worldRenderer.pos(right, bottom, zLevel).color((colbr & 0x00ff0000) >> 16, (colbr & 0x0000ff00) >> 8,
+				(colbr & 0x000000ff), (colbr & 0xff000000) >>> 24).endVertex();
 		tessellator.draw();
+
 		GlStateManager.shadeModel(GL11.GL_FLAT);
 		GlStateManager.disableBlend();
 		GlStateManager.enableAlpha();
@@ -267,19 +290,23 @@ public class GeneralUtils {
 
 			mc.getRenderItem().zLevel = 300;
 			int col1 = 0xf0100010;
-			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY - 4, textY - 3, col1, col1, 300);
-			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY + h + 3, textY + h + 4, col1, col1, 300);
-			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY - 3, textY + h + 3, col1, col1, 300);
-			drawGradientRect(textX - 4, textX - 3, textY - 3, textY + h + 3, col1, col1, 300);
-			drawGradientRect(textX + maxLineWidth + 3, textX + maxLineWidth + 4, textY - 3, textY + h + 3, col1, col1,
+			drawGradientRect(textX - 3, textY - 4, textX + maxLineWidth + 3, textY - 3, col1, col1, col1, col1, 300);
+			drawGradientRect(textX - 3, textY + h + 3, textX + maxLineWidth + 3, textY + h + 4, col1, col1, col1, col1,
 					300);
+			drawGradientRect(textX - 3, textY - 3, textX + maxLineWidth + 3, textY + h + 3, col1, col1, col1, col1,
+					300);
+			drawGradientRect(textX - 4, textY - 3, textX - 3, textY + h + 3, col1, col1, col1, col1, 300);
+			drawGradientRect(textX + maxLineWidth + 3, textY - 3, textX + maxLineWidth + 4, textY + h + 3, col1, col1,
+					col1, col1, 300);
 			int col2 = 0x505000ff;
 			int col3 = (col2 & 0xfefefe) >> 1 | col2 & 0xff000000;
-			drawGradientRect(textX - 3, textX - 3 + 1, textY - 3 + 1, textY + h + 3 - 1, col2, col3, 300);
-			drawGradientRect(textX + maxLineWidth + 2, textX + maxLineWidth + 3, textY - 3 + 1, textY + h + 3 - 1, col2,
-					col3, 300);
-			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY - 3, textY - 3 + 1, col2, col2, 300);
-			drawGradientRect(textX - 3, textX + maxLineWidth + 3, textY + h + 2, textY + h + 3, col3, col3, 300);
+			drawGradientRect(textX - 3, textY - 3 + 1, textX - 3 + 1, textY + h + 3 - 1, col2, col2, col3, col3, 300);
+			drawGradientRect(textX + maxLineWidth + 2, textY - 3 + 1, textX + maxLineWidth + 3, textY + h + 3 - 1, col2,
+					col2, col3, col3, 300);
+			drawGradientRect(textX - 3, textY - 3, textX + maxLineWidth + 3, textY - 3 + 1, col2, col2, col2, col2,
+					300);
+			drawGradientRect(textX - 3, textY + h + 2, textX + maxLineWidth + 3, textY + h + 3, col3, col3, col3, col3,
+					300);
 
 			for (int i = 0; i < lines.size(); i++) {
 				String line = lines.get(i);
@@ -380,8 +407,7 @@ public class GeneralUtils {
 			if (errored) {
 				FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 				String str = "Error drawing entity";
-				fontRenderer.drawStringWithShadow(str, x - fontRenderer.getStringWidth(str) / 2,
-						y - 4, 0xff0000);
+				fontRenderer.drawStringWithShadow(str, x - fontRenderer.getStringWidth(str) / 2, y - 4, 0xff0000);
 			}
 		}
 	}
