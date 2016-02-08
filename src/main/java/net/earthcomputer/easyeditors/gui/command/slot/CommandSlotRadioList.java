@@ -225,7 +225,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (mouseButton == 0) {
-			if (mouseX >= x && mouseX < x + getWidth()) {
+			if (mouseX >= x && mouseX < x + getWidth() && getContext().isMouseInBounds(mouseX, mouseY)) {
 				for (int i = 0; i < buttonTops.length; i++) {
 					int top = getYOfChild(i);
 					if (top > buttonTops[i])
