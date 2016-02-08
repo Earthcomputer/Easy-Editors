@@ -136,12 +136,24 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableCountField;
 		private CommandSlotCheckbox nameInverted;
 		private CommandSlotTextField entityName;
-		private CommandSlotIntTextField originX;
-		private CommandSlotIntTextField originY;
-		private CommandSlotIntTextField originZ;
-		private CommandSlotIntTextField boundsDX;
-		private CommandSlotIntTextField boundsDY;
-		private CommandSlotIntTextField boundsDZ;
+		private CommandSlotRadioList positionalConstraints;
+		private CommandSlotIntTextField rOriginX;
+		private CommandSlotIntTextField rOriginY;
+		private CommandSlotIntTextField rOriginZ;
+		private CommandSlotIntTextField minRadius;
+		private CommandSlotIntTextField maxRadius;
+		private CommandSlotIntTextField boundsX1;
+		private CommandSlotIntTextField boundsY1;
+		private CommandSlotIntTextField boundsZ1;
+		private CommandSlotIntTextField boundsX2;
+		private CommandSlotIntTextField boundsY2;
+		private CommandSlotIntTextField boundsZ2;
+		private CommandSlotIntTextField dOriginX;
+		private CommandSlotIntTextField dOriginY;
+		private CommandSlotIntTextField dOriginZ;
+		private CommandSlotIntTextField distX;
+		private CommandSlotIntTextField distY;
+		private CommandSlotIntTextField distZ;
 
 		public CmdPlayerSelector() {
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
@@ -175,31 +187,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			CommandSlotVerticalArrangement specifics = new CommandSlotVerticalArrangement();
 
-			row = new CommandSlotHorizontalArrangement();
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.origin"), Colors.playerSelectorLabel.color));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
-					Colors.playerSelectorLabel.color));
-			row.addChild(originX = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
-					Colors.playerSelectorLabel.color));
-			row.addChild(originY = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
-					Colors.playerSelectorLabel.color));
-			row.addChild(originZ = new CommandSlotIntTextField(30, 100));
-			specifics.addChild(row);
-
-			specifics.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.bounds"), Colors.playerSelectorLabel.color));
-			CommandSlotVerticalArrangement column = new CommandSlotVerticalArrangement();
-			column.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDX"),
-					Colors.playerSelectorLabel.color, boundsDX = new CommandSlotIntTextField(30, 100)));
-			column.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDY"),
-					Colors.playerSelectorLabel.color, boundsDY = new CommandSlotIntTextField(30, 100)));
-			column.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDZ"),
-					Colors.playerSelectorLabel.color, boundsDZ = new CommandSlotIntTextField(30, 100)));
-			specifics.addChild(new CommandSlotRectangle(column, Colors.playerSelectorBox.color));
-
 			if ((flags & ONE_ONLY) == 0) {
 				specifics.addChild(
 						modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(CommandSlotLabel.createLabel(
@@ -221,6 +208,103 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					return Patterns.partialPlayerName.matcher(input).matches();
 				}
 			});
+
+			specifics.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.positionalConstraints"),
+					Colors.playerSelectorLabel.color));
+			positionalConstraints = new CommandSlotRadioList() {
+				@Override
+				protected int getSelectedIndexForString(String[] args, int index) {
+					return 0;
+				}
+			};
+			CommandSlotVerticalArrangement posConstraint = new CommandSlotVerticalArrangement();
+			row = new CommandSlotHorizontalArrangement();
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.radius.origin"), Colors.playerSelectorLabel.color));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
+					Colors.playerSelectorLabel.color));
+			row.addChild(rOriginX = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
+					Colors.playerSelectorLabel.color));
+			row.addChild(rOriginY = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
+					Colors.playerSelectorLabel.color));
+			row.addChild(rOriginZ = new CommandSlotIntTextField(30, 100));
+			posConstraint.addChild(row);
+			posConstraint
+					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.min"),
+							Colors.playerSelectorLabel.color, minRadius = new CommandSlotIntTextField(30, 100, 0)));
+			posConstraint
+					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.max"),
+							Colors.playerSelectorLabel.color, maxRadius = new CommandSlotIntTextField(30, 100, 0)));
+			positionalConstraints
+					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius"),
+							Colors.playerSelectorLabel.color, posConstraint));
+			posConstraint = new CommandSlotVerticalArrangement();
+			row = new CommandSlotHorizontalArrangement();
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.boundsFromTo.from"),
+					Colors.playerSelectorLabel.color));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
+					Colors.playerSelectorLabel.color));
+			row.addChild(boundsX1 = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
+					Colors.playerSelectorLabel.color));
+			row.addChild(boundsY1 = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
+					Colors.playerSelectorLabel.color));
+			row.addChild(boundsZ1 = new CommandSlotIntTextField(30, 100));
+			posConstraint.addChild(row);
+			row = new CommandSlotHorizontalArrangement();
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.boundsFromTo.to"), Colors.playerSelectorLabel.color));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
+					Colors.playerSelectorLabel.color));
+			row.addChild(boundsX2 = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
+					Colors.playerSelectorLabel.color));
+			row.addChild(boundsY2 = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
+					Colors.playerSelectorLabel.color));
+			row.addChild(boundsZ2 = new CommandSlotIntTextField(30, 100));
+			posConstraint.addChild(row);
+			positionalConstraints
+					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo"),
+							Colors.playerSelectorLabel.color, posConstraint));
+			posConstraint = new CommandSlotVerticalArrangement();
+			row = new CommandSlotHorizontalArrangement();
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.boundsDist.origin"),
+					Colors.playerSelectorLabel.color));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
+					Colors.playerSelectorLabel.color));
+			row.addChild(dOriginX = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
+					Colors.playerSelectorLabel.color));
+			row.addChild(dOriginY = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
+					Colors.playerSelectorLabel.color));
+			row.addChild(dOriginZ = new CommandSlotIntTextField(30, 100));
+			posConstraint.addChild(row);
+			row = new CommandSlotHorizontalArrangement();
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.boundsDist.distance"),
+					Colors.playerSelectorLabel.color));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
+					Colors.playerSelectorLabel.color));
+			row.addChild(distX = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
+					Colors.playerSelectorLabel.color));
+			row.addChild(distY = new CommandSlotIntTextField(30, 100));
+			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
+					Colors.playerSelectorLabel.color));
+			row.addChild(distZ = new CommandSlotIntTextField(30, 100));
+			posConstraint.addChild(row);
+			positionalConstraints
+					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist"),
+							Colors.playerSelectorLabel.color, posConstraint));
+			specifics.addChild(new CommandSlotRectangle(positionalConstraints, Colors.playerSelectorBox.color));
 
 			addChild(expand = new CommandSlotExpand(specifics));
 		}
@@ -332,23 +416,67 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				this.expand.setExpanded(true);
 			}
 
-			this.originX.setText("");
-			this.originY.setText("");
-			this.originZ.setText("");
-			if (specifiers.containsKey("x"))
-				this.originX.setText(String.valueOf(parseInt(specifiers.get("x"))));
-			if (specifiers.containsKey("y"))
-				this.originY.setText(String.valueOf(parseInt(specifiers.get("y"))));
-			if (specifiers.containsKey("z"))
-				this.originZ.setText(String.valueOf(parseInt(specifiers.get("z"))));
-			if (specifiers.containsKey("dx") || specifiers.containsKey("dy") || specifiers.containsKey("dz")) {
+			this.rOriginX.setText("");
+			this.rOriginY.setText("");
+			this.rOriginZ.setText("");
+			this.minRadius.setText("");
+			this.maxRadius.setText("");
+			this.boundsX1.setText("");
+			this.boundsY1.setText("");
+			this.boundsZ1.setText("");
+			this.boundsX2.setText("");
+			this.boundsY2.setText("");
+			this.boundsZ2.setText("");
+			this.dOriginX.setText("");
+			this.dOriginY.setText("");
+			this.dOriginZ.setText("");
+			this.distX.setText("");
+			this.distY.setText("");
+			this.distZ.setText("");
+			if (specifiers.containsKey("x") && specifiers.containsKey("y") && specifiers.containsKey("z")
+					&& specifiers.containsKey("dx") && specifiers.containsKey("dy") && specifiers.containsKey("dz")) {
+				this.positionalConstraints.setSelectedIndex(1);
+				int x = parseInt(specifiers.get("x"));
+				int y = parseInt(specifiers.get("y"));
+				int z = parseInt(specifiers.get("z"));
+				int dx = parseInt(specifiers.get("dx"));
+				int dy = parseInt(specifiers.get("dy"));
+				int dz = parseInt(specifiers.get("dz"));
+				int x1 = dx < 0 ? x + dx : x + dx + 1;
+				int y1 = dy < 0 ? y + dy : y + dy + 1;
+				int z1 = dz < 0 ? z + dz : z + dz + 1;
+				this.boundsX1.setText(String.valueOf(x));
+				this.boundsY1.setText(String.valueOf(y));
+				this.boundsZ1.setText(String.valueOf(z));
+				this.boundsX2.setText(String.valueOf(x1));
+				this.boundsY2.setText(String.valueOf(y1));
+				this.boundsZ2.setText(String.valueOf(z1));
+			} else if (specifiers.containsKey("dx") || specifiers.containsKey("dy") || specifiers.containsKey("dz")) {
+				this.positionalConstraints.setSelectedIndex(2);
+				if (specifiers.containsKey("x"))
+					this.dOriginX.setText(String.valueOf(parseInt(specifiers.get("x"))));
+				if (specifiers.containsKey("y"))
+					this.dOriginY.setText(String.valueOf(parseInt(specifiers.get("y"))));
+				if (specifiers.containsKey("z"))
+					this.dOriginZ.setText(String.valueOf(parseInt(specifiers.get("z"))));
 				if (specifiers.containsKey("dx"))
-					this.boundsDX.setText(String.valueOf(parseInt(specifiers.get("dx"))));
+					this.distX.setText(String.valueOf(parseInt(specifiers.get("dx"))));
 				if (specifiers.containsKey("dy"))
-					this.boundsDY.setText(String.valueOf(parseInt(specifiers.get("dy"))));
+					this.distY.setText(String.valueOf(parseInt(specifiers.get("dy"))));
 				if (specifiers.containsKey("dz"))
-					this.boundsDZ.setText(String.valueOf(parseInt(specifiers.get("dz"))));
+					this.distZ.setText(String.valueOf(parseInt(specifiers.get("dz"))));
 			} else {
+				this.positionalConstraints.setSelectedIndex(0);
+				if (specifiers.containsKey("x"))
+					this.rOriginX.setText(String.valueOf(parseInt(specifiers.get("x"))));
+				if (specifiers.containsKey("y"))
+					this.rOriginY.setText(String.valueOf(parseInt(specifiers.get("y"))));
+				if (specifiers.containsKey("z"))
+					this.rOriginZ.setText(String.valueOf(parseInt(specifiers.get("z"))));
+				if (specifiers.containsKey("rm"))
+					this.minRadius.setText(String.valueOf(parseInt(specifiers.get("rm"))));
+				if (specifiers.containsKey("r"))
+					this.maxRadius.setText(String.valueOf(parseInt(specifiers.get("r"))));
 			}
 
 			return 1;
@@ -414,26 +542,56 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				specifiers.put("name", name);
 			}
 
-			// x/y/z
-			if (!this.originX.getText().isEmpty())
-				specifiers.put("x", this.originX.getText());
-			if (!this.originY.getText().isEmpty())
-				specifiers.put("y", this.originY.getText());
-			if (!this.originZ.getText().isEmpty())
-				specifiers.put("z", this.originZ.getText());
-
-			if (!this.boundsDX.getText().isEmpty() || !this.boundsDY.getText().isEmpty()
-					|| !this.boundsDZ.getText().isEmpty()) {
-				// dx/dy/dz
-				if (!this.boundsDX.getText().isEmpty())
-					specifiers.put("dx", this.boundsDX.getText());
-				if (!this.boundsDY.getText().isEmpty())
-					specifiers.put("dy", this.boundsDY.getText());
-				if (!this.boundsDZ.getText().isEmpty())
-					specifiers.put("dz", this.boundsDZ.getText());
-			} else {
-				// r/rm
-
+			// x/y/z/dx/dy/dz/r/rm
+			switch (this.positionalConstraints.getSelectedIndex()) {
+			case 0:
+				if (!this.rOriginX.getText().isEmpty())
+					specifiers.put("x", this.rOriginX.getText());
+				if (!this.rOriginY.getText().isEmpty())
+					specifiers.put("y", this.rOriginY.getText());
+				if (!this.rOriginZ.getText().isEmpty())
+					specifiers.put("z", this.rOriginZ.getText());
+				if (!this.minRadius.getText().isEmpty() && this.minRadius.getIntValue() != 0)
+					specifiers.put("rm", this.minRadius.getText());
+				if (!this.maxRadius.getText().isEmpty())
+					specifiers.put("r", this.maxRadius.getText());
+				break;
+			case 1:
+				int x1 = this.boundsX1.getIntValue();
+				int y1 = this.boundsY1.getIntValue();
+				int z1 = this.boundsZ1.getIntValue();
+				int x2 = this.boundsX2.getIntValue();
+				int y2 = this.boundsY2.getIntValue();
+				int z2 = this.boundsZ2.getIntValue();
+				int x = x1 < x2 ? x1 : x2;
+				int y = y1 < y2 ? y1 : y2;
+				int z = z1 < z2 ? z1 : z2;
+				int dx = x1 < x2 ? x2 - x1 - 1 : x1 - x2 - 1;
+				int dy = y1 < y2 ? y2 - y1 - 1 : y1 - y2 - 1;
+				int dz = z1 < z2 ? z2 - z1 - 1 : z1 - z2 - 1;
+				specifiers.put("x", String.valueOf(x));
+				specifiers.put("y", String.valueOf(y));
+				specifiers.put("z", String.valueOf(z));
+				specifiers.put("dx", String.valueOf(dx));
+				specifiers.put("dy", String.valueOf(dy));
+				specifiers.put("dz", String.valueOf(dz));
+				break;
+			case 2:
+				if (!this.dOriginX.getText().isEmpty())
+					specifiers.put("x", this.dOriginX.getText());
+				if (!this.dOriginY.getText().isEmpty())
+					specifiers.put("y", this.dOriginY.getText());
+				if (!this.dOriginZ.getText().isEmpty())
+					specifiers.put("z", this.dOriginZ.getText());
+				if (!this.distX.getText().isEmpty())
+					specifiers.put("dx", this.distX.getText());
+				if (!this.distY.getText().isEmpty())
+					specifiers.put("dy", this.distY.getText());
+				if (!this.distZ.getText().isEmpty())
+					specifiers.put("dz", this.distZ.getText());
+				break;
+			default:
+				throw new IllegalStateException();
 			}
 
 			// Build final string
