@@ -632,6 +632,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 			if (selectorType.getCurrentIndex() != 2 && (flags & ONE_ONLY) == 0 && !countField.isValid())
 				return false;
+			if (positionalConstraints.getSelectedIndex() == 1) {
+				if (!boundsX1.isValid() || !boundsY1.isValid() || !boundsZ1.isValid() || !boundsX2.isValid()
+						|| !boundsY2.isValid() || !boundsZ2.isValid())
+					return false;
+			}
 			return true;
 		}
 
