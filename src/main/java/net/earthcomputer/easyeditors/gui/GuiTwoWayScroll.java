@@ -580,6 +580,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		GlStateManager.shadeModel(GL11.GL_FLAT);
 		GlStateManager.enableAlpha();
 		GlStateManager.disableBlend();
+		GlStateManager.enableTexture2D();
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}

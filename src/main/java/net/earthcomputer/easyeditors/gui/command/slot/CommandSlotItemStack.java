@@ -199,20 +199,30 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	@Override
 	public void setItem(ItemStack item) {
-		this.item = item.getItem();
-		if (stackSizeField != null)
-			stackSizeField.setText(String.valueOf(item.stackSize));
-		if (this.damageSlot != null) {
-			damageHandlers = ItemDamageHandler.getHandlers(item.getItem());
-			this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item.getItem()));
-			this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
+		if (item == null || item.getItem() == null) {
+			this.item = null;
+			if (stackSizeField != null)
+				stackSizeField.setText("1");
+			if (this.damageSlot != null)
+				this.damageSlot.setChild(null);
+			if (this.nbtSlot != null)
+				this.nbtSlot.setChild(null);
 		} else {
-			this.damage = 0;
-		}
-		if (this.nbtSlot != null) {
-			nbtHandlers = NBTTagHandler.constructItemStackHandlers(item);
-			this.nbtSlot.setChild(NBTTagHandler.setupCommandSlot(nbtHandlers));
-			NBTTagHandler.readFromNBT(item.getTagCompound(), nbtHandlers);
+			this.item = item.getItem();
+			if (stackSizeField != null)
+				stackSizeField.setText(String.valueOf(item.stackSize));
+			if (this.damageSlot != null) {
+				damageHandlers = ItemDamageHandler.getHandlers(item.getItem());
+				this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item.getItem()));
+				this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
+			} else {
+				this.damage = 0;
+			}
+			if (this.nbtSlot != null) {
+				nbtHandlers = NBTTagHandler.constructItemStackHandlers(item);
+				this.nbtSlot.setChild(NBTTagHandler.setupCommandSlot(nbtHandlers));
+				NBTTagHandler.readFromNBT(item.getTagCompound(), nbtHandlers);
+			}
 		}
 	}
 
