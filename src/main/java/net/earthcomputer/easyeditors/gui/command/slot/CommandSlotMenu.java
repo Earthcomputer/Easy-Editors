@@ -156,6 +156,15 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	}
 
 	/**
+	 * 
+	 * @param index
+	 * @return The word at the given index
+	 */
+	public String getValueAt(int index) {
+		return values[index];
+	}
+
+	/**
 	 * Sets the index of the selected word (changes the selected word)
 	 * 
 	 * @param index
