@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagDouble;
+import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -52,6 +54,10 @@ public class NBTToJson {
 			return intArray(sb, (NBTTagIntArray) nbt);
 		case Constants.NBT.TAG_STRING:
 			return string(sb, (NBTTagString) nbt);
+		case Constants.NBT.TAG_DOUBLE:
+			return _double(sb, (NBTTagDouble) nbt);
+		case Constants.NBT.TAG_FLOAT:
+			return _float(sb, (NBTTagFloat) nbt);
 		default:
 			return other(sb, nbt);
 		}
@@ -113,6 +119,34 @@ public class NBTToJson {
 			theStr = "\"" + theStr.replace("\"", "\\\"") + "\"";
 
 		return sb.append(theStr);
+	}
+
+	private static StringBuilder _double(StringBuilder sb, NBTTagDouble _double) {
+		double d = _double.getDouble();
+		String str;
+		if (d == 0)
+			str = "0d";
+		else if (d < 1 && d > -1)
+			str = String.valueOf(d).replace("0.", ".");
+		else if (d % 1 == 0)
+			str = String.valueOf(d).replace(".0", "d");
+		else
+			str = String.valueOf(d);
+		return sb.append(str);
+	}
+
+	private static StringBuilder _float(StringBuilder sb, NBTTagFloat _float) {
+		float f = _float.getFloat();
+		String str;
+		if (f == 0)
+			str = "0f";
+		else if (f < 1 && f > -1)
+			str = String.valueOf(f).replace("0.", ".") + "f";
+		else if (f % 1 == 0)
+			str = String.valueOf(f).replace(".0", "f");
+		else
+			str = String.valueOf(f) + "f";
+		return sb.append(str);
 	}
 
 	private static StringBuilder other(StringBuilder sb, NBTBase other) {
