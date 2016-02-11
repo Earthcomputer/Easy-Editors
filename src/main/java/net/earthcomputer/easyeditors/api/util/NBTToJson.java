@@ -16,7 +16,9 @@ import net.minecraftforge.common.util.Constants;
  * This class is here to fix two problems:<br/>
  * 1: NBTTagLists add unnecessary indexes in their toString() methods<br/>
  * 2: NBTTagStrings' speech marks are sometimes unnecessary<br/>
- * 3: NEI has a coremod which adds spaces after commas in various toString()
+ * 3: NBTTagDouble and NBTTagFloat sometimes convert to an unnecessarily long
+ * string<br/>
+ * 4: NEI has a coremod which adds spaces after commas in various toString()
  * methods<br/>
  * This class basically does the opposite of {@link net.minecraft.nbt.JsonToNBT
  * JsonToNBT}.
