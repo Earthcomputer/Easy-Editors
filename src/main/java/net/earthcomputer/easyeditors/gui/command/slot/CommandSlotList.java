@@ -201,6 +201,15 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		return entries.get(index);
 	}
 
+	/**
+	 * 
+	 * @return A newly-created entry, created as if the user had pressed a +
+	 *         button
+	 */
+	public E newEntry() {
+		return instantiator.newInstance();
+	}
+
 	private class Entry extends CommandSlotHorizontalArrangement {
 
 		private int ind;

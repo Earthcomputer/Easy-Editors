@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.api.util.ReturnedValueListener;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
@@ -18,6 +20,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 
 /**
  * A command slot representing a player selector
@@ -165,6 +169,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotCheckbox teamInverted;
 		private IGuiCommandSlot teamName;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableTeamName;
+		private List<ScoreObjective> objectivesList;
+		private String objectiveErrorMessage;
+		private CommandSlotList<CmdScoreTest> scoreTests;
 
 		public CmdPlayerSelector() {
 			modifiableTeam = new CommandSlotModifiable<IGuiCommandSlot>(team = CommandSlotLabel.createLabel(
@@ -174,14 +181,23 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					modifiableTeamName = new CommandSlotModifiable<IGuiCommandSlot>(
 							teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 									I18n.format("gui.commandEditor.playerSelector.team.waiting"), 0x404040))));
-			ChatBlocker.obtainTeamsList(new ReturnedValueListener<List<String>>() {
+			ChatBlocker.obtainTeamsList(new ReturnedValueListener<List<ScorePlayerTeam>>() {
 				@Override
-				public void returnValue(List<String> value) {
-					value.add(0, I18n.format("gui.commandEditor.playerSelector.team.any"));
-					value.add(1, I18n.format("gui.commandEditor.playerSelector.team.none"));
+				public void returnValue(List<ScorePlayerTeam> value) {
+					List<String> registeredNames = Lists.newArrayList();
+					registeredNames.add("any");
+					registeredNames.add("none");
+					List<String> displayNames = Lists.newArrayList();
+					displayNames.add(I18n.format("gui.commandEditor.playerSelector.team.any"));
+					displayNames.add(I18n.format("gui.commandEditor.playerSelector.team.none"));
+					for (ScorePlayerTeam team : value) {
+						registeredNames.add(team.getRegisteredName());
+						displayNames.add(team.getTeamName());
+					}
 					CommandSlotMenu teamMenu;
-					modifiableTeamName.setChild(
-							teamName = teamMenu = new CommandSlotMenu(value.toArray(new String[value.size()])));
+					modifiableTeamName.setChild(teamName = teamMenu = new CommandSlotMenu(
+							displayNames.toArray(new String[displayNames.size()]),
+							registeredNames.toArray(new String[registeredNames.size()])));
 					if ("".equals(waitingTeamName))
 						teamMenu.setCurrentIndex(1);
 					else if (waitingTeamName != null) {
@@ -199,6 +215,56 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 											: "gui.commandEditor.playerSelector.team.noPermission"),
 									0xff0000));
 				}
+			});
+
+			scoreTests = new CommandSlotList<CmdScoreTest>(new Instantiator<CmdScoreTest>() {
+				@Override
+				public CmdScoreTest newInstance() {
+					CmdScoreTest r = new CmdScoreTest();
+					if (objectivesList != null) {
+						String[] names = new String[objectivesList.size()];
+						String[] displayNames = new String[names.length];
+						for (int i = 0; i < names.length; i++) {
+							names[i] = objectivesList.get(i).getName();
+							displayNames[i] = objectivesList.get(i).getDisplayName();
+						}
+						r.modifiableObjective.setChild(r.objective = new CommandSlotMenu(displayNames, names));
+					} else if (objectiveErrorMessage != null) {
+						r.modifiableObjective.setChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+								objectiveErrorMessage, 0xff0000));
+					}
+					return r;
+				}
+			}).setAppendHoverText(I18n.format("gui.commandEditor.playerSelector.score.append"))
+					.setInsertHoverText(I18n.format("gui.commandEditor.playerSelector.score.insert"))
+					.setRemoveHoverText(I18n.format("gui.commandEditor.playerSelector.score.remove"));
+			ChatBlocker.obtainObjectiveList(new ReturnedValueListener<List<ScoreObjective>>() {
+
+				@Override
+				public void returnValue(List<ScoreObjective> value) {
+					objectivesList = value;
+					String[] names = new String[value.size()];
+					String[] displayNames = new String[names.length];
+					for (int i = 0; i < names.length; i++) {
+						names[i] = value.get(i).getName();
+						displayNames[i] = value.get(i).getDisplayName();
+					}
+					for (int i = 0; i < scoreTests.entryCount(); i++) {
+						CmdScoreTest entry = scoreTests.getEntry(i);
+						entry.modifiableObjective.setChild(entry.objective = new CommandSlotMenu(displayNames, names));
+					}
+				}
+
+				@Override
+				public void abortFindingValue(int reason) {
+					objectiveErrorMessage = reason == 0 ? "gui.commandEditor.playerSelector.score.timedOut"
+							: "gui.commandEditor.playerSelector.score.noPermission";
+					for (int i = 0; i < scoreTests.entryCount(); i++) {
+						scoreTests.getEntry(i).modifiableObjective.setChild(new CommandSlotLabel(
+								Minecraft.getMinecraft().fontRendererObj, objectiveErrorMessage, 0xff0000));
+					}
+				}
+
 			});
 
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
@@ -363,6 +429,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			specifics.addChild(new CommandSlotRectangle(positionalConstraints, Colors.playerSelectorBox.color));
 
 			specifics.addChild(modifiableTeam);
+
+			specifics.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.score"),
+					Colors.playerSelectorLabel.color, scoreTests));
 
 			addChild(expand = new CommandSlotExpand(specifics));
 		}
@@ -562,6 +631,24 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				}
 			}
 
+			this.scoreTests.clearEntries();
+			for (Map.Entry<String, String> specifier : specifiers.entrySet()) {
+				if (specifier.getKey().startsWith("score_") && specifier.getKey().length() > 6) {
+					String objective = specifier.getKey().substring(6);
+					boolean min = false;
+					if (objective.endsWith("_min")) {
+						objective = objective.substring(objective.length() - 4, objective.length());
+						min = true;
+					}
+
+					CmdScoreTest scoreTest = this.scoreTests.newEntry();
+					scoreTest.waitingObjective = objective;
+					scoreTest.minOrMax.setCurrentIndex(min ? 0 : 1);
+					scoreTest.value.setText(String.valueOf(parseInt(specifier.getValue())));
+					this.scoreTests.addEntry(scoreTest);
+				}
+			}
+
 			return 1;
 		}
 
@@ -697,6 +784,17 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				specifiers.put("team", team);
 			}
 
+			// scores
+			for (int i = 0; i < this.scoreTests.entryCount(); i++) {
+				CmdScoreTest scoreTest = this.scoreTests.getEntry(i);
+				String key = scoreTest.objective == null ? scoreTest.waitingObjective
+						: scoreTest.objective.getCurrentValue();
+				key = "score_" + key;
+				if (scoreTest.minOrMax.getCurrentIndex() == 0)
+					key += "_min";
+				specifiers.put(key, scoreTest.value.getText());
+			}
+
 			// Build final string
 			StringBuilder builder = new StringBuilder("@").append(selectorType);
 			if (!specifiers.isEmpty()) {
@@ -745,7 +843,41 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (((CommandSlotMenu) teamName).getCurrentIndex() == 0 && teamInverted.isChecked())
 					return false;
 			}
+			for (int i = 0; i < scoreTests.entryCount(); i++) {
+				if (!scoreTests.getEntry(i).isValid())
+					return false;
+			}
 			return true;
+		}
+
+		private class CmdScoreTest extends CommandSlotHorizontalArrangement {
+
+			String waitingObjective;
+			CommandSlotModifiable<IGuiCommandSlot> modifiableObjective;
+			CommandSlotMenu objective;
+			CommandSlotMenu minOrMax;
+			CommandSlotIntTextField value;
+
+			public CmdScoreTest() {
+				addChild(modifiableObjective = new CommandSlotModifiable<IGuiCommandSlot>(
+						new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+								I18n.format("gui.commandEditor.playerSelector.score.waiting"), 0x404040)));
+				addChild(minOrMax = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.score.min"),
+						I18n.format("gui.commandEditor.playerSelector.score.max")));
+				addChild(value = new CommandSlotIntTextField(30, 100));
+				value.setText("0");
+			}
+
+			public boolean isValid() {
+				if (objective == null) {
+					if (waitingObjective == null)
+						return false;
+				}
+				if (!value.isValid())
+					return false;
+				return true;
+			}
+
 		}
 
 	}

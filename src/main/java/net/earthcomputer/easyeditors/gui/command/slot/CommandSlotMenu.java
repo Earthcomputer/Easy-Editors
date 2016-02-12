@@ -17,6 +17,7 @@ import net.minecraft.client.gui.Gui;
 public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	private String[] values;
+	private String[] displayValues;
 	private int currentValue = 0;
 	private boolean expanded = false;
 
@@ -26,19 +27,23 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	private FontRenderer fontRenderer;
 
-	/**
-	 * Constructs a menu with the given valid values
-	 * 
-	 * @param values
-	 */
 	public CommandSlotMenu(String... values) {
-		super(calcWidth(Minecraft.getMinecraft().fontRendererObj, values), 12);
+		this(values, values);
+	}
+
+	public CommandSlotMenu(String[] displayValues, String... values) {
+		super(calcWidth(Minecraft.getMinecraft().fontRendererObj, displayValues), 12);
+		if (displayValues.length != values.length)
+			throw new IllegalArgumentException("displayValues.length != values.length");
 		this.values = values;
+		this.displayValues = displayValues;
 
 		this.fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 	}
 
 	private static int calcWidth(FontRenderer fontRenderer, String[] values) {
+		if (values.length == 0)
+			return 100;
 		int maxWidth = 0;
 		for (String val : values) {
 			int w = fontRenderer.getStringWidth(val);
@@ -70,7 +75,10 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 
 	@Override
 	public void addArgs(List<String> args) {
-		args.add(values[currentValue]);
+		if (values.length == 0)
+			args.add("");
+		else
+			args.add(values[currentValue]);
 	}
 
 	@Override
@@ -79,7 +87,8 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 		this.y = y;
 		Gui.drawRect(x, y, x + getWidth() - 12, y + 12, 0xff000000);
 		Gui.drawRect(x + getWidth() - 12, y, x + getWidth(), y + 12, 0xff202020);
-		drawString(fontRenderer, values[currentValue], x + 2, y + 2, 0xffffff);
+		if (displayValues.length != 0)
+			drawString(fontRenderer, displayValues[currentValue], x + 2, y + 2, 0xffffff);
 		fontRenderer.drawString("v", x + getWidth() - 9, y + 2, 0xd0d0d0);
 	}
 
@@ -88,12 +97,12 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
 
 		if (expanded) {
-			expandUpwards = y + 12 + values.length * 12 >= Minecraft.getMinecraft().currentScreen.height;
-			int top = expandUpwards ? y - values.length * 12 : y + 12;
-			for (int i = 0; i < values.length; i++) {
+			expandUpwards = y + 12 + displayValues.length * 12 >= Minecraft.getMinecraft().currentScreen.height;
+			int top = expandUpwards ? y - displayValues.length * 12 : y + 12;
+			for (int i = 0; i < displayValues.length; i++) {
 				Gui.drawRect(x, top + i * 12, x + getWidth() - 12, top + i * 12 + 12,
 						i % 2 == 0 ? 0xe0808080 : 0xe0606060);
-				drawString(fontRenderer, values[i], x + 2, top + i * 12 + 2, 0xffffff);
+				drawString(fontRenderer, displayValues[i], x + 2, top + i * 12 + 2, 0xffffff);
 			}
 		}
 	}
@@ -144,7 +153,7 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	 * @return The selected word
 	 */
 	public String getCurrentValue() {
-		return values[currentValue];
+		return values.length == 0 ? null : values[currentValue];
 	}
 
 	/**
@@ -161,7 +170,7 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	 * @return The word at the given index
 	 */
 	public String getValueAt(int index) {
-		return values[index];
+		return values.length == 0 ? null : values[index];
 	}
 
 	/**
@@ -171,7 +180,8 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	 */
 	public void setCurrentIndex(int index) {
 		this.currentValue = index;
-		onChanged(values[index]);
+		if (values.length != 0)
+			onChanged(values[index]);
 	}
 
 	/**
