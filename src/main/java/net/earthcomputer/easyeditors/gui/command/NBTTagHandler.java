@@ -43,14 +43,8 @@ public abstract class NBTTagHandler {
 			.newLinkedHashMap();
 
 	static {
-		class AlwaysTrue implements Predicate<ItemStack> {
-			@Override
-			public boolean apply(ItemStack stack) {
-				return true;
-			}
-		}
-		registerItemStackHandler(new AlwaysTrue(), DisplayHandler.class);
-		registerItemStackHandler(new AlwaysTrue(), EnchantmentHandler.class);
+		registerItemStackHandler(Predicates.<ItemStack> alwaysTrue(), DisplayHandler.class);
+		registerItemStackHandler(Predicates.<ItemStack> alwaysTrue(), EnchantmentHandler.class);
 		registerItemStackHandler(new Predicate<ItemStack>() {
 			@Override
 			public boolean apply(ItemStack stack) {
