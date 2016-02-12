@@ -13,15 +13,11 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraftforge.common.util.Constants;
 
 /**
- * This class is here to fix two problems:<br/>
- * 1: NBTTagLists add unnecessary indexes in their toString() methods<br/>
- * 2: NBTTagStrings' speech marks are sometimes unnecessary<br/>
- * 3: NBTTagDouble and NBTTagFloat sometimes convert to an unnecessarily long
- * string<br/>
- * 4: NEI has a coremod which adds spaces after commas in various toString()
- * methods<br/>
  * This class basically does the opposite of {@link net.minecraft.nbt.JsonToNBT
- * JsonToNBT}.
+ * JsonToNBT}. It aims to produce the shortest possible string representation of
+ * an NBTTagCompound which would be decoded by JsonToNBT into an identical
+ * NBTTagCompound. Using <code>toString()</code> methods doesn't necessarily
+ * produce the most compact results, so this class is necessary.
  * 
  * <b>This class is a member of the Easy Editors API</b>
  * 

@@ -8,6 +8,12 @@ import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
+/**
+ * A command slot which represents a selection of an entity
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotEntity extends CommandSlotHorizontalArrangement implements IEntitySelectorCallback {
 
 	private boolean includePlayer;
@@ -63,6 +69,11 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 		entityLabel.setColor(0);
 	}
 
+	/**
+	 * 
+	 * @return Whether this would write to arguments in a valid way when the
+	 *         done button is clicked
+	 */
 	public boolean isValid() {
 		return entity != null;
 	}

@@ -125,7 +125,7 @@ public class ChatBlocker {
 	}
 
 	/**
-	 * Obtains a list of registered team names from the server
+	 * Obtains a list of registered teams from somewhere
 	 * 
 	 * @param teams
 	 *            - the listener for obtaining the list of teams. The meaning of
@@ -219,6 +219,15 @@ public class ChatBlocker {
 		}
 	}
 
+	/**
+	 * Obtains a list of registered objectives from somewhere
+	 * 
+	 * @param objectives
+	 *            - the listener for obtaining the list of objectives. The
+	 *            meaning of the abort codes are as follows:<br/>
+	 *            0: Timed out<br/>
+	 *            1: No permission
+	 */
 	public static void obtainObjectiveList(final ReturnedValueListener<List<ScoreObjective>> objectives) {
 		if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
 			addBlock(new Blocker() {

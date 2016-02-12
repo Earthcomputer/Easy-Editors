@@ -54,6 +54,14 @@ public interface IGuiCommandSlot {
 	 * Adds arguments to args from this command slot
 	 * 
 	 * @param args
+	 * @throws RuntimeException
+	 *             This is allowed if this command slot is not considered
+	 *             'valid'. Command slots which may throw an exception in this
+	 *             way must provide an <code>isValid()</code> method and parent
+	 *             command slots and command syntaxes must be invalid if one of
+	 *             their child slots is invalid. Of course, the
+	 *             <code>isValid()</code> method may return false under other
+	 *             circumstances
 	 */
 	void addArgs(List<String> args);
 

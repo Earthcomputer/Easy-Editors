@@ -51,8 +51,17 @@ import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 
+/**
+ * This class represents a fake world, used for rendering entities. Use
+ * sparingly.
+ * 
+ * <b>This class is a member of the Easy Editors API</b>
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class FakeWorld extends World {
-	
+
 	public FakeWorld() {
 		super(new FakeSaveHandler(), new WorldInfo(new NBTTagCompound()), new FakeWorldProvider(),
 				Minecraft.getMinecraft().mcProfiler, true);

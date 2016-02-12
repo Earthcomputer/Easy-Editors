@@ -6,6 +6,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 
+/**
+ * A command slot which represents a selection of an enchantment
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement implements IEnchantmentSelectorCallback {
 
 	private int enchantmentId = -1;
@@ -41,10 +47,19 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		}
 	}
 
+	/**
+	 * 
+	 * @return The enchantment level
+	 */
 	public int getLevel() {
 		return enchantmentLevel.getIntValue();
 	}
 
+	/**
+	 * Sets the enchantment level
+	 * 
+	 * @param level
+	 */
 	public void setLevel(int level) {
 		if (level >= 1 && level <= 100 && level != enchantmentLevel.getIntValue()) {
 			enchantmentLevel.setText(String.valueOf(level));
@@ -52,9 +67,16 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		}
 	}
 
+	/**
+	 * Called when either the enchantment ID or the enchantment level is changed
+	 */
 	protected void onChanged() {
 	}
 
+	/**
+	 * 
+	 * @return Whether this has a valid set of child components
+	 */
 	public boolean isValid() {
 		return Enchantment.getEnchantmentById(enchantmentId) != null && enchantmentLevel.isValid();
 	}

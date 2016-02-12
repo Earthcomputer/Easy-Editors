@@ -17,6 +17,12 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.util.ResourceLocation;
 
+/**
+ * A GUI for selecting an enchantment
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiSelectEnchantment extends GuiScreen {
 
 	private GuiScreen previousScreen;
@@ -151,7 +157,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 		public int getListWidth() {
 			return GuiSelectEnchantment.this.width - 12;
 		}
-		
+
 		@Override
 		public int getScrollBarX() {
 			return GuiSelectEnchantment.this.width - 6;

@@ -23,6 +23,12 @@ import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
+/**
+ * The selection GUI for entities
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiSelectEntity extends GuiScreen {
 
 	private GuiScreen previousScreen;
@@ -124,6 +130,12 @@ public class GuiSelectEntity extends GuiScreen {
 		list.handleMouseInput();
 	}
 
+	/**
+	 * Returns a localized entity name for the given internal entity name
+	 * 
+	 * @param entity
+	 * @return
+	 */
 	public static String getEntityName(String entity) {
 		String unlocalized = "entity." + entity + ".name";
 		if (StatCollector.canTranslate(unlocalized))
