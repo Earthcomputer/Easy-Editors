@@ -872,6 +872,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (objective == null) {
 					if (waitingObjective == null)
 						return false;
+				} else if (objective.wordCount() == 0) {
+					return false;
 				}
 				if (!value.isValid())
 					return false;

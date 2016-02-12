@@ -99,10 +99,11 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 		if (expanded) {
 			expandUpwards = y + 12 + displayValues.length * 12 >= Minecraft.getMinecraft().currentScreen.height;
 			int top = expandUpwards ? y - displayValues.length * 12 : y + 12;
-			for (int i = 0; i < displayValues.length; i++) {
+			for (int i = 0; i < (displayValues.length == 0 ? 1 : displayValues.length); i++) {
 				Gui.drawRect(x, top + i * 12, x + getWidth() - 12, top + i * 12 + 12,
 						i % 2 == 0 ? 0xe0808080 : 0xe0606060);
-				drawString(fontRenderer, displayValues[i], x + 2, top + i * 12 + 2, 0xffffff);
+				if (displayValues.length != 0)
+					drawString(fontRenderer, displayValues[i], x + 2, top + i * 12 + 2, 0xffffff);
 			}
 		}
 	}
