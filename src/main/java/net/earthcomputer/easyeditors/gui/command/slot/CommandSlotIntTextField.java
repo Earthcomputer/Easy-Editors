@@ -64,12 +64,13 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 	 * @return Whether the value inside this text field is a valid integer
 	 */
 	public boolean isValid() {
+		int i;
 		try {
-			Integer.parseInt(getText());
+			i = Integer.parseInt(getText());
 		} catch (NumberFormatException e) {
 			return false;
 		}
-		return true;
+		return i >= minValue && i <= maxValue;
 	}
 
 	/**
