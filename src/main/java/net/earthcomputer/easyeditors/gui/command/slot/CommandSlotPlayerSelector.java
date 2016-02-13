@@ -566,8 +566,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				c = -c;
 			if (c != 0 && (flags & ONE_ONLY) == 0) {
 				this.countField.setText(String.valueOf(c));
-				if (c != 1)
-					this.expand.setExpanded(true);
 			}
 
 			this.entityName.setText("");
@@ -579,7 +577,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					this.nameInverted.setChecked(true);
 				}
 				this.entityName.setText(name);
-				this.expand.setExpanded(true);
 			}
 
 			this.rOriginX.setText("");
