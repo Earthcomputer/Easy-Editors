@@ -770,15 +770,15 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			switch (this.positionalConstraints.getSelectedIndex()) {
 			case 0:
 				if (!this.rOriginX.getText().isEmpty())
-					specifiers.put("x", this.rOriginX.getText());
+					specifiers.put("x", String.valueOf(this.rOriginX.getIntValue()));
 				if (!this.rOriginY.getText().isEmpty())
-					specifiers.put("y", this.rOriginY.getText());
+					specifiers.put("y", String.valueOf(this.rOriginY.getIntValue()));
 				if (!this.rOriginZ.getText().isEmpty())
-					specifiers.put("z", this.rOriginZ.getText());
+					specifiers.put("z", String.valueOf(this.rOriginZ.getIntValue()));
 				if (!this.minRadius.getText().isEmpty() && this.minRadius.getIntValue() != 0)
-					specifiers.put("rm", this.minRadius.getText());
+					specifiers.put("rm", String.valueOf(this.minRadius.getIntValue()));
 				if (!this.maxRadius.getText().isEmpty())
-					specifiers.put("r", this.maxRadius.getText());
+					specifiers.put("r", String.valueOf(this.maxRadius.getIntValue()));
 				break;
 			case 1:
 				int x1 = this.boundsX1.getIntValue();
@@ -802,17 +802,17 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				break;
 			case 2:
 				if (!this.dOriginX.getText().isEmpty())
-					specifiers.put("x", this.dOriginX.getText());
+					specifiers.put("x", String.valueOf(this.dOriginX.getIntValue()));
 				if (!this.dOriginY.getText().isEmpty())
-					specifiers.put("y", this.dOriginY.getText());
+					specifiers.put("y", String.valueOf(this.dOriginY.getIntValue()));
 				if (!this.dOriginZ.getText().isEmpty())
-					specifiers.put("z", this.dOriginZ.getText());
+					specifiers.put("z", String.valueOf(this.dOriginZ.getIntValue()));
 				if (!this.distX.getText().isEmpty())
-					specifiers.put("dx", this.distX.getText());
+					specifiers.put("dx", String.valueOf(this.distX.getIntValue()));
 				if (!this.distY.getText().isEmpty())
-					specifiers.put("dy", this.distY.getText());
+					specifiers.put("dy", String.valueOf(this.distY.getIntValue()));
 				if (!this.distZ.getText().isEmpty())
-					specifiers.put("dz", this.distZ.getText());
+					specifiers.put("dz", String.valueOf(this.distZ.getIntValue()));
 				break;
 			default:
 				throw new IllegalStateException();
@@ -820,10 +820,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			if (this.modifiablePlayersOnlySlots.getChild() == this.playersOnlySlots) {
 				// lm/l
-				if (!this.minExp.getText().isEmpty() && !this.minExp.getText().equals("0"))
-					specifiers.put("lm", this.minExp.getText());
+				if (!this.minExp.getText().isEmpty() && this.minExp.getIntValue() != 0)
+					specifiers.put("lm", String.valueOf(this.minExp.getIntValue()));
 				if (!this.maxExp.getText().isEmpty())
-					specifiers.put("l", this.maxExp.getText());
+					specifiers.put("l", String.valueOf(this.maxExp.getIntValue()));
 
 				// m
 				if (this.gamemode.getCurrentIndex() != 0)
@@ -858,7 +858,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				key = "score_" + key;
 				if (scoreTest.minOrMax.getCurrentIndex() == 0)
 					key += "_min";
-				specifiers.put(key, scoreTest.value.getText());
+				specifiers.put(key, String.valueOf(scoreTest.value.getIntValue()));
 			}
 
 			// Build final string
@@ -899,11 +899,47 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 			if (selectorType.getCurrentIndex() != 2 && (flags & ONE_ONLY) == 0 && !countField.isValid())
 				return false;
-			if (positionalConstraints.getSelectedIndex() == 1) {
+			switch (positionalConstraints.getSelectedIndex()) {
+			case 0:
+				if (!rOriginX.getText().isEmpty() && !rOriginX.isValid())
+					return false;
+				if (!rOriginY.getText().isEmpty() && !rOriginY.isValid())
+					return false;
+				if (!rOriginZ.getText().isEmpty() && !rOriginZ.isValid())
+					return false;
+				if (!minRadius.getText().isEmpty() && !minRadius.isValid())
+					return false;
+				if (!maxRadius.getText().isEmpty() && !maxRadius.isValid())
+					return false;
+				break;
+			case 1:
 				if (!boundsX1.isValid() || !boundsY1.isValid() || !boundsZ1.isValid() || !boundsX2.isValid()
 						|| !boundsY2.isValid() || !boundsZ2.isValid())
 					return false;
+				break;
+			case 2:
+				if (!dOriginX.getText().isEmpty() && !dOriginX.isValid())
+					return false;
+				if (!dOriginY.getText().isEmpty() && !dOriginY.isValid())
+					return false;
+				if (!dOriginZ.getText().isEmpty() && !dOriginZ.isValid())
+					return false;
+				if (!distX.getText().isEmpty() && !distX.isValid())
+					return false;
+				if (!distY.getText().isEmpty() && !distY.isValid())
+					return false;
+				if (!distZ.getText().isEmpty() && !distZ.isValid())
+					return false;
+				break;
 			}
+
+			if (modifiablePlayersOnlySlots.getChild() == playersOnlySlots) {
+				if (!minExp.getText().isEmpty() && !minExp.isValid())
+					return false;
+				if (!maxExp.getText().isEmpty() && !maxExp.isValid())
+					return false;
+			}
+
 			if (modifiableTeam.getChild() != null && modifiableTeamName.getChild() == teamName
 					&& teamName instanceof CommandSlotMenu) {
 				if (((CommandSlotMenu) teamName).getCurrentIndex() == 0 && teamInverted.isChecked())

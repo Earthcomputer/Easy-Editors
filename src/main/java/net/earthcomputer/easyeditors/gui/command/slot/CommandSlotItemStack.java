@@ -84,7 +84,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		}
 		final int finalDisplayComponents = displayComponents;
 
-		addChild(new CommandSlotHorizontalArrangement(new CompItem(), new CommandSlotButton(20, 20, "...") {
+		addChild(new CommandSlotHorizontalArrangement(new CmdItem(), new CommandSlotButton(20, 20, "...") {
 			@Override
 			public void onPress() {
 				Minecraft.getMinecraft().displayGuiScreen(new GuiItemSelector(Minecraft.getMinecraft().currentScreen,
@@ -268,11 +268,11 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		return true;
 	}
 
-	private class CompItem extends GuiCommandSlotImpl {
+	private class CmdItem extends GuiCommandSlotImpl {
 
 		private HoverChecker hoverChecker;
 
-		public CompItem() {
+		public CmdItem() {
 			super(18 + Minecraft.getMinecraft().fontRendererObj.getStringWidth(I18n.format("gui.commandEditor.noItem")),
 					Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT > 16
 							? Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT : 16);
