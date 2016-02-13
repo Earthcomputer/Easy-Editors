@@ -31,7 +31,6 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 
 	public CommandSlotRadioList(IGuiCommandSlot... children) {
 		super(children);
-		buttonTops = new int[children.length];
 		refreshButtonTops();
 	}
 
@@ -54,6 +53,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 			total += child.getHeight() > 16 ? child.getHeight() : 16;
 		}
 		setHeight(total);
+		refreshButtonTops();
 	}
 
 	@Override
@@ -198,8 +198,8 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 						Colors.radioOutline.color);
 				drawVerticalLine(x + 18, y + getYOfChild(i) - 2, y + getYOfChild(i) + child.getHeight() + 1,
 						Colors.radioOutline.color);
-				drawVerticalLine(x + getWidth() - 1, y + getYOfChild(i) - 2,
-						y + getYOfChild(i) + child.getHeight() + 1, Colors.radioOutline.color);
+				drawVerticalLine(x + getWidth() - 1, y + getYOfChild(i) - 2, y + getYOfChild(i) + child.getHeight() + 1,
+						Colors.radioOutline.color);
 			}
 		}
 		super.draw(x, y, mouseX, mouseY, partialTicks);
@@ -225,9 +225,15 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (mouseButton == 0) {
-			if (mouseX >= x && mouseX < x + getWidth()) {
+			if (mouseX >= x && mouseX < x + getWidth() && getContext().isMouseInBounds(mouseX, mouseY)) {
 				for (int i = 0; i < buttonTops.length; i++) {
-					if (mouseY >= y + buttonTops[i] && mouseY < y + buttonTops[i] + 16) {
+					int top = getYOfChild(i);
+					if (top > buttonTops[i])
+						top = buttonTops[i];
+					int height = getChildAt(i).getHeight();
+					if (height < 16)
+						height = 16;
+					if (mouseY >= top && mouseY < y + top + height) {
 						if (selectedIndex != i) {
 							selectedIndex = i;
 							GeneralUtils.playButtonSound();
@@ -242,7 +248,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
 		if (size() != 0)
@@ -272,7 +278,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	}
 
 	private void refreshButtonTops() {
-		if (size() != buttonTops.length) {
+		if (buttonTops == null || size() != buttonTops.length) {
 			buttonTops = new int[size()];
 		}
 		int height = 1;

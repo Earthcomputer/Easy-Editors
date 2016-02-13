@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.NBTToJson;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
 import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.ItemDamageHandler;
@@ -58,9 +57,9 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	private CommandSlotIntTextField stackSizeField;
 	private List<ItemDamageHandler> damageHandlers = Lists.newArrayList();
-	private CommandSlotModifiable damageSlot;
+	private CommandSlotModifiable<IGuiCommandSlot> damageSlot;
 	private List<NBTTagHandler> nbtHandlers = Lists.newArrayList();
-	private CommandSlotModifiable nbtSlot;
+	private CommandSlotModifiable<IGuiCommandSlot> nbtSlot;
 
 	/**
 	 * Constructs a new command slot which represents an item stack
@@ -85,7 +84,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		}
 		final int finalDisplayComponents = displayComponents;
 
-		addChild(new CommandSlotHorizontalArrangement(new CompItem(), new CommandSlotButton(20, 20, "...") {
+		addChild(new CommandSlotHorizontalArrangement(new CmdItem(), new CommandSlotButton(20, 20, "...") {
 			@Override
 			public void onPress() {
 				Minecraft.getMinecraft().displayGuiScreen(new GuiItemSelector(Minecraft.getMinecraft().currentScreen,
@@ -99,10 +98,10 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 					stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)));
 
 		if ((displayComponents & COMPONENT_DAMAGE) != 0)
-			addChild(damageSlot = new CommandSlotModifiable(null));
+			addChild(damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
 
 		if ((displayComponents & COMPONENT_NBT) != 0)
-			addChild(nbtSlot = new CommandSlotModifiable(null));
+			addChild(nbtSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
 	}
 
 	@Override
@@ -200,20 +199,30 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	@Override
 	public void setItem(ItemStack item) {
-		this.item = item.getItem();
-		if (stackSizeField != null)
-			stackSizeField.setText(String.valueOf(item.stackSize));
-		if (this.damageSlot != null) {
-			damageHandlers = ItemDamageHandler.getHandlers(item.getItem());
-			this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item.getItem()));
-			this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
+		if (item == null || item.getItem() == null) {
+			this.item = null;
+			if (stackSizeField != null)
+				stackSizeField.setText("1");
+			if (this.damageSlot != null)
+				this.damageSlot.setChild(null);
+			if (this.nbtSlot != null)
+				this.nbtSlot.setChild(null);
 		} else {
-			this.damage = 0;
-		}
-		if (this.nbtSlot != null) {
-			nbtHandlers = NBTTagHandler.constructItemStackHandlers(item);
-			this.nbtSlot.setChild(NBTTagHandler.setupCommandSlot(nbtHandlers));
-			NBTTagHandler.readFromNBT(item.getTagCompound(), nbtHandlers);
+			this.item = item.getItem();
+			if (stackSizeField != null)
+				stackSizeField.setText(String.valueOf(item.stackSize));
+			if (this.damageSlot != null) {
+				damageHandlers = ItemDamageHandler.getHandlers(item.getItem());
+				this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item.getItem()));
+				this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
+			} else {
+				this.damage = 0;
+			}
+			if (this.nbtSlot != null) {
+				nbtHandlers = NBTTagHandler.constructItemStackHandlers(item);
+				this.nbtSlot.setChild(NBTTagHandler.setupCommandSlot(nbtHandlers));
+				NBTTagHandler.readFromNBT(item.getTagCompound(), nbtHandlers);
+			}
 		}
 	}
 
@@ -259,11 +268,11 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		return true;
 	}
 
-	private class CompItem extends GuiCommandSlotImpl {
+	private class CmdItem extends GuiCommandSlotImpl {
 
 		private HoverChecker hoverChecker;
 
-		public CompItem() {
+		public CmdItem() {
 			super(18 + Minecraft.getMinecraft().fontRendererObj.getStringWidth(I18n.format("gui.commandEditor.noItem")),
 					Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT > 16
 							? Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT : 16);
@@ -306,7 +315,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				else
 					hoverChecker.updateBounds(y, y + getHeight(), x, x + getWidth());
 
-				if (!GuiCommandEditor.isInBounds(mouseX, mouseY))
+				if (!getContext().isMouseInBounds(mouseX, mouseY))
 					hoverChecker.resetHoverTimer();
 				else if (hoverChecker.checkHover(mouseX, mouseY)) {
 					drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().thePlayer,

@@ -9,7 +9,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.client.resources.I18n;
 
 public class SyntaxGive extends ICommandSyntax {
-	
+
 	private CommandSlotPlayerSelector playerSelector;
 	private CommandSlotItemStack item;
 
@@ -18,7 +18,8 @@ public class SyntaxGive extends ICommandSyntax {
 		item = new CommandSlotItemStack(1, CommandSlotItemStack.COMPONENT_ITEM,
 				CommandSlotItemStack.COMPONENT_STACK_SIZE, CommandSlotItemStack.COMPONENT_DAMAGE,
 				CommandSlotItemStack.COMPONENT_NBT);
-		playerSelector = new CommandSlotPlayerSelector();
+		playerSelector = new CommandSlotPlayerSelector(
+				CommandSlotPlayerSelector.PLAYERS_ONLY | CommandSlotPlayerSelector.ONE_ONLY);
 
 		return new IGuiCommandSlot[] {
 				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"),

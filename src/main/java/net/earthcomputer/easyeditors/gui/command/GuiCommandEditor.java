@@ -14,10 +14,12 @@ import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 
 /**
  * The command editor GUI
@@ -31,6 +33,7 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 
 	private GuiScreen previousGui;
 	private ICommandEditorCallback callback;
+	private ICommandSender sender;
 
 	private GuiButton doneButton;
 	private GuiButton cancelButton;
@@ -38,15 +41,7 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 	private CommandSlotCommand commandSlotCommand;
 	private CommandSlotRectangle commandSlotRectangle;
 
-	public static boolean isInBounds(int x, int y) {
-		if (!(Minecraft.getMinecraft().currentScreen instanceof GuiTwoWayScroll))
-			return true;
-		GuiTwoWayScroll currentScreen = (GuiTwoWayScroll) Minecraft.getMinecraft().currentScreen;
-		return x < currentScreen.getShownWidth() && y >= currentScreen.getHeaderHeight()
-				&& y < currentScreen.getHeaderHeight() + currentScreen.getShownHeight();
-	}
-
-	public GuiCommandEditor(GuiScreen previousGui, ICommandEditorCallback callback) {
+	public GuiCommandEditor(GuiScreen previousGui, ICommandEditorCallback callback, ICommandSender sender) {
 		super(30, 30, 4, 500);
 		setLeftKey(Keyboard.KEY_LEFT);
 		setRightKey(Keyboard.KEY_RIGHT);
@@ -54,6 +49,7 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 		setDownKey(Keyboard.KEY_DOWN);
 		this.previousGui = previousGui;
 		this.callback = callback;
+		this.sender = sender;
 		commandSlotCommand = new CommandSlotCommand();
 		String str = callback.getCommand();
 		if (str.startsWith("/"))
@@ -62,6 +58,7 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 		commandSlotCommand.readFromArgs(str.split(" "), 0);
 		commandSlotRectangle = new CommandSlotRectangle(commandSlotCommand, Colors.commandBox.color);
 		commandSlotRectangle.addSizeChangeListener(this);
+		commandSlotRectangle.setContext(new Cxt());
 		setVirtualWidth(commandSlotRectangle.getWidth() + 4);
 		setVirtualHeight(commandSlotRectangle.getHeight() + 4);
 	}
@@ -172,6 +169,31 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 	@Override
 	public void onHeightChange(int oldHeight, int newHeight) {
 		setVirtualHeight(newHeight + 4);
+	}
+
+	private class Cxt implements ICommandSlotContext {
+
+		@Override
+		public World getWorld() {
+			return sender.getEntityWorld();
+		}
+
+		@Override
+		public BlockPos getPos() {
+			return sender.getPosition();
+		}
+
+		@Override
+		public ICommandSender getSender() {
+			return sender;
+		}
+
+		@Override
+		public boolean isMouseInBounds(int mouseX, int mouseY) {
+			return mouseX < getShownWidth() && mouseY >= getHeaderHeight()
+					&& mouseY < getHeaderHeight() + getShownHeight();
+		}
+
 	}
 
 }

@@ -25,6 +25,7 @@ import net.minecraftforge.fml.client.IModGuiFactory;
 import net.minecraftforge.fml.client.config.DummyConfigElement.DummyCategoryElement;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.GuiConfigEntries;
+import net.minecraftforge.fml.client.config.GuiConfigEntries.ButtonEntry;
 import net.minecraftforge.fml.client.config.GuiConfigEntries.CategoryEntry;
 import net.minecraftforge.fml.client.config.GuiConfigEntries.ListEntryBase;
 import net.minecraftforge.fml.client.config.HoverChecker;
@@ -124,6 +125,101 @@ public class GuiFactory implements IModGuiFactory {
 		}
 
 		/**
+		 * This entry class is basically the same as
+		 * {@link GuiConfigEntries.CycleValueEntry CycleValueEntry}, except the
+		 * cycled values can have more unique translation keys (specific to Easy
+		 * Editors)
+		 * 
+		 * @author Earthcomputer
+		 *
+		 */
+		public static class TranslatedCycleValueEntry extends ButtonEntry {
+			protected final int beforeIndex;
+			protected final int defaultIndex;
+			protected int currentIndex;
+
+			public TranslatedCycleValueEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList,
+					IConfigElement configElement) {
+				super(owningScreen, owningEntryList, configElement);
+				beforeIndex = getIndex(configElement.get().toString());
+				defaultIndex = getIndex(configElement.getDefault().toString());
+				currentIndex = beforeIndex;
+				this.btnValue.enabled = enabled();
+				updateValueButtonText();
+			}
+
+			private int getIndex(String s) {
+				for (int i = 0; i < configElement.getValidValues().length; i++)
+					if (configElement.getValidValues()[i].equalsIgnoreCase(s)) {
+						return i;
+					}
+
+				return 0;
+			}
+
+			@Override
+			public void updateValueButtonText() {
+				this.btnValue.displayString = I18n
+						.format("gui.easyeditorsconfig.cycleValue." + configElement.getValidValues()[currentIndex]);
+			}
+
+			@Override
+			public void valueButtonPressed(int slotIndex) {
+				if (enabled()) {
+					if (++this.currentIndex >= configElement.getValidValues().length)
+						this.currentIndex = 0;
+
+					updateValueButtonText();
+				}
+			}
+
+			@Override
+			public boolean isDefault() {
+				return currentIndex == defaultIndex;
+			}
+
+			@Override
+			public void setToDefault() {
+				if (enabled()) {
+					currentIndex = defaultIndex;
+					updateValueButtonText();
+				}
+			}
+
+			@Override
+			public boolean isChanged() {
+				return currentIndex != beforeIndex;
+			}
+
+			@Override
+			public void undoChanges() {
+				if (enabled()) {
+					currentIndex = beforeIndex;
+					updateValueButtonText();
+				}
+			}
+
+			@Override
+			public boolean saveConfigElement() {
+				if (enabled() && isChanged()) {
+					configElement.set(configElement.getValidValues()[currentIndex]);
+					return configElement.requiresMcRestart();
+				}
+				return false;
+			}
+
+			@Override
+			public String getCurrentValue() {
+				return configElement.getValidValues()[currentIndex];
+			}
+
+			@Override
+			public String[] getCurrentValues() {
+				return new String[] { getCurrentValue() };
+			}
+		}
+
+		/**
 		 * The entry class used for customizing colors. Most of the code is
 		 * adapted from
 		 * {@link net.minecraftforge.fml.client.config.GuiConfigEntries.StringEntry
@@ -138,7 +234,8 @@ public class GuiFactory implements IModGuiFactory {
 			protected final String beforeValue;
 			protected final boolean allowAlpha;
 			protected HoverChecker colorHoverChecker;
-			protected final List<String> colorHoverTooltip = Arrays.asList(I18n.format("gui.easyeditorsconfig.colortooltip"));
+			protected final List<String> colorHoverTooltip = Arrays
+					.asList(I18n.format("gui.easyeditorsconfig.colortooltip"));
 
 			public ColorEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
 				super(owningScreen, owningEntryList, configElement);

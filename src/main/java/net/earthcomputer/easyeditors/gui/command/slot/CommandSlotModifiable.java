@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 
 /**
  * A command slot which wraps a child which can be changed
@@ -11,11 +12,12 @@ import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
  * @author Earthcomputer
  *
  */
-public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeChangeListener {
+public class CommandSlotModifiable<T extends IGuiCommandSlot> extends GuiCommandSlotImpl
+		implements ISizeChangeListener {
 
-	private IGuiCommandSlot child;
+	private T child;
 
-	public CommandSlotModifiable(IGuiCommandSlot child) {
+	public CommandSlotModifiable(T child) {
 		super(child == null ? 0 : child.getWidth(), child == null ? 0 : child.getHeight());
 		setChild(child);
 	}
@@ -24,7 +26,7 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 	 * 
 	 * @return The child command slot
 	 */
-	public IGuiCommandSlot getChild() {
+	public T getChild() {
 		return child;
 	}
 
@@ -36,7 +38,7 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 	 * 
 	 * @param child
 	 */
-	public void setChild(IGuiCommandSlot child) {
+	public void setChild(T child) {
 		if (child != this.child) {
 			if (this.child != null)
 				this.child.removeSizeChangeListener(this);
@@ -49,6 +51,7 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 				setHeight(child.getHeight());
 				child.addSizeChangeListener(this);
 				child.setParent(this);
+				child.setContext(getContext());
 			}
 		}
 	}
@@ -69,11 +72,11 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 		if (child != null)
 			child.draw(x, y, mouseX, mouseY, partialTicks);
 	}
-	
+
 	@Override
 	public void drawForeground(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		super.drawForeground(x, y, mouseX, mouseY, partialTicks);
-		
+
 		if (child != null)
 			child.drawForeground(x, y, mouseX, mouseY, partialTicks);
 	}
@@ -89,7 +92,7 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 			return child.onMouseClicked(mouseX, mouseY, mouseButton);
 		return false;
 	}
-	
+
 	@Override
 	public boolean onMouseClickedForeground(int mouseX, int mouseY, int mouseButton) {
 		if (child != null)
@@ -110,12 +113,19 @@ public class CommandSlotModifiable extends GuiCommandSlotImpl implements ISizeCh
 			return child.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		return false;
 	}
-	
+
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
 		if (child != null)
 			return child.onMouseScrolled(mouseX, mouseY, scrolledUp);
 		return false;
+	}
+
+	@Override
+	public void setContext(ICommandSlotContext context) {
+		super.setContext(context);
+		if (child != null)
+			child.setContext(context);
 	}
 
 	@Override

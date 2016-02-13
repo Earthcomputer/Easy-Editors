@@ -137,7 +137,7 @@ public class GuiColorPicker extends GuiScreen {
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		drawDefaultBackground();
+		drawBackground(0);
 
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
@@ -150,108 +150,65 @@ public class GuiColorPicker extends GuiScreen {
 		GlStateManager.disableTexture2D();
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-		int rgb;
-		int red;
-		int green;
-		int blue;
-		int red1;
-		int green1;
-		int blue1;
+		int col1;
+		int col2;
 
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+
+		// Color wheel
 		int x = width / 2 - 80;
 		int y = height / 2 - 30;
 		for (float f = 0; f < 360; f += 0.25) {
 			worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 			float fRads = (float) Math.toRadians(f);
-			rgb = GeneralUtils.hsvToRgb((int) f, 100, 100);
-			red = (rgb & 0xff0000) >> 16;
-			green = (rgb & 0x00ff00) >> 8;
-			blue = rgb & 0x0000ff;
+			col1 = GeneralUtils.hsvToRgb((int) f, 100, 100);
 			worldRenderer.pos(x, y, 0).color(1f, 1f, 1f, 1f).endVertex();
-			worldRenderer.pos(x + Math.cos(fRads) * 50, y + Math.sin(fRads) * 50, 0).color(red, green, blue, 255)
-					.endVertex();
+			worldRenderer.pos(x + Math.cos(fRads) * 50, y + Math.sin(fRads) * 50, 0)
+					.color((col1 & 0xff0000) >> 16, (col1 & 0x00ff00) >> 8, col1 & 0x0000ff, 255).endVertex();
 			tessellator.draw();
 		}
 
 		x = width / 2;
 
+		// hue
 		y -= 10;
-		for (int f = 0; f < 64; f += 8) {
-			rgb = GeneralUtils.hsvToRgb(f * 360 / 64, 100, 100);
-			red = (rgb & 0xff0000) >> 16;
-			green = (rgb & 0x00ff00) >> 8;
-			blue = rgb & 0x0000ff;
-			rgb = GeneralUtils.hsvToRgb((f + 8) * 360 / 64, 100, 100);
-			red1 = (rgb & 0xff0000) >> 16;
-			green1 = (rgb & 0x00ff00) >> 8;
-			blue1 = rgb & 0x0000ff;
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(x + f, y + 20, 0).tex(0, 1).color(red, green, blue, 255).endVertex();
-			worldRenderer.pos(x + f + 8, y + 20, 0).tex(1, 1).color(red1, green1, blue1, 255).endVertex();
-			worldRenderer.pos(x + f + 8, y, 0).tex(1, 1).color(red1, green1, blue1, 255).endVertex();
-			worldRenderer.pos(x + f, y, 0).tex(0, 0).color(red, green, blue, 255).endVertex();
-			tessellator.draw();
+		for (int i = 0; i < 64; i += 8) {
+			col1 = GeneralUtils.hsvToRgb(i * 360 / 64, 100, 100) | 0xff000000;
+			col2 = GeneralUtils.hsvToRgb((i + 8) * 360 / 64, 100, 100) | 0xff000000;
+			GeneralUtils.drawGradientRect(x + i, y, x + i + 8, y + 20, col1, col2, col1, col2);
 		}
 
+		// saturation
 		y += 30;
-		rgb = GeneralUtils.hsvToRgb(hue, 0, value);
-		red = (rgb & 0xff0000) >> 16;
-		green = (rgb & 0x00ff00) >> 8;
-		blue = rgb & 0x0000ff;
-		rgb = GeneralUtils.hsvToRgb(hue, 100, value);
-		red1 = (rgb & 0xff0000) >> 16;
-		green1 = (rgb & 0x00ff00) >> 8;
-		blue1 = rgb & 0x0000ff;
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(x, y + 20, 0).tex(0, 1).color(red, green, blue, 255).endVertex();
-		worldRenderer.pos(x + 64, y + 20, 0).tex(1, 1).color(red1, green1, blue1, 255).endVertex();
-		worldRenderer.pos(x + 64, y, 0).tex(1, 0).color(red1, green1, blue1, 255).endVertex();
-		worldRenderer.pos(x, y, 0).tex(0, 0).color(red, green, blue, 255).endVertex();
-		tessellator.draw();
+		col1 = GeneralUtils.hsvToRgb(hue, 0, value) | 0xff000000;
+		col2 = GeneralUtils.hsvToRgb(hue, 100, value) | 0xff000000;
+		GeneralUtils.drawGradientRect(x, y, x + 64, y + 20, col1, col2, col1, col2);
 
+		// value
 		y += 30;
-		rgb = GeneralUtils.hsvToRgb(hue, saturation, 100);
-		red = (rgb & 0xff0000) >> 16;
-		green = (rgb & 0x00ff00) >> 8;
-		blue = rgb & 0x0000ff;
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(x, y + 20, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
-		worldRenderer.pos(x + 64, y + 20, 0).tex(1, 1).color(red, green, blue, 255).endVertex();
-		worldRenderer.pos(x + 64, y, 0).tex(1, 0).color(red, green, blue, 255).endVertex();
-		worldRenderer.pos(x, y, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
-		tessellator.draw();
+		col1 = GeneralUtils.hsvToRgb(hue, saturation, 100) | 0xff000000;
+		GeneralUtils.drawGradientRect(x, y, x + 64, y + 20, 0xff000000, col1, 0xff000000, col1);
 
+		// red
 		x += 100;
 		y = height / 2 - 40;
-		red = (this.rgb & 0xff0000) >> 16;
-		green = (this.rgb & 0x00ff00) >> 8;
-		blue = this.rgb & 0x0000ff;
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(x, y + 20, 0).tex(0, 1).color(0, green, blue, 255).endVertex();
-		worldRenderer.pos(x + 64, y + 20, 0).tex(1, 1).color(255, green, blue, 255).endVertex();
-		worldRenderer.pos(x + 64, y, 0).tex(1, 0).color(255, green, blue, 255).endVertex();
-		worldRenderer.pos(x, y, 0).tex(0, 0).color(0, green, blue, 255).endVertex();
-		tessellator.draw();
+		col1 = rgb | 0xff000000;
+		GeneralUtils.drawGradientRect(x, y, x + 64, y + 20, col1 & 0xff00ffff, col1 | 0x00ff0000, col1 & 0xff00ffff,
+				col1 | 0x00ff0000);
 
+		// green
 		y += 30;
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(x, y + 20, 0).tex(0, 1).color(red, 0, blue, 255).endVertex();
-		worldRenderer.pos(x + 64, y + 20, 0).tex(1, 1).color(red, 255, blue, 255).endVertex();
-		worldRenderer.pos(x + 64, y, 0).tex(1, 0).color(red, 255, blue, 255).endVertex();
-		worldRenderer.pos(x, y, 0).tex(0, 0).color(red, 0, blue, 255).endVertex();
-		tessellator.draw();
+		GeneralUtils.drawGradientRect(x, y, x + 64, y + 20, col1 & 0xffff00ff, col1 | 0x0000ff00, col1 & 0xffff00ff,
+				col1 | 0x0000ff00);
 
+		// blue
 		y += 30;
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(x, y + 20, 0).tex(0, 1).color(red, green, 0, 255).endVertex();
-		worldRenderer.pos(x + 64, y + 20, 0).tex(1, 1).color(red, green, 255, 255).endVertex();
-		worldRenderer.pos(x + 64, y, 0).tex(1, 0).color(red, green, 255, 255).endVertex();
-		worldRenderer.pos(x, y, 0).tex(0, 0).color(red, green, 0, 255).endVertex();
-		tessellator.draw();
+		GeneralUtils.drawGradientRect(x, y, x + 64, y + 20, col1 & 0xffffff00, col1 | 0x000000ff, col1 & 0xffffff00,
+				col1 | 0x000000ff);
 
 		if (enableAlpha) {
+			// alpha transparent background
 			x = width / 2 - 170;
 			y = height / 2 - 32;
 			GlStateManager.enableTexture2D();
@@ -262,19 +219,14 @@ public class GuiColorPicker extends GuiScreen {
 			worldRenderer.pos(x + 20, y, 0).tex(20d / 16, 0).endVertex();
 			worldRenderer.pos(x, y, 0).tex(0, 0).endVertex();
 			tessellator.draw();
-			GlStateManager.disableTexture2D();
-			GlStateManager.disableAlpha();
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(x, y + 64, 0).tex(0, 1).color(red, green, blue, 0).endVertex();
-			worldRenderer.pos(x + 20, y + 64, 0).tex(1, 1).color(red, green, blue, 0).endVertex();
-			worldRenderer.pos(x + 20, y, 0).tex(1, 0).color(red, green, blue, 255).endVertex();
-			worldRenderer.pos(x, y, 0).tex(0, 0).color(red, green, blue, 255).endVertex();
-			tessellator.draw();
+
+			GeneralUtils.drawGradientRect(x, y, x + 20, y + 64, rgb | 0xff000000, rgb | 0xff000000, rgb, rgb);
 		}
 
 		x = width / 2 - 80;
 		y = height / 2 + 30;
 		if (enableAlpha && alpha != 255) {
+			// color transparent background
 			GlStateManager.enableTexture2D();
 			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 			worldRenderer.pos(x - 30, y + 20, 0).tex(0, 20f / 16).endVertex();
@@ -284,53 +236,59 @@ public class GuiColorPicker extends GuiScreen {
 			tessellator.draw();
 			GlStateManager.disableTexture2D();
 		}
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(x - 30, y + 20, 0).tex(0, 1).color(red, green, blue, alpha).endVertex();
-		worldRenderer.pos(x + 30, y + 20, 0).tex(1, 1).color(red, green, blue, alpha).endVertex();
-		worldRenderer.pos(x + 30, y, 0).tex(1, 0).color(red, green, blue, alpha).endVertex();
-		worldRenderer.pos(x - 30, y, 0).tex(0, 0).color(red, green, blue, alpha).endVertex();
-		tessellator.draw();
+		// color
+		Gui.drawRect(x - 30, y, x + 30, y + 20, col1);
 
-		x = width / 2;
 		GlStateManager.tryBlendFuncSeparate(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ONE_MINUS_SRC_COLOR, 1, 0);
+		GlStateManager.enableBlend();
+		GlStateManager.color(1, 1, 1, 1);
+		GlStateManager.disableTexture2D();
+		x = width / 2;
+		// hue marker
 		y = height / 2 - 40;
 		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		worldRenderer.pos(x + hue * 64 / 360, y, 0).endVertex();
 		worldRenderer.pos(x + hue * 64 / 360, y + 20, 0).endVertex();
 		tessellator.draw();
 
+		// saturation marker
 		y += 30;
 		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		worldRenderer.pos(x + saturation * 64 / 100, y, 0).endVertex();
 		worldRenderer.pos(x + saturation * 64 / 100, y + 20, 0).endVertex();
 		tessellator.draw();
 
+		// value marker
 		y += 30;
 		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		worldRenderer.pos(x + value * 64 / 100, y, 0).endVertex();
 		worldRenderer.pos(x + value * 64 / 100, y + 20, 0).endVertex();
 		tessellator.draw();
 
+		// red marker
 		x += 100;
 		y = height / 2 - 40;
 		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + red * 64 / 255, y, 0).endVertex();
-		worldRenderer.pos(x + red * 64 / 255, y + 20, 0).endVertex();
+		worldRenderer.pos(x + ((rgb & 0xff0000) >> 16) * 64 / 255, y, 0).endVertex();
+		worldRenderer.pos(x + ((rgb & 0xff0000) >> 16) * 64 / 255, y + 20, 0).endVertex();
 		tessellator.draw();
 
+		// green marker
 		y += 30;
 		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + green * 64 / 255, y, 0).endVertex();
-		worldRenderer.pos(x + green * 64 / 255, y + 20, 0).endVertex();
+		worldRenderer.pos(x + ((rgb & 0x00ff00) >> 8) * 64 / 255, y, 0).endVertex();
+		worldRenderer.pos(x + ((rgb & 0x00ff00) >> 8) * 64 / 255, y + 20, 0).endVertex();
 		tessellator.draw();
 
+		// blue marker
 		y += 30;
 		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + blue * 64 / 255, y, 0).endVertex();
-		worldRenderer.pos(x + blue * 64 / 255, y + 20, 0).endVertex();
+		worldRenderer.pos(x + (rgb & 0x0000ff) * 64 / 255, y, 0).endVertex();
+		worldRenderer.pos(x + (rgb & 0x0000ff) * 64 / 255, y + 20, 0).endVertex();
 		tessellator.draw();
 
 		if (enableAlpha) {
+			// alpha marker
 			x = width / 2 - 170;
 			y = height / 2 - 32;
 			worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
@@ -341,6 +299,7 @@ public class GuiColorPicker extends GuiScreen {
 
 		GlStateManager.enableTexture2D();
 
+		// color wheel marker
 		x = width / 2 - 80;
 		y = height / 2 - 30;
 		int dist = saturation / 2;
@@ -349,6 +308,7 @@ public class GuiColorPicker extends GuiScreen {
 				y + (int) (Math.sin(Math.toRadians(hue)) * dist) - 7, 0, 0, 16, 16);
 
 		GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+		// labels
 		x = width / 2;
 		y -= 10;
 		drawString(fontRendererObj, "H:", x - 10, y + 5, 0xffffff);
@@ -376,6 +336,7 @@ public class GuiColorPicker extends GuiScreen {
 			drawString(fontRendererObj, str, x, y, 0xffffff);
 		}
 
+		// text boxes
 		hueField.drawTextBox();
 		saturationField.drawTextBox();
 		valueField.drawTextBox();
@@ -704,7 +665,7 @@ public class GuiColorPicker extends GuiScreen {
 	}
 
 	private void updateAlphaClick(int dy) {
-		dy = MathHelper.clamp_int(0, dy, 64);
+		dy = MathHelper.clamp_int(dy, 0, 64);
 		dy = 64 - dy;
 		alpha = dy * 255 / 64;
 	}

@@ -555,75 +555,32 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		GlStateManager.disableTexture2D();
 
 		if (yScrollBarVisible) {
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(width - 6, height - footerHeight, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
-			worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
-			worldRenderer.pos(width, headerHeight, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
-			worldRenderer.pos(width - 6, headerHeight, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
-			tessellator.draw();
+			Gui.drawRect(width - 6, headerHeight, width, height - footerHeight, 0xff000000);
 		}
 		if (xScrollBarVisible) {
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(0, height - footerHeight, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
-			worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
-			worldRenderer.pos(width, height - footerHeight - 6, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
-			worldRenderer.pos(0, height - footerHeight - 6, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
-			tessellator.draw();
+			Gui.drawRect(0, height - footerHeight - 6, width, height - footerHeight, 0xff000000);
 		}
 		if (xScrollBarVisible && yScrollBarVisible) {
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(width - 6, height - footerHeight, 0).tex(0, 1).color(0x40, 0x40, 0x40, 255).endVertex();
-			worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0x40, 0x40, 0x40, 255).endVertex();
-			worldRenderer.pos(width, height - footerHeight - 6, 0).tex(1, 0).color(0x40, 0x40, 0x40, 255).endVertex();
-			worldRenderer.pos(height - 6, height - footerHeight - 6, 0).tex(0, 0).color(0x40, 0x40, 0x40, 255)
-					.endVertex();
-			tessellator.draw();
+			Gui.drawRect(width - 6, height - footerHeight - 6, width, height - footerHeight, 0xff404040);
 		}
 		if (yScrollBarVisible) {
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(width - 6, yScrollBarBottom, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
-			worldRenderer.pos(width, yScrollBarBottom, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
-			worldRenderer.pos(width, yScrollBarTop, 0).tex(1, 0).color(0x80, 0x80, 0x80, 255).endVertex();
-			worldRenderer.pos(width - 6, yScrollBarTop, 0).tex(0, 0).color(0x80, 0x80, 0x80, 255).endVertex();
-			tessellator.draw();
+			Gui.drawRect(width - 6, yScrollBarTop, width, yScrollBarBottom, 0xff808080);
 		}
 		if (xScrollBarVisible) {
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(xScrollBarLeft, height - footerHeight, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255)
-					.endVertex();
-			worldRenderer.pos(xScrollBarRight, height - footerHeight, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255)
-					.endVertex();
-			worldRenderer.pos(xScrollBarRight, height - footerHeight - 6, 0).tex(1, 0).color(0x80, 0x80, 0x80, 255)
-					.endVertex();
-			worldRenderer.pos(xScrollBarLeft, height - footerHeight - 6, 0).tex(0, 0).color(0x80, 0x80, 0x80, 255)
-					.endVertex();
-			tessellator.draw();
+			Gui.drawRect(xScrollBarLeft, height - footerHeight - 6, xScrollBarRight, height - footerHeight, 0xff808080);
 		}
 		if (yScrollBarVisible) {
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(width - 6, yScrollBarBottom - 1, 0).tex(0, 1).color(0xc0, 0xc0, 0xc0, 255).endVertex();
-			worldRenderer.pos(width - 1, yScrollBarBottom - 1, 0).tex(1, 1).color(0xc0, 0xc0, 0xc0, 255).endVertex();
-			worldRenderer.pos(width - 1, yScrollBarTop, 0).tex(1, 0).color(0xc0, 0xc0, 0xc0, 255).endVertex();
-			worldRenderer.pos(width - 6, yScrollBarTop, 0).tex(0, 0).color(0xc0, 0xc0, 0xc0, 255).endVertex();
-			tessellator.draw();
+			Gui.drawRect(width - 6, yScrollBarTop, width - 1, yScrollBarBottom - 1, 0xffc0c0c0);
 		}
 		if (xScrollBarVisible) {
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldRenderer.pos(xScrollBarLeft, height - footerHeight - 1, 0).tex(0, 1).color(0xc0, 0xc0, 0xc0, 255)
-					.endVertex();
-			worldRenderer.pos(xScrollBarRight, height - footerHeight - 1, 0).tex(1, 1).color(0xc0, 0xc0, 0xc0, 255)
-					.endVertex();
-			worldRenderer.pos(xScrollBarRight - 1, height - footerHeight - 6, 0).tex(1, 0).color(0xc0, 0xc0, 0xc0, 255)
-					.endVertex();
-			worldRenderer.pos(xScrollBarLeft, height - footerHeight - 6, 0).tex(0, 0).color(0xc0, 0xc0, 0xc0, 255)
-					.endVertex();
-			tessellator.draw();
+			Gui.drawRect(xScrollBarLeft, height - footerHeight - 6, xScrollBarRight - 1, height - footerHeight - 1,
+					0xffc0c0c0);
 		}
 
-		GlStateManager.enableTexture2D();
 		GlStateManager.shadeModel(GL11.GL_FLAT);
 		GlStateManager.enableAlpha();
 		GlStateManager.disableBlend();
+		GlStateManager.enableTexture2D();
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}

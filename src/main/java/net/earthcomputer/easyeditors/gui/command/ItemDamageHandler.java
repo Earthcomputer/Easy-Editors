@@ -148,7 +148,7 @@ public abstract class ItemDamageHandler {
 		registerHandler(new Predicate<Item>() {
 			@Override
 			public boolean apply(Item input) {
-				return input.isDamageable();
+				return input != null && input.isDamageable();
 			}
 		}, ToolHandler.class);
 	}

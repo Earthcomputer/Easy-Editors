@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GuiReplacementRegistry;
+import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.Colors.Color;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
@@ -119,6 +120,14 @@ public class EasyEditors {
 		Property prop = config.get("general", "active", true, "Whether Easy Editors should replace GUIs");
 		EasyEditorsApi.isEasyEditorsActive = prop.getBoolean();
 		prop.setLanguageKey("gui.easyeditorsconfig.active");
+
+		prop = config.get("general", "obtainDataFrom", "client",
+				"Where to obtain data on the server from. Set to server for servers that are likely to lie about their data (e.g. large public servers such as Hypixel)");
+		prop.setValidValues(new String[] { "client", "server" });
+		ChatBlocker.obtainDataFromServer = prop.getString().equals("server");
+		prop.setLanguageKey("gui.easyeditorsconfig.obtainDataFrom");
+		prop.setConfigEntryClass(GuiFactory.EasyEditorsConfigGui.TranslatedCycleValueEntry.class);
+
 		config.addCustomCategoryComment("colors",
 				"This changes all the colors in things like the command editor.\n"
 						+ "For six-digit colors, the format is RRGGBB, where R is the red\n"

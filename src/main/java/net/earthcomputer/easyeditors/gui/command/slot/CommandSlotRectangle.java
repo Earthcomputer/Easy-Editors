@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 import net.minecraft.client.renderer.GlStateManager;
 
 /**
@@ -82,6 +83,12 @@ public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeCha
 	@Override
 	public boolean onMouseScrolled(int mouseX, int mouseY, boolean scrolledUp) {
 		return child.onMouseScrolled(mouseX, mouseY, scrolledUp);
+	}
+
+	@Override
+	public void setContext(ICommandSlotContext context) {
+		super.setContext(context);
+		child.setContext(context);
 	}
 
 	@Override

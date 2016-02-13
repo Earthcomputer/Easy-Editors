@@ -23,6 +23,12 @@ import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
+/**
+ * The selection GUI for entities
+ * 
+ * @author Earthcomputer
+ *
+ */
 public class GuiSelectEntity extends GuiScreen {
 
 	private GuiScreen previousScreen;
@@ -42,7 +48,7 @@ public class GuiSelectEntity extends GuiScreen {
 	}
 
 	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
-			boolean includeLightning) {
+			boolean includeLightning, String... additionalOptions) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 
@@ -51,6 +57,8 @@ public class GuiSelectEntity extends GuiScreen {
 			entities.add("Player");
 		if (!includeLightning)
 			entities.remove("LightningBolt");
+		for (String additionalOption : additionalOptions)
+			entities.add(additionalOption);
 		Collections.sort(entities, new Comparator<String>() {
 			@Override
 			public int compare(String s1, String s2) {
@@ -122,6 +130,12 @@ public class GuiSelectEntity extends GuiScreen {
 		list.handleMouseInput();
 	}
 
+	/**
+	 * Returns a localized entity name for the given internal entity name
+	 * 
+	 * @param entity
+	 * @return
+	 */
 	public static String getEntityName(String entity) {
 		String unlocalized = "entity." + entity + ".name";
 		if (StatCollector.canTranslate(unlocalized))

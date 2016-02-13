@@ -31,13 +31,12 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 			public boolean apply(String input) {
 				if (!Patterns.partialInteger.matcher(input).matches())
 					return false;
-				int i;
-				try {
-					i = Integer.parseInt(input);
-				} catch (NumberFormatException e) {
+				else if (CommandSlotIntTextField.this.minValue >= 0 && input.startsWith("-"))
+					return false;
+				else if (CommandSlotIntTextField.this.maxValue < 0 && input.startsWith("+"))
+					return false;
+				else
 					return true;
-				}
-				return i >= CommandSlotIntTextField.this.minValue && i <= CommandSlotIntTextField.this.maxValue;
 			}
 		});
 		this.minValue = minValue;
@@ -65,12 +64,13 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 	 * @return Whether the value inside this text field is a valid integer
 	 */
 	public boolean isValid() {
+		int i;
 		try {
-			Integer.parseInt(getText());
+			i = Integer.parseInt(getText());
 		} catch (NumberFormatException e) {
 			return false;
 		}
-		return true;
+		return i >= minValue && i <= maxValue;
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 	 * @return The value of this text field, as an integer
 	 */
 	public int getIntValue() {
-		return getText().isEmpty() ? 0 : Integer.parseInt(getText());
+		return !isValid() ? (minValue > 0 ? minValue : (maxValue < 0 ? maxValue : 0)) : Integer.parseInt(getText());
 	}
 
 }

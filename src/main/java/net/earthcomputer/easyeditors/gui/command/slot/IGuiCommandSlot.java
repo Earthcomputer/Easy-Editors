@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 
 /**
  * A basic component of a command GUI. There are a number of reasons these are
@@ -53,6 +54,14 @@ public interface IGuiCommandSlot {
 	 * Adds arguments to args from this command slot
 	 * 
 	 * @param args
+	 * @throws RuntimeException
+	 *             This is allowed if this command slot is not considered
+	 *             'valid'. Command slots which may throw an exception in this
+	 *             way must provide an <code>isValid()</code> method and parent
+	 *             command slots and command syntaxes must be invalid if one of
+	 *             their child slots is invalid. Of course, the
+	 *             <code>isValid()</code> method may return false under other
+	 *             circumstances
 	 */
 	void addArgs(List<String> args);
 
@@ -191,6 +200,19 @@ public interface IGuiCommandSlot {
 	 * @param parent
 	 */
 	void setParent(IGuiCommandSlot parent);
+
+	/**
+	 * 
+	 * @return The context of this command slot
+	 */
+	ICommandSlotContext getContext();
+
+	/**
+	 * Sets the context of this command slot
+	 * 
+	 * @param context
+	 */
+	void setContext(ICommandSlotContext context);
 
 	/**
 	 * Draws a tooltip on top of everything else
