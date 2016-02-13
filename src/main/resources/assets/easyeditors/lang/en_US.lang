@@ -81,3 +81,5 @@ gui.easyeditorsconfig.title=Easy Editors Configuration
 
 gui.selectColor.opacity=Opacity:
 gui.selectColor.title=Select Color
+
+itemGroup.tabless=Tabless Blocks and Items

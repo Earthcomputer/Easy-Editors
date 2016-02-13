@@ -3,13 +3,17 @@ package net.earthcomputer.easyeditors;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.earthcomputer.easyeditors.api.util.Colors;
-import net.earthcomputer.easyeditors.api.util.GeneralUtils;
-import net.earthcomputer.easyeditors.api.util.Colors.Color;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GuiReplacementRegistry;
+import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.Colors.Color;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiNewCommandBlock;
 import net.minecraft.client.gui.GuiCommandBlock;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -56,6 +60,8 @@ public class EasyEditors {
 	 */
 	public Configuration config;
 
+	public CreativeTabs tablessTab;
+
 	/**
 	 * A client-side mod must always accept remote clients and servers
 	 * 
@@ -72,6 +78,23 @@ public class EasyEditors {
 	public void preinit(FMLPreInitializationEvent e) {
 		config = new Configuration(e.getSuggestedConfigurationFile());
 		config.load();
+
+		tablessTab = new CreativeTabs("tabless") {
+			@Override
+			public Item getTabIconItem() {
+				return Item.getItemFromBlock(Blocks.command_block);
+			}
+		};
+		Blocks.mob_spawner.setCreativeTab(tablessTab);
+		Blocks.farmland.setCreativeTab(tablessTab);
+		Blocks.lit_furnace.setCreativeTab(tablessTab);
+		Blocks.brown_mushroom_block.setCreativeTab(tablessTab);
+		Blocks.red_mushroom_block.setCreativeTab(tablessTab);
+		Blocks.dragon_egg.setCreativeTab(tablessTab);
+		Blocks.command_block.setCreativeTab(tablessTab);
+		Blocks.barrier.setCreativeTab(tablessTab);
+		Items.fireworks.setCreativeTab(tablessTab);
+		Items.command_block_minecart.setCreativeTab(tablessTab);
 	}
 
 	@EventHandler
