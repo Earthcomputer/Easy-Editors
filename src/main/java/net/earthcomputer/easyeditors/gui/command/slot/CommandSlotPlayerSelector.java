@@ -273,6 +273,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			});
 
+			modifiablePlayersOnlySlots = new CommandSlotModifiable<IGuiCommandSlot>(null);
+
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
 			row.addChild(selectorType = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.nearest"),
 					I18n.format("gui.commandEditor.playerSelector.farthest"),
@@ -464,8 +466,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			playersOnlySlots.addChild(CommandSlotLabel.createLabel(
 					I18n.format("gui.commandEditor.playerSelector.gamemode"), Colors.playerSelectorLabel.color,
 					gamemode = new CommandSlotMenu(gamemodeNames, gamemodeIds)));
-			specifics.addChild(modifiablePlayersOnlySlots = new CommandSlotModifiable<IGuiCommandSlot>(
-					(flags & NON_PLAYERS_ONLY) == 0 ? playersOnlySlots : null));
+			if ((flags & NON_PLAYERS_ONLY) == 0)
+				modifiablePlayersOnlySlots.setChild(playersOnlySlots);
+			specifics.addChild(modifiablePlayersOnlySlots);
 
 			specifics.addChild(modifiableTeam);
 
