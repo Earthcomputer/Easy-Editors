@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.GuiReplacementRegistry;
+import net.earthcomputer.easyeditors.api.ISmartTranslation;
+import net.earthcomputer.easyeditors.api.SmartTranslationRegistry;
 import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.Colors.Color;
@@ -96,6 +98,26 @@ public class EasyEditors {
 		Blocks.barrier.setCreativeTab(tablessTab);
 		Items.fireworks.setCreativeTab(tablessTab);
 		Items.command_block_minecart.setCreativeTab(tablessTab);
+		
+		SmartTranslationRegistry.registerAlias("entity.MinecartRideable.name", "item.minecart.name");
+		SmartTranslationRegistry.registerAlias("entity.MinecartChest.name", "item.minecartChest.name");
+		SmartTranslationRegistry.registerAlias("entity.MinecartCommandBlock.name", "item.minecartCommandBlock.name");
+		SmartTranslationRegistry.registerAlias("entity.MinecartTNT.name", "item.minecartTnt.name");
+		SmartTranslationRegistry.registerAlias("entity.MinecartHopper.name", "item.minecartHopper.name");
+		SmartTranslationRegistry.registerAlias("entity.MinecartFurnace.name", "item.minecartFurnace.name");
+
+		SmartTranslationRegistry.registerAlias("entity.LeashKnot.name", "item.leash.name");
+		SmartTranslationRegistry.registerAlias("entity.ItemFrame.name", "item.frame.name");
+		SmartTranslationRegistry.registerAlias("entity.FireworksRocketEntity.name", "item.fireworks.name");
+		SmartTranslationRegistry.registerAlias("entity.WitherSkull.name", "item.skull.wither.name");
+		
+		SmartTranslationRegistry.registerTranslation("entity.ThrownEnderpearl.name",
+				new ThrownTranslation("item.enderPearl.name"));
+		SmartTranslationRegistry.registerTranslation("entity.EyeOfEnderSignal.name",
+				new ThrownTranslation("item.eyeOfEnder.name"));
+		SmartTranslationRegistry.registerTranslation("entity.ThrownExpBottle.name",
+				new ThrownTranslation("item.expBottle.name"));
+		SmartTranslationRegistry.registerTranslation("entity.ThrownEgg.name", new ThrownTranslation("item.egg.name"));
 	}
 
 	@EventHandler
@@ -145,6 +167,19 @@ public class EasyEditors {
 
 		if (config.hasChanged())
 			config.save();
+	}
+
+	private static class ThrownTranslation implements ISmartTranslation {
+		private String thrownObject;
+
+		public ThrownTranslation(String thrownObject) {
+			this.thrownObject = thrownObject;
+		}
+
+		@Override
+		public String translateToLocal(String language, Map<String, String> translations) {
+			return String.format(translations.get("smartTranslations.entity.thrown"), translations.get(thrownObject));
+		}
 	}
 
 }
