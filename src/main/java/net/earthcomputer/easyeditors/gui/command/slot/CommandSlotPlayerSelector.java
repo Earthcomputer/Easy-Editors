@@ -22,6 +22,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.WorldSettings.GameType;
 
 /**
@@ -164,6 +165,12 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotIntTextField distX;
 		private CommandSlotIntTextField distY;
 		private CommandSlotIntTextField distZ;
+		private CommandSlotIntTextField minHRotation;
+		private CommandSlotIntTextField maxHRotation;
+		private CommandSlotIntTextField minVRotation;
+		private CommandSlotIntTextField maxVRotation;
+		private IGuiCommandSlot rotations;
+		private CommandSlotModifiable<IGuiCommandSlot> modifiableRotations;
 		private CommandSlotIntTextField minExp;
 		private CommandSlotIntTextField maxExp;
 		private CommandSlotMenu gamemode;
@@ -273,6 +280,56 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			});
 
+			CommandSlotVerticalArrangement rotations = new CommandSlotVerticalArrangement();
+			this.rotations = rotations;
+			rotations.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.rotations"), Colors.playerSelectorLabel.color));
+			CommandSlotVerticalArrangement rotationSlots = new CommandSlotVerticalArrangement();
+			rotationSlots
+					.addChild(
+							CommandSlotLabel
+									.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.horizontal"),
+											Colors.playerSelectorLabel.color,
+											new CommandSlotRectangle(
+													new CommandSlotVerticalArrangement(
+															CommandSlotLabel
+																	.createLabel(
+																			I18n.format(
+																					"gui.commandEditor.playerSelector.rotations.min"),
+																			Colors.playerSelectorLabel.color,
+																			minHRotation = new CommandSlotIntTextField(
+																					30, 100, -180, 179)),
+															CommandSlotLabel.createLabel(
+																	I18n.format(
+																			"gui.commandEditor.playerSelector.rotations.max"),
+																	Colors.playerSelectorLabel.color,
+																	maxHRotation = new CommandSlotIntTextField(30, 100,
+																			-180, 179))),
+							Colors.playerSelectorBox.color)));
+			rotationSlots
+					.addChild(
+							CommandSlotLabel
+									.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.vertical"),
+											Colors.playerSelectorLabel.color,
+											new CommandSlotRectangle(
+													new CommandSlotVerticalArrangement(
+															CommandSlotLabel
+																	.createLabel(
+																			I18n.format(
+																					"gui.commandEditor.playerSelector.rotations.min"),
+																			Colors.playerSelectorLabel.color,
+																			minVRotation = new CommandSlotIntTextField(
+																					30, 100, -180, 179)),
+															CommandSlotLabel.createLabel(
+																	I18n.format(
+																			"gui.commandEditor.playerSelector.rotations.max"),
+																	Colors.playerSelectorLabel.color,
+																	maxVRotation = new CommandSlotIntTextField(30, 100,
+																			-180, 179))),
+							Colors.playerSelectorBox.color)));
+			rotations.addChild(new CommandSlotRectangle(rotationSlots, Colors.playerSelectorLabel.color));
+			modifiableRotations = new CommandSlotModifiable<IGuiCommandSlot>(rotations);
+
 			modifiablePlayersOnlySlots = new CommandSlotModifiable<IGuiCommandSlot>(null);
 
 			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
@@ -304,8 +361,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						}
 						Class<? extends Entity> entityClass = EntityList.stringToClassMapping.get(entityName);
 						if (entityClass == null || EntityLivingBase.class.isAssignableFrom(entityClass)) {
+							modifiableRotations.setChild(CmdPlayerSelector.this.rotations);
 							modifiableTeam.setChild(team);
 						} else {
+							modifiableRotations.setChild(null);
 							modifiableTeam.setChild(null);
 						}
 					}
@@ -440,6 +499,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist"),
 							Colors.playerSelectorLabel.color, posConstraint));
 			specifics.addChild(new CommandSlotRectangle(positionalConstraints, Colors.playerSelectorBox.color));
+
+			specifics.addChild(modifiableRotations);
 
 			CommandSlotVerticalArrangement playersOnlySlots = new CommandSlotVerticalArrangement();
 			this.playersOnlySlots = playersOnlySlots;
@@ -645,6 +706,25 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					this.maxRadius.setText(String.valueOf(parseInt(specifiers.get("r"))));
 			}
 
+			this.minHRotation.setText("");
+			this.maxHRotation.setText("");
+			this.minVRotation.setText("");
+			this.maxVRotation.setText("");
+			if (this.modifiableRotations.getChild() == this.rotations) {
+				if (specifiers.containsKey("rym"))
+					this.minHRotation.setText(
+							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rym")))));
+				if (specifiers.containsKey("ry"))
+					this.maxHRotation.setText(
+							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("ry")))));
+				if (specifiers.containsKey("rxm"))
+					this.minVRotation.setText(
+							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rxm")))));
+				if (specifiers.containsKey("rx"))
+					this.maxVRotation.setText(
+							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rx")))));
+			}
+
 			this.minExp.setText("");
 			this.maxExp.setText("");
 			if (specifiers.containsKey("lm"))
@@ -821,6 +901,18 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				throw new IllegalStateException();
 			}
 
+			// rx/rxm/ry/rym
+			if (this.modifiableRotations.getChild() == this.rotations) {
+				if (!this.minHRotation.getText().isEmpty() && this.minHRotation.getIntValue() != -180)
+					specifiers.put("rym", String.valueOf(this.minHRotation.getIntValue()));
+				if (!this.maxHRotation.getText().isEmpty() && this.maxHRotation.getIntValue() != 179)
+					specifiers.put("ry", String.valueOf(this.maxHRotation.getIntValue()));
+				if (!this.minVRotation.getText().isEmpty() && this.minVRotation.getIntValue() != -180)
+					specifiers.put("rxm", String.valueOf(this.minVRotation.getIntValue()));
+				if (!this.maxVRotation.getText().isEmpty() && this.maxVRotation.getIntValue() != 179)
+					specifiers.put("rx", String.valueOf(this.maxVRotation.getIntValue()));
+			}
+
 			if (this.modifiablePlayersOnlySlots.getChild() == this.playersOnlySlots) {
 				// lm/l
 				if (!this.minExp.getText().isEmpty() && this.minExp.getIntValue() != 0)
@@ -934,6 +1026,17 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (!distZ.getText().isEmpty() && !distZ.isValid())
 					return false;
 				break;
+			}
+
+			if (modifiableRotations.getChild() == rotations) {
+				if (!minHRotation.getText().isEmpty() && !minHRotation.isValid())
+					return false;
+				if (!maxHRotation.getText().isEmpty() && !maxHRotation.isValid())
+					return false;
+				if (!minVRotation.getText().isEmpty() && !minVRotation.isValid())
+					return false;
+				if (!maxVRotation.getText().isEmpty() && !maxVRotation.isValid())
+					return false;
 			}
 
 			if (modifiablePlayersOnlySlots.getChild() == playersOnlySlots) {
