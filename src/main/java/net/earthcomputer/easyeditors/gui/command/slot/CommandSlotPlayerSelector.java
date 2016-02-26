@@ -142,11 +142,22 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotMenu selectorType;
 		private CommandSlotCheckbox targetInverted;
 		private CommandSlotEntity targetEntity;
+
+		private static final int SELTYPE_NEAREST = 0;
+		private static final int SELTYPE_FARTHEST = 1;
+		private static final int SELTYPE_ALL = 2;
+		private static final int SELTYPE_RANDOM = 3;
+
 		private CommandSlotExpand expand;
+
 		private CommandSlotIntTextField countField;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableCountField;
+
 		private CommandSlotCheckbox nameInverted;
 		private CommandSlotTextField entityName;
+
+		private static final String ENTITY_ANYTHING = "Anything";
+
 		private CommandSlotRadioList positionalConstraints;
 		private CommandSlotIntTextField rOriginX;
 		private CommandSlotIntTextField rOriginY;
@@ -165,92 +176,148 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotIntTextField distX;
 		private CommandSlotIntTextField distY;
 		private CommandSlotIntTextField distZ;
+
+		private static final int POSTYPE_RADIUS = 0;
+		private static final int POSTYPE_BB_KNOWN_COORDS = 1;
+		private static final int POSTYPE_BB_UNKNOWN_COORDS = 2;
+
 		private CommandSlotIntTextField minHRotation;
 		private CommandSlotIntTextField maxHRotation;
 		private CommandSlotIntTextField minVRotation;
 		private CommandSlotIntTextField maxVRotation;
 		private IGuiCommandSlot rotations;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableRotations;
+
 		private CommandSlotIntTextField minExp;
 		private CommandSlotIntTextField maxExp;
 		private CommandSlotMenu gamemode;
 		private IGuiCommandSlot playersOnlySlots;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiablePlayersOnlySlots;
+
+		private static final int GAMEMODE_ANY = 0;
+
 		private String waitingTeamName;
 		private IGuiCommandSlot team;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableTeam;
 		private CommandSlotCheckbox teamInverted;
 		private IGuiCommandSlot teamName;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableTeamName;
+
+		private static final int TEAM_ANY = 0;
+		private static final int TEAM_NONE = 1;
+		private static final String TEAM_ANY_NAME = "any";
+		private static final String TEAM_NONE_NAME = "none";
+
 		private List<ScoreObjective> objectivesList;
 		private String objectiveErrorMessage;
 		private CommandSlotList<CmdScoreTest> scoreTests;
 
 		public CmdPlayerSelector() {
-			modifiableTeam = new CommandSlotModifiable<IGuiCommandSlot>(team = CommandSlotLabel.createLabel(
-					I18n.format("gui.commandEditor.playerSelector.team"), Colors.playerSelectorLabel.color,
-					teamInverted = new CommandSlotCheckbox(
-							I18n.format("gui.commandEditor.playerSelector.team.inverted")),
-					modifiableTeamName = new CommandSlotModifiable<IGuiCommandSlot>(
-							teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-									I18n.format("gui.commandEditor.playerSelector.team.waiting"), 0x404040))));
+			preSetup();
+			setupHeader();
+			setupSpecifics();
+		}
+
+		private void preSetup() {
+			setupTeamSlot();
+			obtainTeamsList();
+
+			setupScoresSlot();
+			obtainObjectiveList();
+
+			preSetupRotationsSlot();
+			preSetupPlayersOnlySlot();
+		}
+
+		private void setupTeamSlot() {
+			teamInverted = new CommandSlotCheckbox(I18n.format("gui.commandEditor.playerSelector.team.inverted"));
+
+			teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.team.waiting"), 0x404040);
+			modifiableTeamName = new CommandSlotModifiable<IGuiCommandSlot>(teamName);
+
+			team = CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.team"),
+					Colors.playerSelectorLabel.color, teamInverted, modifiableTeamName);
+			modifiableTeam = new CommandSlotModifiable<IGuiCommandSlot>(team);
+		}
+
+		private void obtainTeamsList() {
 			ChatBlocker.obtainTeamsList(new ReturnedValueListener<List<ScorePlayerTeam>>() {
+
 				@Override
 				public void returnValue(List<ScorePlayerTeam> value) {
 					List<String> registeredNames = Lists.newArrayList();
-					registeredNames.add("any");
-					registeredNames.add("none");
+					registeredNames.add(TEAM_ANY_NAME);
+					registeredNames.add(TEAM_NONE_NAME);
+
 					List<String> displayNames = Lists.newArrayList();
 					displayNames.add(I18n.format("gui.commandEditor.playerSelector.team.any"));
 					displayNames.add(I18n.format("gui.commandEditor.playerSelector.team.none"));
+
 					for (ScorePlayerTeam team : value) {
 						registeredNames.add(team.getRegisteredName());
 						displayNames.add(team.getTeamName());
 					}
+
 					CommandSlotMenu teamMenu;
-					modifiableTeamName.setChild(teamName = teamMenu = new CommandSlotMenu(
-							displayNames.toArray(new String[displayNames.size()]),
-							registeredNames.toArray(new String[registeredNames.size()])));
+					String[] displayNamesArray = displayNames.toArray(new String[displayNames.size()]);
+					String[] registeredNamesArray = registeredNames.toArray(new String[registeredNames.size()]);
+					teamName = teamMenu = new CommandSlotMenu(displayNamesArray, registeredNamesArray);
+					modifiableTeamName.setChild(teamName);
+
 					if ("".equals(waitingTeamName))
 						teamMenu.setCurrentIndex(1);
 					else if (waitingTeamName != null) {
-						for (int i = 2; i < value.size(); i++)
+						for (int i = 2; i < value.size(); i++) {
 							if (value.get(i).equals(waitingTeamName))
 								teamMenu.setCurrentIndex(i);
+						}
 					}
 				}
 
 				@Override
 				public void abortFindingValue(int reason) {
-					modifiableTeamName
-							.setChild(teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-									I18n.format(reason == 0 ? "gui.commandEditor.playerSelector.team.timedOut"
-											: "gui.commandEditor.playerSelector.team.noPermission"),
-									0xff0000));
+					String errorMessage = reason == 0 ? "gui.commandEditor.playerSelector.team.timedOut"
+							: "gui.commandEditor.playerSelector.team.noPermission";
+					errorMessage = I18n.format(errorMessage);
+					teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, errorMessage, 0xff0000);
+					modifiableTeamName.setChild(teamName);
 				}
 			});
 
+		}
+
+		private void setupScoresSlot() {
 			scoreTests = new CommandSlotList<CmdScoreTest>(new Instantiator<CmdScoreTest>() {
+
 				@Override
 				public CmdScoreTest newInstance() {
 					CmdScoreTest r = new CmdScoreTest();
+
 					if (objectivesList != null) {
 						String[] names = new String[objectivesList.size()];
 						String[] displayNames = new String[names.length];
+
 						for (int i = 0; i < names.length; i++) {
 							names[i] = objectivesList.get(i).getName();
 							displayNames[i] = objectivesList.get(i).getDisplayName();
 						}
-						r.modifiableObjective.setChild(r.objective = new CommandSlotMenu(displayNames, names));
+
+						r.objective = new CommandSlotMenu(displayNames, names);
+						r.modifiableObjective.setChild(r.objective);
 					} else if (objectiveErrorMessage != null) {
 						r.modifiableObjective.setChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 								objectiveErrorMessage, 0xff0000));
 					}
 					return r;
 				}
+
 			}).setAppendHoverText(I18n.format("gui.commandEditor.playerSelector.score.append"))
 					.setInsertHoverText(I18n.format("gui.commandEditor.playerSelector.score.insert"))
 					.setRemoveHoverText(I18n.format("gui.commandEditor.playerSelector.score.remove"));
+		}
+
+		private void obtainObjectiveList() {
 			ChatBlocker.obtainObjectiveList(new ReturnedValueListener<List<ScoreObjective>>() {
 
 				@Override
@@ -258,10 +325,12 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					objectivesList = value;
 					String[] names = new String[value.size()];
 					String[] displayNames = new String[names.length];
+
 					for (int i = 0; i < names.length; i++) {
 						names[i] = value.get(i).getName();
 						displayNames[i] = value.get(i).getDisplayName();
 					}
+
 					for (int i = 0; i < scoreTests.entryCount(); i++) {
 						CmdScoreTest entry = scoreTests.getEntry(i);
 						entry.modifiableObjective.setChild(entry.objective = new CommandSlotMenu(displayNames, names));
@@ -272,6 +341,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				public void abortFindingValue(int reason) {
 					objectiveErrorMessage = reason == 0 ? "gui.commandEditor.playerSelector.score.timedOut"
 							: "gui.commandEditor.playerSelector.score.noPermission";
+					objectiveErrorMessage = I18n.format(objectiveErrorMessage);
 					for (int i = 0; i < scoreTests.entryCount(); i++) {
 						scoreTests.getEntry(i).modifiableObjective.setChild(new CommandSlotLabel(
 								Minecraft.getMinecraft().fontRendererObj, objectiveErrorMessage, 0xff0000));
@@ -279,370 +349,491 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				}
 
 			});
+		}
 
-			CommandSlotVerticalArrangement rotations = new CommandSlotVerticalArrangement();
-			this.rotations = rotations;
-			rotations.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.rotations"), Colors.playerSelectorLabel.color));
-			CommandSlotVerticalArrangement rotationSlots = new CommandSlotVerticalArrangement();
-			rotationSlots
-					.addChild(
-							CommandSlotLabel
-									.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.horizontal"),
-											Colors.playerSelectorLabel.color,
-											new CommandSlotRectangle(
-													new CommandSlotVerticalArrangement(
-															CommandSlotLabel
-																	.createLabel(
-																			I18n.format(
-																					"gui.commandEditor.playerSelector.rotations.min"),
-																			Colors.playerSelectorLabel.color,
-																			minHRotation = new CommandSlotIntTextField(
-																					30, 100, -180, 179)),
-															CommandSlotLabel.createLabel(
-																	I18n.format(
-																			"gui.commandEditor.playerSelector.rotations.max"),
-																	Colors.playerSelectorLabel.color,
-																	maxHRotation = new CommandSlotIntTextField(30, 100,
-																			-180, 179))),
-							Colors.playerSelectorBox.color)));
-			rotationSlots
-					.addChild(
-							CommandSlotLabel
-									.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.vertical"),
-											Colors.playerSelectorLabel.color,
-											new CommandSlotRectangle(
-													new CommandSlotVerticalArrangement(
-															CommandSlotLabel
-																	.createLabel(
-																			I18n.format(
-																					"gui.commandEditor.playerSelector.rotations.min"),
-																			Colors.playerSelectorLabel.color,
-																			minVRotation = new CommandSlotIntTextField(
-																					30, 100, -180, 179)),
-															CommandSlotLabel.createLabel(
-																	I18n.format(
-																			"gui.commandEditor.playerSelector.rotations.max"),
-																	Colors.playerSelectorLabel.color,
-																	maxVRotation = new CommandSlotIntTextField(30, 100,
-																			-180, 179))),
-							Colors.playerSelectorBox.color)));
-			rotations.addChild(new CommandSlotRectangle(rotationSlots, Colors.playerSelectorLabel.color));
-			modifiableRotations = new CommandSlotModifiable<IGuiCommandSlot>(rotations);
+		private void preSetupRotationsSlot() {
+			modifiableRotations = new CommandSlotModifiable<IGuiCommandSlot>(null);
+		}
 
+		private void preSetupPlayersOnlySlot() {
 			modifiablePlayersOnlySlots = new CommandSlotModifiable<IGuiCommandSlot>(null);
+		}
 
-			CommandSlotHorizontalArrangement row = new CommandSlotHorizontalArrangement();
-			row.addChild(selectorType = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.nearest"),
+		private void setupHeader() {
+			CommandSlotHorizontalArrangement header = new CommandSlotHorizontalArrangement();
+
+			header.addChild(setupSelectorTypeSlot());
+			if ((flags & PLAYERS_ONLY) == 0) {
+				header.addChild(setupTargetEntityInvertedSlot());
+				header.addChild(setupTargetEntitySlot());
+			} else {
+				header.addChild(setupPlayersOnlyTargetEntitySlot());
+			}
+
+			addChild(header);
+		}
+
+		private IGuiCommandSlot setupSelectorTypeSlot() {
+			return selectorType = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.nearest"),
 					I18n.format("gui.commandEditor.playerSelector.farthest"),
 					I18n.format("gui.commandEditor.playerSelector.all"),
 					I18n.format("gui.commandEditor.playerSelector.random")) {
+
 				@Override
 				protected void onChanged(String to) {
 					if ((flags & ONE_ONLY) == 0) {
-						if (getCurrentIndex() == 2)
+						if (getCurrentIndex() == SELTYPE_ALL)
 							modifiableCountField.setChild(null);
 						else
 							modifiableCountField.setChild(countField);
 					}
 				}
-			});
-			if ((flags & PLAYERS_ONLY) == 0) {
-				row.addChild(targetInverted = new CommandSlotCheckbox(
-						I18n.format("gui.commandEditor.playerSelector.targetInverted")));
-				row.addChild(targetEntity = new CommandSlotEntity((flags & NON_PLAYERS_ONLY) == 0, false, "Anything") {
-					@Override
-					public void setEntity(String entityName) {
-						super.setEntity(entityName);
-						if ("Player".equals(entityName)) {
-							modifiablePlayersOnlySlots.setChild(playersOnlySlots);
-						} else {
-							modifiablePlayersOnlySlots.setChild(null);
-						}
-						Class<? extends Entity> entityClass = EntityList.stringToClassMapping.get(entityName);
-						if (entityClass == null || EntityLivingBase.class.isAssignableFrom(entityClass)) {
-							modifiableRotations.setChild(CmdPlayerSelector.this.rotations);
-							modifiableTeam.setChild(team);
-						} else {
-							modifiableRotations.setChild(null);
-							modifiableTeam.setChild(null);
-						}
-					}
-				});
-				if ((flags & NON_PLAYERS_ONLY) == 0)
-					targetEntity.setEntity("Player");
-				else
-					targetEntity.setEntity("Anything");
-			} else {
-				row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-						GuiSelectEntity.getEntityName("Player"), 0));
-			}
-			addChild(row);
 
+			};
+		}
+
+		private IGuiCommandSlot setupTargetEntityInvertedSlot() {
+			return targetInverted = new CommandSlotCheckbox(
+					I18n.format("gui.commandEditor.playerSelector.targetInverted"));
+		}
+
+		private IGuiCommandSlot setupTargetEntitySlot() {
+			targetEntity = new CommandSlotEntity((flags & NON_PLAYERS_ONLY) == 0, false, ENTITY_ANYTHING) {
+
+				@Override
+				public void setEntity(String entityName) {
+					super.setEntity(entityName);
+
+					if ("Player".equals(entityName)) {
+						modifiablePlayersOnlySlots.setChild(playersOnlySlots);
+					} else {
+						modifiablePlayersOnlySlots.setChild(null);
+					}
+
+					Class<? extends Entity> entityClass = EntityList.stringToClassMapping.get(entityName);
+					if (entityClass == null || EntityLivingBase.class.isAssignableFrom(entityClass)) {
+						modifiableRotations.setChild(CmdPlayerSelector.this.rotations);
+						modifiableTeam.setChild(team);
+					} else {
+						modifiableRotations.setChild(null);
+						modifiableTeam.setChild(null);
+					}
+				}
+
+			};
+
+			if ((flags & NON_PLAYERS_ONLY) == 0)
+				targetEntity.setEntity("Player");
+			else
+				targetEntity.setEntity(ENTITY_ANYTHING);
+
+			return targetEntity;
+		}
+
+		private IGuiCommandSlot setupPlayersOnlyTargetEntitySlot() {
+			return new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					GuiSelectEntity.getEntityName("Player"), 0);
+		}
+
+		private void setupSpecifics() {
 			CommandSlotVerticalArrangement specifics = new CommandSlotVerticalArrangement();
 
 			if ((flags & ONE_ONLY) == 0) {
-				specifics.addChild(
-						modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(CommandSlotLabel.createLabel(
-								I18n.format("gui.commandEditor.playerSelector.count"), Colors.playerSelectorLabel.color,
-								countField = new CommandSlotIntTextField(50, 50, 1))));
-				countField.setText("1");
+				specifics.addChild(setupCountSlot());
 			}
 
-			specifics.addChild(new CommandSlotHorizontalArrangement(
+			specifics.addChild(setupNameSlot());
+			specifics.addChild(setupPositionalConstraintsSlot());
+			specifics.addChild(setupRotationsSlot());
+			specifics.addChild(setupPlayersOnlySlot());
+			specifics.addChild(modifiableTeam);
+			specifics.addChild(setupScoresSlotWithLabel());
+
+			expand = new CommandSlotExpand(specifics);
+			addChild(expand);
+		}
+
+		private IGuiCommandSlot setupCountSlot() {
+			countField = new CommandSlotIntTextField(50, 50, 1);
+			modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.count"),
+							Colors.playerSelectorLabel.color, countField));
+
+			countField.setText("1");
+
+			return modifiableCountField;
+		}
+
+		private IGuiCommandSlot setupNameSlot() {
+			nameInverted = new CommandSlotCheckbox(I18n.format("gui.commandEditor.playerSelector.entityNameInverted"));
+			entityName = new CommandSlotTextField(200, 200);
+			IGuiCommandSlot r = new CommandSlotHorizontalArrangement(
 					new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 							I18n.format("gui.commandEditor.playerSelector.entityName"),
 							Colors.playerSelectorLabel.color),
-					nameInverted = new CommandSlotCheckbox(
-							I18n.format("gui.commandEditor.playerSelector.entityNameInverted")),
-					entityName = new CommandSlotTextField(200, 200)));
+					nameInverted, entityName);
+
 			entityName.setContentFilter(new Predicate<String>() {
+
 				@Override
 				public boolean apply(String input) {
 					return Patterns.partialPlayerName.matcher(input).matches();
 				}
+
 			});
 
-			specifics.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+			return r;
+		}
+
+		private IGuiCommandSlot setupPositionalConstraintsSlot() {
+			CommandSlotVerticalArrangement wholeColumn = new CommandSlotVerticalArrangement();
+
+			wholeColumn.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 					I18n.format("gui.commandEditor.playerSelector.positionalConstraints"),
 					Colors.playerSelectorLabel.color));
+
 			positionalConstraints = new CommandSlotRadioList() {
 				@Override
 				protected int getSelectedIndexForString(String[] args, int index) {
-					return 0;
+					return POSTYPE_RADIUS;
 				}
 			};
-			CommandSlotVerticalArrangement posConstraint = new CommandSlotVerticalArrangement();
-			row = new CommandSlotHorizontalArrangement();
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.radius.origin"), Colors.playerSelectorLabel.color));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
-					Colors.playerSelectorLabel.color));
-			row.addChild(rOriginX = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
-					Colors.playerSelectorLabel.color));
-			row.addChild(rOriginY = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
-					Colors.playerSelectorLabel.color));
-			row.addChild(rOriginZ = new CommandSlotIntTextField(30, 100));
-			posConstraint.addChild(row);
-			posConstraint
-					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.min"),
-							Colors.playerSelectorLabel.color, minRadius = new CommandSlotIntTextField(30, 100, 0)));
-			posConstraint
-					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.max"),
-							Colors.playerSelectorLabel.color, maxRadius = new CommandSlotIntTextField(30, 100, 0)));
-			positionalConstraints
-					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius"),
-							Colors.playerSelectorLabel.color, posConstraint));
-			posConstraint = new CommandSlotVerticalArrangement();
-			row = new CommandSlotHorizontalArrangement();
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.boundsFromTo.from"),
-					Colors.playerSelectorLabel.color));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
-					Colors.playerSelectorLabel.color));
-			row.addChild(boundsX1 = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
-					Colors.playerSelectorLabel.color));
-			row.addChild(boundsY1 = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
-					Colors.playerSelectorLabel.color));
-			row.addChild(boundsZ1 = new CommandSlotIntTextField(30, 100));
-			posConstraint.addChild(row);
-			row = new CommandSlotHorizontalArrangement();
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.boundsFromTo.to"), Colors.playerSelectorLabel.color));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
-					Colors.playerSelectorLabel.color));
-			row.addChild(boundsX2 = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
-					Colors.playerSelectorLabel.color));
-			row.addChild(boundsY2 = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
-					Colors.playerSelectorLabel.color));
-			row.addChild(boundsZ2 = new CommandSlotIntTextField(30, 100));
-			posConstraint.addChild(row);
-			positionalConstraints
-					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo"),
-							Colors.playerSelectorLabel.color, posConstraint));
-			posConstraint = new CommandSlotVerticalArrangement();
-			row = new CommandSlotHorizontalArrangement();
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.boundsDist.origin"),
-					Colors.playerSelectorLabel.color));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
-					Colors.playerSelectorLabel.color));
-			row.addChild(dOriginX = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
-					Colors.playerSelectorLabel.color));
-			row.addChild(dOriginY = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
-					Colors.playerSelectorLabel.color));
-			row.addChild(dOriginZ = new CommandSlotIntTextField(30, 100));
-			posConstraint.addChild(row);
-			row = new CommandSlotHorizontalArrangement();
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.boundsDist.distance"),
-					Colors.playerSelectorLabel.color));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
-					Colors.playerSelectorLabel.color));
-			row.addChild(distX = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
-					Colors.playerSelectorLabel.color));
-			row.addChild(distY = new CommandSlotIntTextField(30, 100));
-			row.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
-					Colors.playerSelectorLabel.color));
-			row.addChild(distZ = new CommandSlotIntTextField(30, 100));
-			posConstraint.addChild(row);
-			positionalConstraints
-					.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist"),
-							Colors.playerSelectorLabel.color, posConstraint));
-			specifics.addChild(new CommandSlotRectangle(positionalConstraints, Colors.playerSelectorBox.color));
 
-			specifics.addChild(modifiableRotations);
+			positionalConstraints.addChild(setupRadiusPosConstraint());
+			positionalConstraints.addChild(setupBoundsFromToConstraint());
+			positionalConstraints.addChild(setupBoundsDistConstraint());
 
+			wholeColumn.addChild(new CommandSlotRectangle(positionalConstraints, Colors.playerSelectorBox.color));
+
+			return wholeColumn;
+		}
+
+		private IGuiCommandSlot setupRadiusPosConstraint() {
+			CommandSlotVerticalArrangement radiusConstraint = new CommandSlotVerticalArrangement();
+
+			IGuiCommandSlot[] xyz = setupXYZConstraint();
+			rOriginX = (CommandSlotIntTextField) xyz[1];
+			rOriginY = (CommandSlotIntTextField) xyz[2];
+			rOriginZ = (CommandSlotIntTextField) xyz[3];
+			radiusConstraint.addChild(
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.origin"),
+							Colors.playerSelectorLabel.color, xyz[0]));
+
+			radiusConstraint.addChild(setupMinRadiusConstraint());
+			radiusConstraint.addChild(setupMaxRadiusConstraint());
+
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius"),
+					Colors.playerSelectorLabel.color, radiusConstraint);
+		}
+
+		private IGuiCommandSlot setupMinRadiusConstraint() {
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.min"),
+					Colors.playerSelectorLabel.color, minRadius = new CommandSlotIntTextField(30, 100, 0));
+		}
+
+		private IGuiCommandSlot setupMaxRadiusConstraint() {
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.max"),
+					Colors.playerSelectorLabel.color, maxRadius = new CommandSlotIntTextField(30, 100, 0));
+		}
+
+		private IGuiCommandSlot setupBoundsFromToConstraint() {
+			CommandSlotVerticalArrangement fromToConstraint = new CommandSlotVerticalArrangement();
+
+			IGuiCommandSlot[] xyz = setupXYZConstraint();
+			boundsX1 = (CommandSlotIntTextField) xyz[1];
+			boundsY1 = (CommandSlotIntTextField) xyz[2];
+			boundsZ1 = (CommandSlotIntTextField) xyz[3];
+			fromToConstraint.addChild(
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo.from"),
+							Colors.playerSelectorLabel.color, xyz[0]));
+
+			xyz = setupXYZConstraint();
+			boundsX2 = (CommandSlotIntTextField) xyz[1];
+			boundsY2 = (CommandSlotIntTextField) xyz[2];
+			boundsZ2 = (CommandSlotIntTextField) xyz[3];
+			fromToConstraint.addChild(
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo.to"),
+							Colors.playerSelectorLabel.color, xyz[0]));
+
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo"),
+					Colors.playerSelectorLabel.color, fromToConstraint);
+		}
+
+		private IGuiCommandSlot setupBoundsDistConstraint() {
+			CommandSlotVerticalArrangement boundsDistConstraint = new CommandSlotVerticalArrangement();
+
+			IGuiCommandSlot[] xyz = setupXYZConstraint();
+			dOriginX = (CommandSlotIntTextField) xyz[1];
+			dOriginY = (CommandSlotIntTextField) xyz[2];
+			dOriginZ = (CommandSlotIntTextField) xyz[3];
+			boundsDistConstraint.addChild(
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist.origin"),
+							Colors.playerSelectorLabel.color, xyz[0]));
+
+			xyz = setupXYZConstraint();
+			distX = (CommandSlotIntTextField) xyz[1];
+			distY = (CommandSlotIntTextField) xyz[2];
+			distZ = (CommandSlotIntTextField) xyz[3];
+			boundsDistConstraint.addChild(
+					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist.distance"),
+							Colors.playerSelectorLabel.color, xyz[0]));
+
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist"),
+					Colors.playerSelectorLabel.color, boundsDistConstraint);
+		}
+
+		/**
+		 * 
+		 * @return An array with length 4:<br/>
+		 *         0: The whole CommandSlotHorizontalArrangement which should be
+		 *         displayed to the user<br/>
+		 *         1: The CommandSlotIntTextField for the X-coordinate<br/>
+		 *         2: The CommandSlotIntTextField for the Y-coordinate<br/>
+		 *         3: The CommandSlotIntTextField for the Z-coordinate
+		 */
+		private IGuiCommandSlot[] setupXYZConstraint() {
+			IGuiCommandSlot[] r = new IGuiCommandSlot[4];
+
+			CommandSlotHorizontalArrangement wholeRow = new CommandSlotHorizontalArrangement();
+			r[0] = wholeRow;
+
+			wholeRow.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "X",
+					Colors.playerSelectorLabel.color));
+			wholeRow.addChild(r[1] = new CommandSlotIntTextField(30, 100));
+			wholeRow.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Y",
+					Colors.playerSelectorLabel.color));
+			wholeRow.addChild(r[2] = new CommandSlotIntTextField(30, 100));
+			wholeRow.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "Z",
+					Colors.playerSelectorLabel.color));
+			wholeRow.addChild(r[3] = new CommandSlotIntTextField(30, 100));
+
+			return r;
+		}
+
+		private IGuiCommandSlot setupRotationsSlot() {
+			CommandSlotVerticalArrangement wholeColumn = new CommandSlotVerticalArrangement();
+			rotations = wholeColumn;
+
+			wholeColumn.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					I18n.format("gui.commandEditor.playerSelector.rotations"), Colors.playerSelectorLabel.color));
+
+			CommandSlotVerticalArrangement insideBox = new CommandSlotVerticalArrangement();
+
+			insideBox.addChild(setupHorizontalRotationSlot());
+			insideBox.addChild(setupVerticalRotationSlot());
+
+			wholeColumn.addChild(new CommandSlotRectangle(insideBox, Colors.playerSelectorBox.color));
+
+			modifiableRotations.setChild(wholeColumn);
+			return modifiableRotations;
+		}
+
+		private IGuiCommandSlot setupHorizontalRotationSlot() {
+			CommandSlotVerticalArrangement insideBox = new CommandSlotVerticalArrangement();
+
+			insideBox.addChild(setupMinHRotationSlot());
+			insideBox.addChild(setupMaxHRotationSlot());
+
+			IGuiCommandSlot component = new CommandSlotRectangle(insideBox, Colors.playerSelectorLabel.color);
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.horizontal"),
+					Colors.playerSelectorLabel.color, component);
+		}
+
+		private IGuiCommandSlot setupMinHRotationSlot() {
+			minHRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.min"),
+					Colors.playerSelectorLabel.color, minHRotation);
+		}
+
+		private IGuiCommandSlot setupMaxHRotationSlot() {
+			maxHRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.max"),
+					Colors.playerSelectorLabel.color, maxHRotation);
+		}
+
+		private IGuiCommandSlot setupVerticalRotationSlot() {
+			CommandSlotVerticalArrangement insideBox = new CommandSlotVerticalArrangement();
+
+			insideBox.addChild(setupMinVRotationSlot());
+			insideBox.addChild(setupMaxVRotationSlot());
+
+			IGuiCommandSlot component = new CommandSlotRectangle(insideBox, Colors.playerSelectorLabel.color);
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.vertical"),
+					Colors.playerSelectorLabel.color, component);
+		}
+
+		private IGuiCommandSlot setupMinVRotationSlot() {
+			minVRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.min"),
+					Colors.playerSelectorLabel.color, minVRotation);
+		}
+
+		private IGuiCommandSlot setupMaxVRotationSlot() {
+			maxVRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.max"),
+					Colors.playerSelectorLabel.color, maxVRotation);
+		}
+
+		private IGuiCommandSlot setupPlayersOnlySlot() {
 			CommandSlotVerticalArrangement playersOnlySlots = new CommandSlotVerticalArrangement();
 			this.playersOnlySlots = playersOnlySlots;
-			playersOnlySlots.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+
+			playersOnlySlots.addChild(setupExperienceSlot());
+			playersOnlySlots.addChild(setupGamemodeSlot());
+
+			if ((flags & NON_PLAYERS_ONLY) == 0)
+				modifiablePlayersOnlySlots.setChild(playersOnlySlots);
+
+			return modifiablePlayersOnlySlots;
+		}
+
+		private IGuiCommandSlot setupExperienceSlot() {
+			CommandSlotVerticalArrangement expSlots = new CommandSlotVerticalArrangement();
+
+			expSlots.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 					I18n.format("gui.commandEditor.playerSelector.exp"), Colors.playerSelectorLabel.color));
-			CommandSlotVerticalArrangement expThings = new CommandSlotVerticalArrangement();
-			expThings.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.min"),
-					Colors.playerSelectorLabel.color, minExp = new CommandSlotIntTextField(30, 100, 0)));
-			expThings.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.max"),
-					Colors.playerSelectorLabel.color, maxExp = new CommandSlotIntTextField(30, 100, 0)));
-			playersOnlySlots.addChild(new CommandSlotRectangle(expThings, Colors.playerSelectorLabel.color));
+
+			CommandSlotVerticalArrangement insideBox = new CommandSlotVerticalArrangement();
+			minExp = new CommandSlotIntTextField(30, 100, 0);
+			insideBox.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.min"),
+					Colors.playerSelectorLabel.color, minExp));
+			maxExp = new CommandSlotIntTextField(30, 100, 0);
+			insideBox.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.max"),
+					Colors.playerSelectorLabel.color, maxExp));
+
+			expSlots.addChild(new CommandSlotRectangle(insideBox, Colors.playerSelectorLabel.color));
+
+			return expSlots;
+		}
+
+		private IGuiCommandSlot setupGamemodeSlot() {
 			GameType[] gamemodes = GameType.values();
 			String[] gamemodeNames = new String[gamemodes.length];
 			String[] gamemodeIds = new String[gamemodeNames.length];
 			for (int i = 0; i < gamemodes.length; i++) {
 				if (gamemodes[i] == GameType.NOT_SET) {
 					gamemodeNames[i] = I18n.format("gui.commandEditor.playerSelector.gamemode.any");
-					gamemodeIds[i] = "-1";
 				} else {
 					gamemodeNames[i] = I18n.format("gameMode." + gamemodes[i].getName());
-					gamemodeIds[i] = String.valueOf(gamemodes[i].getID());
 				}
+				gamemodeIds[i] = String.valueOf(gamemodes[i].getID());
 			}
-			playersOnlySlots.addChild(CommandSlotLabel.createLabel(
-					I18n.format("gui.commandEditor.playerSelector.gamemode"), Colors.playerSelectorLabel.color,
-					gamemode = new CommandSlotMenu(gamemodeNames, gamemodeIds)));
-			if ((flags & NON_PLAYERS_ONLY) == 0)
-				modifiablePlayersOnlySlots.setChild(playersOnlySlots);
-			specifics.addChild(modifiablePlayersOnlySlots);
 
-			specifics.addChild(modifiableTeam);
+			gamemode = new CommandSlotMenu(gamemodeNames, gamemodeIds);
 
-			specifics.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.score"),
-					Colors.playerSelectorLabel.color, scoreTests));
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.gamemode"),
+					Colors.playerSelectorLabel.color, gamemode);
+		}
 
-			addChild(expand = new CommandSlotExpand(specifics));
+		private IGuiCommandSlot setupScoresSlotWithLabel() {
+			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.score"),
+					Colors.playerSelectorLabel.color, scoreTests);
 		}
 
 		@Override
 		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 			if (index >= args.length)
 				throw new CommandSyntaxException();
+
 			Matcher matcher = Patterns.playerSelector.matcher(args[index]);
+
 			if (!matcher.matches())
 				throw new CommandSyntaxException();
+
 			String selectorType = matcher.group(1);
 			String specifiersString = matcher.group(2);
-			Map<String, String> specifiers = Maps.newHashMap();
-			// Parse specifiers
-			if (specifiersString != null) {
-				String[] specifierStrings = specifiersString.split(",");
-				int i;
-				for (i = 0; i < specifierStrings.length; i++) {
-					if (specifierStrings[i].contains("="))
-						break;
-					String key = null;
-					switch (i) {
-					case 0:
-						key = "x";
-						break;
-					case 1:
-						key = "y";
-						break;
-					case 2:
-						key = "z";
-						break;
-					case 3:
-						key = "r";
-						break;
-					}
-					if (key != null)
-						specifiers.put(key, specifierStrings[i]);
-				}
-				for (; i < specifierStrings.length; i++) {
-					int equalsIndex = specifierStrings[i].indexOf('=');
-					if (equalsIndex == -1)
-						throw new CommandSyntaxException();
-					specifiers.put(specifierStrings[i].substring(0, equalsIndex),
-							specifierStrings[i].substring(equalsIndex + 1));
-				}
-			}
+			Map<String, String> specifiers = parseSpecifiersToMap(specifiersString);
 
+			// Find the default count
 			int c = selectorType.equals("p") || selectorType.equals("r") ? 1 : 0;
+			// Overwrite with specified count
 			if (specifiers.containsKey("c"))
 				c = parseInt(specifiers.get("c"));
 
 			if (c == 0) {
-				this.selectorType.setCurrentIndex(2);
+				// if c is 0, looking for ALL entities
+				this.selectorType.setCurrentIndex(SELTYPE_ALL);
 			} else if (selectorType.equals("r")) {
-				this.selectorType.setCurrentIndex(3);
+				// otherwise if @r, looking for random entity/ies
+				this.selectorType.setCurrentIndex(SELTYPE_RANDOM);
 			} else if (c < 0) {
-				this.selectorType.setCurrentIndex(1);
+				// otherwise if c < 0, looking for furthest entity/ies
+				this.selectorType.setCurrentIndex(SELTYPE_FARTHEST);
 			} else {
-				this.selectorType.setCurrentIndex(0);
+				// otherwise, looking for closest entity/ies
+				this.selectorType.setCurrentIndex(SELTYPE_NEAREST);
 			}
 
+			// The target should default to not inverted
 			if (this.targetInverted != null)
 				this.targetInverted.setChecked(false);
+
 			String targetType;
-			if (selectorType.equals("p") || selectorType.equals("a"))
+			if (selectorType.equals("p") || selectorType.equals("a")) {
+				// @p or @a both imply we're searching for Player
 				targetType = "Player";
-			else if (specifiers.containsKey("type")) {
+			} else if (specifiers.containsKey("type")) {
+				// There may be a specified target type
 				targetType = specifiers.get("type");
+
 				if (targetType.startsWith("!")) {
+					// If the target type starts with !, it is inverted
 					if (this.targetInverted != null)
 						this.targetInverted.setChecked(true);
 					targetType = targetType.substring(1);
 				}
-				if (targetType.isEmpty())
-					targetType = "Anything";
-			} else if (selectorType.equals("r"))
+
+				if (targetType.isEmpty()) {
+					// If nothing else is specified, it could be Anything
+					targetType = ENTITY_ANYTHING;
+				}
+			} else if (selectorType.equals("r")) {
+				// @r implies Player if type isn't specified
 				targetType = "Player";
-			else
-				targetType = "Anything";
+			} else {
+				// If nothing is specified, it could be Anything
+				targetType = ENTITY_ANYTHING;
+			}
 			if (this.targetEntity != null) {
 				if ((flags & NON_PLAYERS_ONLY) != 0) {
 					if (targetType.equals("Player")) {
 						this.targetInverted.setChecked(false);
-						targetType = "Anything";
+						targetType = ENTITY_ANYTHING;
 					}
 				}
 				this.targetEntity.setEntity(targetType);
 			}
 
+			// Not expanded by default
 			this.expand.setExpanded(false);
+
+			// Eliminate possible negative value of c
 			if (c < 0)
 				c = -c;
+
+			// Map c onto the count field if there is logically a count
 			if (c != 0 && (flags & ONE_ONLY) == 0) {
 				this.countField.setText(String.valueOf(c));
 			}
 
+			// Defaults for entity name and name inverted
 			this.entityName.setText("");
 			this.nameInverted.setChecked(false);
+
 			if (specifiers.containsKey("name")) {
+				// The name is set only if it is specified
 				String name = specifiers.get("name");
+
 				if (name.startsWith("!")) {
+					// If name starts with !, it is inverted
 					name = name.substring(1);
 					this.nameInverted.setChecked(true);
 				}
+
 				this.entityName.setText(name);
 			}
 
+			// All positional fields default to 0
 			this.rOriginX.setText("");
 			this.rOriginY.setText("");
 			this.rOriginZ.setText("");
@@ -660,9 +851,12 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			this.distX.setText("");
 			this.distY.setText("");
 			this.distZ.setText("");
+
 			if (specifiers.containsKey("x") && specifiers.containsKey("y") && specifiers.containsKey("z")
 					&& specifiers.containsKey("dx") && specifiers.containsKey("dy") && specifiers.containsKey("dz")) {
-				this.positionalConstraints.setSelectedIndex(1);
+				// If all non-radius positional arguments are specified, we're
+				// dealing with a known-coordinate bounding box
+				this.positionalConstraints.setSelectedIndex(POSTYPE_BB_KNOWN_COORDS);
 				int x = parseInt(specifiers.get("x"));
 				int y = parseInt(specifiers.get("y"));
 				int z = parseInt(specifiers.get("z"));
@@ -679,7 +873,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				this.boundsY2.setText(String.valueOf(y1));
 				this.boundsZ2.setText(String.valueOf(z1));
 			} else if (specifiers.containsKey("dx") || specifiers.containsKey("dy") || specifiers.containsKey("dz")) {
-				this.positionalConstraints.setSelectedIndex(2);
+				// If any xyz distance argument is specified, we're dealing with
+				// an unknown coordinate bounding box
+				this.positionalConstraints.setSelectedIndex(POSTYPE_BB_UNKNOWN_COORDS);
 				if (specifiers.containsKey("x"))
 					this.dOriginX.setText(String.valueOf(parseInt(specifiers.get("x"))));
 				if (specifiers.containsKey("y"))
@@ -693,7 +889,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (specifiers.containsKey("dz"))
 					this.distZ.setText(String.valueOf(parseInt(specifiers.get("dz"))));
 			} else {
-				this.positionalConstraints.setSelectedIndex(0);
+				// Otherwise we're dealing with a radius
+				this.positionalConstraints.setSelectedIndex(POSTYPE_RADIUS);
 				if (specifiers.containsKey("x"))
 					this.rOriginX.setText(String.valueOf(parseInt(specifiers.get("x"))));
 				if (specifiers.containsKey("y"))
@@ -706,11 +903,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					this.maxRadius.setText(String.valueOf(parseInt(specifiers.get("r"))));
 			}
 
+			// All rotational fields default to empty
 			this.minHRotation.setText("");
 			this.maxHRotation.setText("");
 			this.minVRotation.setText("");
 			this.maxVRotation.setText("");
+
 			if (this.modifiableRotations.getChild() == this.rotations) {
+				// If rotations is expanded, map the rotations onto the fields
 				if (specifiers.containsKey("rym"))
 					this.minHRotation.setText(
 							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rym")))));
@@ -725,15 +925,20 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rx")))));
 			}
 
+			// All experience fields default to empty
 			this.minExp.setText("");
 			this.maxExp.setText("");
+
+			// Map the experience specifics to the fields
 			if (specifiers.containsKey("lm"))
 				this.minExp.setText(String.valueOf(Integer.parseInt(specifiers.get("lm"))));
 			if (specifiers.containsKey("l"))
 				this.maxExp.setText(String.valueOf(Integer.parseInt(specifiers.get("l"))));
 
-			this.gamemode.setCurrentIndex(0);
+			// The gamemode defaults to Any Mode
+			this.gamemode.setCurrentIndex(GAMEMODE_ANY);
 			if (specifiers.containsKey("m")) {
+				// Map the gamemode to the correct value
 				String gamemode = specifiers.get("m");
 				for (int i = 0; i < this.gamemode.wordCount(); i++) {
 					if (this.gamemode.getValueAt(i).equals(gamemode)) {
@@ -743,21 +948,34 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				}
 			}
 
+			// By default, there is no waiting team name
 			this.waitingTeamName = null;
+			// By default, the team is not inverted
 			this.teamInverted.setChecked(false);
+
 			if (specifiers.containsKey("team")) {
 				String teamName = specifiers.get("team");
+
 				if (teamName.startsWith("!")) {
+					// If the specified team name starts with !, it is inverted
 					teamName = teamName.substring(1);
 					this.teamInverted.setChecked(true);
 				}
+
+				// We now know the team name, so set the waiting team name
 				this.waitingTeamName = teamName;
-				if (this.teamName instanceof CommandSlotMenu && this.modifiableTeam.getChild() == this.team) {
+
+				boolean teamsHaveBeenObtained = this.teamName instanceof CommandSlotMenu;
+				if (teamsHaveBeenObtained && this.modifiableTeam.getChild() == this.team) {
 					CommandSlotMenu teamMenu = (CommandSlotMenu) this.teamName;
-					teamMenu.setCurrentIndex(0);
-					if ("".equals(this.waitingTeamName))
-						teamMenu.setCurrentIndex(1);
-					else {
+
+					// Default to any team
+					teamMenu.setCurrentIndex(TEAM_ANY);
+					if ("".equals(this.waitingTeamName)) {
+						// If team name is specified but empty, it means no team
+						teamMenu.setCurrentIndex(TEAM_NONE);
+					} else {
+						// Otherwise, find appropriate team
 						for (int i = 2; i < teamMenu.wordCount(); i++) {
 							if (teamMenu.getValueAt(i).equals(waitingTeamName)) {
 								teamMenu.setCurrentIndex(i);
@@ -768,25 +986,94 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				}
 			}
 
+			// Remove any previously existing score tests
 			this.scoreTests.clearEntries();
+
 			for (Map.Entry<String, String> specifier : specifiers.entrySet()) {
-				if (specifier.getKey().startsWith("score_") && specifier.getKey().length() > 6) {
+				boolean isScoreTest = specifier.getKey().startsWith("score_") && specifier.getKey().length() > 6;
+				if (isScoreTest) {
+					// Objective name is specifier key with "score_" removed
 					String objective = specifier.getKey().substring(6);
 					boolean min = false;
 					if (objective.endsWith("_min")) {
+						// If score test ends with "_min", it is a minimum
+						// score, and "_min" is not included in the objective
+						// name
 						objective = objective.substring(objective.length() - 4, objective.length());
 						min = true;
 					}
 
+					// Create a new entry for this score test
 					CmdScoreTest scoreTest = this.scoreTests.newEntry();
 					scoreTest.waitingObjective = objective;
-					scoreTest.minOrMax.setCurrentIndex(min ? 0 : 1);
+					scoreTest.minOrMax.setCurrentIndex(min ? CmdScoreTest.TEST_MIN : CmdScoreTest.TEST_MAX);
 					scoreTest.value.setText(String.valueOf(parseInt(specifier.getValue())));
+					// Add the entry
 					this.scoreTests.addEntry(scoreTest);
 				}
 			}
 
+			// After all this, only one argument has been read. Eek!!
 			return 1;
+		}
+
+		private Map<String, String> parseSpecifiersToMap(String specifiersString) throws CommandSyntaxException {
+			Map<String, String> specifiers = Maps.newHashMap();
+			// If there are no specifiers, that's it
+			if (specifiersString == null)
+				return specifiers;
+
+			// Specifiers are separated with commas
+			String[] specifierStrings = specifiersString.split(",");
+
+			int argIndex;
+
+			// First, deal with implied keys
+			for (argIndex = 0; argIndex < specifierStrings.length; argIndex++) {
+				// If there is an equals sign, there is a key, so this is not an
+				// implied key
+				if (specifierStrings[argIndex].contains("="))
+					break;
+
+				// Obtain the key from the index
+				String key;
+				switch (argIndex) {
+				case 0:
+					key = "x";
+					break;
+				case 1:
+					key = "y";
+					break;
+				case 2:
+					key = "z";
+					break;
+				case 3:
+					key = "r";
+					break;
+				default:
+					key = null;
+				}
+
+				// If there is a key and the value isn't empty, we have a
+				// specifier
+				if (key != null && !specifierStrings[argIndex].isEmpty())
+					specifiers.put(key, specifierStrings[argIndex]);
+			}
+
+			// Next, deal with specifiers with explicit keys
+			for (; argIndex < specifierStrings.length; argIndex++) {
+				int equalsIndex = specifierStrings[argIndex].indexOf('=');
+
+				// If there is no equals sign, we have a syntax error
+				if (equalsIndex == -1)
+					throw new CommandSyntaxException();
+
+				// Split key and value at the equals sign
+				specifiers.put(specifierStrings[argIndex].substring(0, equalsIndex),
+						specifierStrings[argIndex].substring(equalsIndex + 1));
+			}
+
+			return specifiers;
 		}
 
 		private int parseInt(String string) throws CommandSyntaxException {
@@ -800,58 +1087,24 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		@Override
 		public void addArgs(List<String> args) {
 			String selectorType;
-			Map<String, String> specifiers = Maps.newHashMap();
+			Map<String, String> specifiers = Maps.newLinkedHashMap();
 
-			// Decide p/a/r/e
-			if (this.selectorType.getCurrentIndex() == 3) {
+			// Decide @p/@a/@r/@e
+			if (this.selectorType.getCurrentIndex() == SELTYPE_RANDOM) {
 				selectorType = "r";
 			} else if (this.targetEntity != null
 					&& (!this.targetEntity.getEntity().equals("Player") || this.targetInverted.isChecked())) {
 				selectorType = "e";
-			} else if (this.selectorType.getCurrentIndex() == 2 && (flags & ONE_ONLY) == 0) {
+			} else if (this.selectorType.getCurrentIndex() == SELTYPE_ALL && (flags & ONE_ONLY) == 0) {
 				selectorType = "a";
 			} else {
 				selectorType = "p";
 			}
 
-			// c
-			int arg;
-			if ((flags & ONE_ONLY) != 0)
-				arg = 1;
-			else if (this.selectorType.getCurrentIndex() == 2)
-				arg = 0;
-			else
-				arg = this.countField.getIntValue();
-			if (this.selectorType.getCurrentIndex() == 1)
-				arg = -arg;
-			if (((selectorType.equals("p") || selectorType.equals("r") || (flags & ONE_ONLY) != 0) && arg != 1)
-					|| ((selectorType.equals("a") || selectorType.equals("e")) && arg != 0))
-				specifiers.put("c", String.valueOf(arg));
-
-			// type
-			if (this.targetEntity != null
-					&& (!this.targetEntity.getEntity().equals("Player") || this.targetInverted.isChecked())) {
-				String targetType = targetEntity.getEntity();
-				if (targetType.equals("Anything"))
-					targetType = "";
-				if (this.targetInverted.isChecked())
-					targetType = "!" + targetType;
-				if (!selectorType.equals("e") || !targetType.isEmpty()) {
-					specifiers.put("type", targetType);
-				}
-			}
-
-			// name
-			if (!this.entityName.getText().isEmpty()) {
-				String name = this.entityName.getText();
-				if (this.nameInverted.isChecked())
-					name = "!" + name;
-				specifiers.put("name", name);
-			}
-
 			// x/y/z/dx/dy/dz/r/rm
 			switch (this.positionalConstraints.getSelectedIndex()) {
-			case 0:
+			case POSTYPE_RADIUS:
+				// Only specify them if the user specifies them
 				if (!this.rOriginX.getText().isEmpty())
 					specifiers.put("x", String.valueOf(this.rOriginX.getIntValue()));
 				if (!this.rOriginY.getText().isEmpty())
@@ -863,19 +1116,22 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (!this.maxRadius.getText().isEmpty())
 					specifiers.put("r", String.valueOf(this.maxRadius.getIntValue()));
 				break;
-			case 1:
+			case POSTYPE_BB_KNOWN_COORDS:
+				// All of these must be specified by the user anyway
 				int x1 = this.boundsX1.getIntValue();
 				int y1 = this.boundsY1.getIntValue();
 				int z1 = this.boundsZ1.getIntValue();
 				int x2 = this.boundsX2.getIntValue();
 				int y2 = this.boundsY2.getIntValue();
 				int z2 = this.boundsZ2.getIntValue();
+
 				int x = x1 < x2 ? x1 : x2;
 				int y = y1 < y2 ? y1 : y2;
 				int z = z1 < z2 ? z1 : z2;
 				int dx = x1 < x2 ? x2 - x1 - 1 : x1 - x2 - 1;
 				int dy = y1 < y2 ? y2 - y1 - 1 : y1 - y2 - 1;
 				int dz = z1 < z2 ? z2 - z1 - 1 : z1 - z2 - 1;
+
 				specifiers.put("x", String.valueOf(x));
 				specifiers.put("y", String.valueOf(y));
 				specifiers.put("z", String.valueOf(z));
@@ -883,7 +1139,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				specifiers.put("dy", String.valueOf(dy));
 				specifiers.put("dz", String.valueOf(dz));
 				break;
-			case 2:
+			case POSTYPE_BB_UNKNOWN_COORDS:
+				// Only specify them if the user specifies them
 				if (!this.dOriginX.getText().isEmpty())
 					specifiers.put("x", String.valueOf(this.dOriginX.getIntValue()));
 				if (!this.dOriginY.getText().isEmpty())
@@ -899,6 +1156,62 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				break;
 			default:
 				throw new IllegalStateException();
+			}
+
+			// Decide count
+			int c;
+			if ((flags & ONE_ONLY) != 0) {
+				// This means there can only ever be one
+				c = 1;
+			} else if (this.selectorType.getCurrentIndex() == SELTYPE_ALL) {
+				// All is coded as 0
+				c = 0;
+			} else {
+				c = this.countField.getIntValue();
+			}
+			if (this.selectorType.getCurrentIndex() == SELTYPE_FARTHEST) {
+				// Farthest is coded as a negative number
+				c = -c;
+			}
+			boolean oneImplied = selectorType.equals("p") || selectorType.equals("r") || (flags & ONE_ONLY) != 0;
+			boolean zeroImplied = selectorType.equals("a") || selectorType.equals("e");
+			if ((oneImplied && c != 1) || (zeroImplied && c != 0)) {
+				// If the value is not implied, specify it
+				specifiers.put("c", String.valueOf(c));
+			}
+
+			// type
+			if (this.targetEntity != null) {
+				boolean targetImplied = this.targetEntity.getEntity().equals("Player")
+						&& !this.targetInverted.isChecked();
+				if (!targetImplied) {
+					String targetType = targetEntity.getEntity();
+					if (targetType.equals(ENTITY_ANYTHING)) {
+						// Anything is still sometimes specified as an empty
+						// string
+						targetType = "";
+					}
+
+					if (this.targetInverted.isChecked()) {
+						// Add ! if inverted
+						targetType = "!" + targetType;
+					}
+
+					targetImplied = selectorType.equals("e") && targetType.isEmpty();
+					if (!targetImplied) {
+						specifiers.put("type", targetType);
+					}
+				}
+			}
+
+			// name
+			if (!this.entityName.getText().isEmpty()) {
+				String name = this.entityName.getText();
+				if (this.nameInverted.isChecked()) {
+					// Names are inverted by adding !
+					name = "!" + name;
+				}
+				specifiers.put("name", name);
 			}
 
 			// rx/rxm/ry/rym
@@ -921,27 +1234,40 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					specifiers.put("l", String.valueOf(this.maxExp.getIntValue()));
 
 				// m
-				if (this.gamemode.getCurrentIndex() != 0)
+				if (this.gamemode.getCurrentIndex() != GAMEMODE_ANY) {
+					// Any gamemode doesn't have to be specified
 					specifiers.put("m", this.gamemode.getCurrentValue());
+				}
 			}
 
 			// team
-			if (this.teamName instanceof CommandSlotMenu && this.modifiableTeam.getChild() == this.team) {
+			boolean teamsHaveBeenObtained = this.teamName instanceof CommandSlotMenu;
+			if (teamsHaveBeenObtained && this.modifiableTeam.getChild() == this.team) {
 				CommandSlotMenu teamMenu = (CommandSlotMenu) this.teamName;
-				if (teamMenu.getCurrentIndex() != 0) {
+				// Any team is not coded
+				if (teamMenu.getCurrentIndex() != TEAM_ANY) {
 					String team;
-					if (teamMenu.getCurrentIndex() == 1)
+
+					if (teamMenu.getCurrentIndex() == TEAM_NONE) {
+						// No team is coded as an empty string
 						team = "";
-					else
+					} else {
 						team = teamMenu.getCurrentValue();
-					if (this.teamInverted.isChecked())
+					}
+
+					if (this.teamInverted.isChecked()) {
+						// Inverted team is prefixed by !
 						team = "!" + team;
+					}
+
 					specifiers.put("team", team);
 				}
 			} else if (this.waitingTeamName != null) {
 				String team = this.waitingTeamName;
+
 				if (this.teamInverted.isChecked())
 					team = "!" + team;
+
 				specifiers.put("team", team);
 			}
 
@@ -951,51 +1277,106 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				String key = scoreTest.objective == null ? scoreTest.waitingObjective
 						: scoreTest.objective.getCurrentValue();
 				key = "score_" + key;
-				if (scoreTest.minOrMax.getCurrentIndex() == 0)
+				if (scoreTest.minOrMax.getCurrentIndex() == CmdScoreTest.TEST_MIN)
 					key += "_min";
 				specifiers.put(key, String.valueOf(scoreTest.value.getIntValue()));
 			}
 
 			// Build final string
+			args.add(buildSelector(selectorType, specifiers));
+		}
+
+		private String buildSelector(String selectorType, Map<String, String> specifiers) {
 			StringBuilder builder = new StringBuilder("@").append(selectorType);
+
 			if (!specifiers.isEmpty()) {
 				builder.append("[");
+
 				boolean appendCommaBefore = false;
-				String[] strs = new String[] { "x", "y", "z", "r" };
-				for (String str : strs) {
-					if (!specifiers.containsKey(str))
-						break;
-					if (appendCommaBefore)
-						builder.append(",");
-					builder.append(specifiers.remove(str));
-					appendCommaBefore = true;
+
+				// This is used to ensure that shorthand args are strictly
+				// shorter and clearer than their longhand equivalent
+				int maxShorthandArg;
+				if (specifiers.containsKey("r")) {
+					if (specifiers.containsKey("y") || specifiers.containsKey("z")) {
+						// X,Y,,R is shorter than X,Y,r=R use shorthand
+						maxShorthandArg = 3;
+					} else if (specifiers.containsKey("x")) {
+						// X,r=R is the same length as X,,,R longhand is clearer
+						maxShorthandArg = 0;
+					} else {
+						// ,,,R is longer than r=R use longhand
+						maxShorthandArg = -1;
+					}
+				} else if (specifiers.containsKey("z")) {
+					if (specifiers.containsKey("x") || specifiers.containsKey("y")) {
+						// X,,Z is shorter than X,z=Z
+						maxShorthandArg = 2;
+					} else {
+						// z=Z is the same length as ,,Z longhand is clearer
+						maxShorthandArg = -1;
+					}
+				} else if (specifiers.containsKey("y")) {
+					// ,Y is shorter than y=Y use shorthand
+					maxShorthandArg = 1;
+				} else if (specifiers.containsKey("x")) {
+					// X is shorter than x=X use shorthand
+					maxShorthandArg = 0;
+				} else {
+					// There are no shorthand args - shorthand is not possible
+					maxShorthandArg = -1;
 				}
+
+				if (maxShorthandArg != -1) {
+					// If we're using shorthand, parse shorthand up to
+					// maxShorthandArg
+					String[] keys = new String[] { "x", "y", "z", "r" };
+					for (int i = 0; i <= maxShorthandArg; i++) {
+						String key = keys[i];
+
+						if (appendCommaBefore)
+							builder.append(",");
+
+						if (specifiers.containsKey(key))
+							builder.append(specifiers.remove(key));
+
+						appendCommaBefore = true;
+					}
+				}
+
 				for (Map.Entry<String, String> specifier : specifiers.entrySet()) {
 					if (appendCommaBefore)
 						builder.append(",");
+
 					builder.append(specifier.getKey()).append("=").append(specifier.getValue());
+
 					appendCommaBefore = true;
 				}
+
 				builder.append("]");
 			}
-			args.add(builder.toString());
+			return builder.toString();
 		}
 
 		public boolean isValid() {
 			if (targetEntity != null) {
 				if (!targetEntity.isValid())
 					return false;
-				else if (targetEntity.getEntity().equals("Anything")) {
-					if (selectorType.getCurrentIndex() == 3)
+
+				else if (targetEntity.getEntity().equals(ENTITY_ANYTHING)) {
+					if (selectorType.getCurrentIndex() == SELTYPE_RANDOM) {
 						return false;
-					else if (targetInverted.isChecked())
+					} else if (targetInverted.isChecked()) {
 						return false;
+					}
 				}
 			}
+
 			if (selectorType.getCurrentIndex() != 2 && (flags & ONE_ONLY) == 0 && !countField.isValid())
 				return false;
+
 			switch (positionalConstraints.getSelectedIndex()) {
-			case 0:
+			case POSTYPE_RADIUS:
 				if (!rOriginX.getText().isEmpty() && !rOriginX.isValid())
 					return false;
 				if (!rOriginY.getText().isEmpty() && !rOriginY.isValid())
@@ -1007,12 +1388,12 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (!maxRadius.getText().isEmpty() && !maxRadius.isValid())
 					return false;
 				break;
-			case 1:
+			case POSTYPE_BB_KNOWN_COORDS:
 				if (!boundsX1.isValid() || !boundsY1.isValid() || !boundsZ1.isValid() || !boundsX2.isValid()
 						|| !boundsY2.isValid() || !boundsZ2.isValid())
 					return false;
 				break;
-			case 2:
+			case POSTYPE_BB_UNKNOWN_COORDS:
 				if (!dOriginX.getText().isEmpty() && !dOriginX.isValid())
 					return false;
 				if (!dOriginY.getText().isEmpty() && !dOriginY.isValid())
@@ -1046,15 +1427,17 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					return false;
 			}
 
-			if (modifiableTeam.getChild() != null && modifiableTeamName.getChild() == teamName
-					&& teamName instanceof CommandSlotMenu) {
-				if (((CommandSlotMenu) teamName).getCurrentIndex() == 0 && teamInverted.isChecked())
+			boolean teamsHaveBeenObtained = teamName instanceof CommandSlotMenu;
+			if (teamsHaveBeenObtained && modifiableTeamName.getChild() == teamName) {
+				if (((CommandSlotMenu) teamName).getCurrentIndex() == TEAM_ANY && teamInverted.isChecked())
 					return false;
 			}
+
 			for (int i = 0; i < scoreTests.entryCount(); i++) {
 				if (!scoreTests.getEntry(i).isValid())
 					return false;
 			}
+
 			return true;
 		}
 
@@ -1066,13 +1449,21 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			CommandSlotMenu minOrMax;
 			CommandSlotIntTextField value;
 
+			public static final int TEST_MIN = 0;
+			public static final int TEST_MAX = 1;
+
 			public CmdScoreTest() {
-				addChild(modifiableObjective = new CommandSlotModifiable<IGuiCommandSlot>(
+				modifiableObjective = new CommandSlotModifiable<IGuiCommandSlot>(
 						new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-								I18n.format("gui.commandEditor.playerSelector.score.waiting"), 0x404040)));
-				addChild(minOrMax = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.score.min"),
-						I18n.format("gui.commandEditor.playerSelector.score.max")));
-				addChild(value = new CommandSlotIntTextField(30, 100));
+								I18n.format("gui.commandEditor.playerSelector.score.waiting"), 0x404040));
+				addChild(modifiableObjective);
+
+				minOrMax = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.score.min"),
+						I18n.format("gui.commandEditor.playerSelector.score.max"));
+				addChild(minOrMax);
+
+				value = new CommandSlotIntTextField(30, 100);
+				addChild(value);
 				value.setText("0");
 			}
 
@@ -1083,6 +1474,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				} else if (objective.wordCount() == 0) {
 					return false;
 				}
+
 				if (!value.isValid())
 					return false;
 				return true;
