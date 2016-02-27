@@ -1,6 +1,5 @@
 package net.earthcomputer.easyeditors.gui.command;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +12,7 @@ import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.api.util.Instantiator;
+import net.earthcomputer.easyeditors.api.util.Predicates2;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
@@ -142,8 +142,14 @@ public abstract class NBTTagHandler {
 	public static void registerHandler(String handlerType, Predicate<?> predicate,
 			Class<? extends NBTTagHandler> handler) {
 		if (!handlers.containsKey(handlerType))
-			handlers.put(handlerType, new HashMap<Predicate<?>, Class<? extends NBTTagHandler>>());
-		handlers.get(handlerType).put(predicate, handler);
+			handlers.put(handlerType, Maps.<Predicate<?>, Class<? extends NBTTagHandler>> newLinkedHashMap());
+
+		Map<Predicate<?>, Class<? extends NBTTagHandler>> map = handlers.get(handlerType);
+
+		if (map.containsKey(predicate))
+			predicate = Predicates2.copyOf(predicate);
+
+		map.put(predicate, handler);
 	}
 
 	/**
