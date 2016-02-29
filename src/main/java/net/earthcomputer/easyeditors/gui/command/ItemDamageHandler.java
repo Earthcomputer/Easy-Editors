@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.api.util.Predicates2;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
@@ -71,6 +72,9 @@ public abstract class ItemDamageHandler {
 	 */
 	public static void registerHandler(Predicate<Item> itemPredicate,
 			Class<? extends ItemDamageHandler> damageHandler) {
+		if (handlers.containsKey(itemPredicate))
+			itemPredicate = Predicates2.copyOf(itemPredicate);
+		
 		handlers.put(itemPredicate, damageHandler);
 	}
 
