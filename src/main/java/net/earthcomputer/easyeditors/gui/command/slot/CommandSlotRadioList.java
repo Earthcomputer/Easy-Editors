@@ -7,6 +7,7 @@ import java.util.List;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -172,7 +173,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
 		if (size() != 0) {
 			getChildAt(selectedIndex).addArgs(args);
 		}

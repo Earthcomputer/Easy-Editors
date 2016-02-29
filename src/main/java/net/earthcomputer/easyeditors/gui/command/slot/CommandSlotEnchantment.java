@@ -2,6 +2,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import net.earthcomputer.easyeditors.gui.command.GuiSelectEnchantment;
 import net.earthcomputer.easyeditors.gui.command.IEnchantmentSelectorCallback;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
@@ -30,6 +31,8 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		});
 		addChild(enchantmentLevel = new CommandSlotIntTextField(30, 30, 1, 100));
 		enchantmentLevel.setText("1");
+		enchantmentLevel.setNumberInvalidMessage("gui.commandEditor.playerSelector.enchantmentInvalid.levelInvalid")
+				.setOutOfBoundsMessage("gui.commandEditor.playerSelector.enchantmentInvalid.levelOutOfBounds");
 	}
 
 	@Override
@@ -75,10 +78,13 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 
 	/**
 	 * 
-	 * @return Whether this has a valid set of child components
+	 * @throws UIInvalidException
+	 *             - when this doesn't have a valid set of child components
 	 */
-	public boolean isValid() {
-		return Enchantment.getEnchantmentById(enchantmentId) != null && enchantmentLevel.isValid();
+	public void checkValid() throws UIInvalidException {
+		if (Enchantment.getEnchantmentById(enchantmentId) == null)
+			throw new UIInvalidException("gui.commandEditor.enchantmentInvalid.noEnchantment");
+		enchantmentLevel.checkValid();
 	}
 
 }

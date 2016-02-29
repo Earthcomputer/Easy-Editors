@@ -82,9 +82,11 @@ public abstract class NBTTagHandler {
 
 	/**
 	 * 
-	 * @return Whether the command slots can be read to produce valid results
+	 * @throws UIInvalidException
+	 *             - when the command slots cannot be read to produce valid
+	 *             results
 	 */
-	public abstract boolean isValid();
+	public abstract void checkValid() throws UIInvalidException;
 
 	/**
 	 * Registers an NBTTagHandler which deals with NBT tags specific to the
@@ -333,8 +335,7 @@ public abstract class NBTTagHandler {
 		}
 
 		@Override
-		public boolean isValid() {
-			return true;
+		public void checkValid() {
 		}
 
 	}
@@ -375,8 +376,7 @@ public abstract class NBTTagHandler {
 		}
 
 		@Override
-		public boolean isValid() {
-			return true;
+		public void checkValid() {
 		}
 
 	}
@@ -443,13 +443,11 @@ public abstract class NBTTagHandler {
 		}
 
 		@Override
-		public boolean isValid() {
+		public void checkValid() throws UIInvalidException {
 			for (int i = 0; i < list.entryCount(); i++) {
 				CommandSlotEnchantment ench = list.getEntry(i);
-				if (!ench.isValid())
-					return false;
+				ench.checkValid();
 			}
-			return true;
 		}
 
 	}

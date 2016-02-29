@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.ReportedException;
@@ -32,10 +33,13 @@ public abstract class ICommandSyntax {
 
 	/**
 	 * 
-	 * @return Whether using the components from {@link #setupCommand()} would
-	 *         produce a valid command
+	 * @throws UIInvalidException
+	 *             when the components of the command are invalid for a
+	 *             miscellaneous reason (one not already thrown by the command
+	 *             slots themselves)
 	 */
-	public abstract boolean isValid();
+	public void checkValid() throws UIInvalidException {
+	}
 
 	/**
 	 * Returns a String, containing the elements in args from index n to

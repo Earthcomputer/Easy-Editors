@@ -29,9 +29,4 @@ public class SyntaxGive extends ICommandSyntax {
 						I18n.format("gui.commandEditor.give.item.tooltip"),
 						new CommandSlotRectangle(item, Colors.itemBox.color)) };
 	}
-
-	@Override
-	public boolean isValid() {
-		return playerSelector.isValid() && item.isValid();
-	}
 }

@@ -6,6 +6,7 @@ import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiCommandSelector;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -19,11 +20,7 @@ import net.minecraft.client.resources.I18n;
 public class CommandSlotCommand extends CommandSlotVerticalArrangement implements ICommandEditorCallback {
 
 	private String commandName = "";
-	ICommandSyntax commandSyntax;
-
-	public CommandSlotCommand() {
-		super(new IGuiCommandSlot[0]);
-	}
+	private ICommandSyntax commandSyntax;
 
 	@Override
 	public int readFromArgs(String[] args, int index) {
@@ -64,7 +61,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
+		if (commandSyntax == null)
+			throw new UIInvalidException("gui.commandEditor.noCommandChosen");
+		commandSyntax.checkValid();
 		args.add(commandName);
 		super.addArgs(args);
 	}
@@ -83,14 +83,6 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 			addChild(buildHeader(rawCommand));
 			addChildren(commandSyntax.setupCommand());
 		}
-	}
-
-	/**
-	 * 
-	 * @return Whether the command is valid
-	 */
-	public boolean isValid() {
-		return commandSyntax == null ? false : commandSyntax.isValid();
 	}
 
 }

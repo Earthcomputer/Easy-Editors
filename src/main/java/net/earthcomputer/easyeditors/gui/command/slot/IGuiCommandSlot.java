@@ -5,6 +5,7 @@ import java.util.List;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 
 /**
  * A basic component of a command GUI. There are a number of reasons these are
@@ -54,16 +55,11 @@ public interface IGuiCommandSlot {
 	 * Adds arguments to args from this command slot
 	 * 
 	 * @param args
-	 * @throws RuntimeException
-	 *             This is allowed if this command slot is not considered
-	 *             'valid'. Command slots which may throw an exception in this
-	 *             way must provide an <code>isValid()</code> method and parent
-	 *             command slots and command syntaxes must be invalid if one of
-	 *             their child slots is invalid. Of course, the
-	 *             <code>isValid()</code> method may return false under other
-	 *             circumstances
+	 * @throws UIInvalidException
+	 *             - when this operation cannot be done. The reason will be
+	 *             displayed when hovering over the disabled done button
 	 */
-	void addArgs(List<String> args);
+	void addArgs(List<String> args) throws UIInvalidException;
 
 	/**
 	 * Draws this command slot

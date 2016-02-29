@@ -5,6 +5,7 @@ import java.util.List;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.IEntitySelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -53,7 +54,8 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
+		checkValid();
 		args.add(entity);
 	}
 
@@ -71,11 +73,12 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 
 	/**
 	 * 
-	 * @return Whether this would write to arguments in a valid way when the
-	 *         done button is clicked
+	 * @throws UIInvalidException
+	 *             - when this doesn't have a valid set of child components
 	 */
-	public boolean isValid() {
-		return entity != null;
+	public void checkValid() throws UIInvalidException {
+		if (entity == null)
+			throw new UIInvalidException("gui.commandEditor.noEntitySelected");
 	}
 
 }

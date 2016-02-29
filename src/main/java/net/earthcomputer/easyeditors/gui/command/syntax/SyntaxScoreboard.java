@@ -14,9 +14,4 @@ public class SyntaxScoreboard extends ICommandSyntax {
 						new CommandSlotMenu("objectives", "players", "teams")) };
 	}
 
-	@Override
-	public boolean isValid() {
-		return true;
-	}
-
 }

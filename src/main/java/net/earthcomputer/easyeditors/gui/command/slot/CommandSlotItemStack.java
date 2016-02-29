@@ -12,6 +12,7 @@ import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
 import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.ItemDamageHandler;
 import net.earthcomputer.easyeditors.gui.command.NBTTagHandler;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -95,7 +96,9 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		if ((displayComponents & COMPONENT_STACK_SIZE) != 0)
 			addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.stackSize"),
 					Colors.itemLabel.color, I18n.format("gui.commandEditor.item.stackSize.tooltip"),
-					stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)));
+					stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)
+							.setNumberInvalidMessage("gui.commandEditor.item.stackSize.invalid")
+							.setOutOfBoundsMessage("gui.commandEditor.item.stackSize.outOfBounds")));
 
 		if ((displayComponents & COMPONENT_DAMAGE) != 0)
 			addChild(damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
@@ -161,7 +164,9 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
+		checkValid();
+
 		List<String> potentialArgs = Lists.newArrayList();
 		int maxElementToCopy = 0;
 		for (int i = 0; i < argOrder.length; i++) {
@@ -252,20 +257,19 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	/**
 	 * 
-	 * @return Whether this command slot would output a valid value
+	 * @throws UIInvalidException
+	 *             - when this command slot wouldn't output a valid value
 	 */
-	public boolean isValid() {
-		if (item == null || !stackSizeField.isValid())
-			return false;
+	public void checkValid() throws UIInvalidException {
+		if (item == null)
+			throw new UIInvalidException("gui.commandEditor.itemInvalid.noItem");
+		stackSizeField.checkValid();
 		for (ItemDamageHandler damageHandler : damageHandlers) {
-			if (!damageHandler.isValid())
-				return false;
+			damageHandler.checkValid();
 		}
 		for (NBTTagHandler nbtHandler : nbtHandlers) {
-			if (!nbtHandler.isValid())
-				return false;
+			nbtHandler.checkValid();
 		}
-		return true;
 	}
 
 	private class CmdItem extends GuiCommandSlotImpl {

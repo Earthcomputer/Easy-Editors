@@ -5,6 +5,7 @@ import java.util.List;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.renderer.GlStateManager;
 
 /**
@@ -32,7 +33,7 @@ public class CommandSlotRectangle extends GuiCommandSlotImpl implements ISizeCha
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
 		child.addArgs(args);
 	}
 

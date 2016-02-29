@@ -1,9 +1,13 @@
 package net.earthcomputer.easyeditors.gui.command.slot;
 
+import java.util.List;
+
 import com.google.common.base.Predicate;
 
 import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.minecraft.util.MathHelper;
 
 /**
  * A text field which has an integer value
@@ -15,6 +19,9 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 
 	private int minValue;
 	private int maxValue;
+
+	private String numberInvalidMessage;
+	private String outOfBoundsMessage;
 
 	public CommandSlotIntTextField(int minWidth, int maxWidth) {
 		this(minWidth, maxWidth, Integer.MIN_VALUE);
@@ -43,6 +50,16 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		this.maxValue = maxValue;
 	}
 
+	public CommandSlotIntTextField setNumberInvalidMessage(String numberInvalidMessage) {
+		this.numberInvalidMessage = numberInvalidMessage;
+		return this;
+	}
+
+	public CommandSlotIntTextField setOutOfBoundsMessage(String outOfBoundsMessage) {
+		this.outOfBoundsMessage = outOfBoundsMessage;
+		return this;
+	}
+
 	@Override
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 		if (index >= args.length)
@@ -59,18 +76,30 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		return 1;
 	}
 
+	@Override
+	public void addArgs(List<String> args) throws UIInvalidException {
+		checkValid();
+
+		super.addArgs(args);
+	}
+
 	/**
 	 * 
 	 * @return Whether the value inside this text field is a valid integer
 	 */
-	public boolean isValid() {
-		int i;
+	public void checkValid() throws UIInvalidException {
+		int intVal;
 		try {
-			i = Integer.parseInt(getText());
+			intVal = Integer.parseInt(getText());
 		} catch (NumberFormatException e) {
-			return false;
+			throw new UIInvalidException(
+					numberInvalidMessage == null ? "gui.commandEditor.numberInvalid" : numberInvalidMessage);
 		}
-		return i >= minValue && i <= maxValue;
+		if (intVal < minValue || intVal > maxValue) {
+			throw new UIInvalidException(
+					outOfBoundsMessage == null ? "gui.commandEditor.numberOutOfBounds" : outOfBoundsMessage, minValue,
+					maxValue);
+		}
 	}
 
 	/**
@@ -78,7 +107,13 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 	 * @return The value of this text field, as an integer
 	 */
 	public int getIntValue() {
-		return !isValid() ? (minValue > 0 ? minValue : (maxValue < 0 ? maxValue : 0)) : Integer.parseInt(getText());
+		int intVal;
+		try {
+			intVal = Integer.parseInt(getText());
+		} catch (NumberFormatException e) { 
+			intVal = 0;
+		}
+		return MathHelper.clamp_int(intVal, minValue, maxValue);
 	}
 
 }

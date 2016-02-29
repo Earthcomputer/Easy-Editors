@@ -15,6 +15,7 @@ import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.api.util.ReturnedValueListener;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -113,28 +114,40 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		addChild(radioList);
 	}
 
+	@Override
+	public void addArgs(List<String> args) throws UIInvalidException {
+		checkValid();
+		super.addArgs(args);
+	}
+
 	/**
 	 * 
-	 * @return Whether this player selector is valid
+	 * @throws UIInvalidException
+	 *             - when this player selector is invalid
 	 */
-	public boolean isValid() {
+	public void checkValid() throws UIInvalidException {
 		int i = 0;
 		int selectedIndex = radioList.getSelectedIndex();
 		if ((flags & DISALLOW_USERNAME) == 0) {
-			if (selectedIndex == i)
-				return !playerNameField.getText().isEmpty();
+			if (selectedIndex == i) {
+				if (playerNameField.getText().isEmpty()) {
+					throw new UIInvalidException("gui.commandEditor.playerSelector.noUsernameTyped");
+				}
+			}
 			i++;
 		}
 		if ((flags & DISALLOW_UUID) == 0) {
-			if (selectedIndex == i)
-				return Patterns.UUID.matcher(UUIDField.getText()).matches();
+			if (selectedIndex == i) {
+				if (!Patterns.UUID.matcher(UUIDField.getText()).matches()) {
+					throw new UIInvalidException("gui.commandEditor.playerSelector.invalidUUID");
+				}
+			}
 			i++;
 		}
 		if ((flags & DISALLOW_SELECTOR) == 0) {
 			if (selectedIndex == i)
-				return playerSelector.isValid();
+				playerSelector.checkValid();
 		}
-		return true;
 	}
 
 	private class CmdPlayerSelector extends CommandSlotVerticalArrangement {
@@ -455,6 +468,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private IGuiCommandSlot setupCountSlot() {
 			countField = new CommandSlotIntTextField(50, 50, 1);
+			countField.setNumberInvalidMessage("gui.commandEditor.playerSelector.count.invalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.count.outOfBounds");
 			modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.count"),
 							Colors.playerSelectorLabel.color, countField));
@@ -513,8 +528,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			IGuiCommandSlot[] xyz = setupXYZConstraint();
 			rOriginX = (CommandSlotIntTextField) xyz[1];
+			rOriginX.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.origin.xInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.origin.xOutOfBounds");
 			rOriginY = (CommandSlotIntTextField) xyz[2];
+			rOriginY.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.origin.yInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.origin.yOutOfBounds");
 			rOriginZ = (CommandSlotIntTextField) xyz[3];
+			rOriginZ.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.origin.zInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.origin.zOutOfBounds");
 			radiusConstraint.addChild(
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.origin"),
 							Colors.playerSelectorLabel.color, xyz[0]));
@@ -527,13 +548,19 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private IGuiCommandSlot setupMinRadiusConstraint() {
+			minRadius = new CommandSlotIntTextField(30, 100, 0);
+			minRadius.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.min.invalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.min.outOfBounds");
 			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.min"),
-					Colors.playerSelectorLabel.color, minRadius = new CommandSlotIntTextField(30, 100, 0));
+					Colors.playerSelectorLabel.color, minRadius);
 		}
 
 		private IGuiCommandSlot setupMaxRadiusConstraint() {
+			maxRadius = new CommandSlotIntTextField(30, 100, 0);
+			maxRadius.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.max.invalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.max.outOfBounds");
 			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.max"),
-					Colors.playerSelectorLabel.color, maxRadius = new CommandSlotIntTextField(30, 100, 0));
+					Colors.playerSelectorLabel.color, maxRadius);
 		}
 
 		private IGuiCommandSlot setupBoundsFromToConstraint() {
@@ -541,16 +568,28 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			IGuiCommandSlot[] xyz = setupXYZConstraint();
 			boundsX1 = (CommandSlotIntTextField) xyz[1];
+			boundsX1.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.from.xInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.from.xOutOfBounds");
 			boundsY1 = (CommandSlotIntTextField) xyz[2];
+			boundsY1.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.from.yInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.from.yOutOfBounds");
 			boundsZ1 = (CommandSlotIntTextField) xyz[3];
+			boundsZ1.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.from.zInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.from.zOutOfBounds");
 			fromToConstraint.addChild(
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo.from"),
 							Colors.playerSelectorLabel.color, xyz[0]));
 
 			xyz = setupXYZConstraint();
 			boundsX2 = (CommandSlotIntTextField) xyz[1];
+			boundsX2.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.to.xInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.to.xOutOfBounds");
 			boundsY2 = (CommandSlotIntTextField) xyz[2];
+			boundsY2.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.to.yInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.to.yOutOfBounds");
 			boundsZ2 = (CommandSlotIntTextField) xyz[3];
+			boundsZ2.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.to.zInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.to.zOutOfBounds");
 			fromToConstraint.addChild(
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo.to"),
 							Colors.playerSelectorLabel.color, xyz[0]));
@@ -564,16 +603,28 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			IGuiCommandSlot[] xyz = setupXYZConstraint();
 			dOriginX = (CommandSlotIntTextField) xyz[1];
+			dOriginX.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.origin.xInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.origin.xOutOfBounds");
 			dOriginY = (CommandSlotIntTextField) xyz[2];
+			dOriginY.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.origin.yInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.origin.yOutOfBounds");
 			dOriginZ = (CommandSlotIntTextField) xyz[3];
+			dOriginZ.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.origin.zInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.origin.zOutOfBounds");
 			boundsDistConstraint.addChild(
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist.origin"),
 							Colors.playerSelectorLabel.color, xyz[0]));
 
 			xyz = setupXYZConstraint();
 			distX = (CommandSlotIntTextField) xyz[1];
+			distX.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.distance.xInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.distance.xOutOfBounds");
 			distY = (CommandSlotIntTextField) xyz[2];
+			distY.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.distance.yInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.distance.yOutOfBounds");
 			distZ = (CommandSlotIntTextField) xyz[3];
+			distZ.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.distance.zInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.distance.zOutOfBounds");
 			boundsDistConstraint.addChild(
 					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist.distance"),
 							Colors.playerSelectorLabel.color, xyz[0]));
@@ -641,12 +692,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private IGuiCommandSlot setupMinHRotationSlot() {
 			minHRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			minHRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.horizontal.minInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.horizontal.minOutOfBounds");
 			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.min"),
 					Colors.playerSelectorLabel.color, minHRotation);
 		}
 
 		private IGuiCommandSlot setupMaxHRotationSlot() {
 			maxHRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			maxHRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.horizontal.maxInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.horizontal.maxOutOfBounds");
 			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.max"),
 					Colors.playerSelectorLabel.color, maxHRotation);
 		}
@@ -664,12 +719,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private IGuiCommandSlot setupMinVRotationSlot() {
 			minVRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			minVRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.vertical.minInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.vertical.minOutOfBounds");
 			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.min"),
 					Colors.playerSelectorLabel.color, minVRotation);
 		}
 
 		private IGuiCommandSlot setupMaxVRotationSlot() {
 			maxVRotation = new CommandSlotIntTextField(30, 100, -180, 179);
+			maxVRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.vertical.maxInvalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.vertical.maxOutOfBounds");
 			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.max"),
 					Colors.playerSelectorLabel.color, maxVRotation);
 		}
@@ -695,9 +754,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			CommandSlotVerticalArrangement insideBox = new CommandSlotVerticalArrangement();
 			minExp = new CommandSlotIntTextField(30, 100, 0);
+			minExp.setNumberInvalidMessage("gui.commandEditor.playerSelector.exp.min.invalid")
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.exp.min.outOfBounds");
 			insideBox.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.min"),
 					Colors.playerSelectorLabel.color, minExp));
 			maxExp = new CommandSlotIntTextField(30, 100, 0);
+			maxExp.setNumberInvalidMessage("gui.commandEditor.playerSelector.exp.max.invalid")
+			.setOutOfBoundsMessage("gui.commandEditor.playerSelector.exp.max.outOfBounds");
 			insideBox.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.max"),
 					Colors.playerSelectorLabel.color, maxExp));
 
@@ -1358,87 +1421,87 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			return builder.toString();
 		}
 
-		public boolean isValid() {
+		public void checkValid() throws UIInvalidException {
 			if (targetEntity != null) {
-				if (!targetEntity.isValid())
-					return false;
+				targetEntity.checkValid();
 
-				else if (targetEntity.getEntity().equals(ENTITY_ANYTHING)) {
+				if (targetEntity.getEntity().equals(ENTITY_ANYTHING)) {
 					if (selectorType.getCurrentIndex() == SELTYPE_RANDOM) {
-						return false;
+						throw new UIInvalidException("gui.commandEditor.playerSelector.randomAnything");
 					} else if (targetInverted.isChecked()) {
-						return false;
+						throw new UIInvalidException("gui.commandEditor.notAny");
 					}
 				}
 			}
 
-			if (selectorType.getCurrentIndex() != 2 && (flags & ONE_ONLY) == 0 && !countField.isValid())
-				return false;
+			if (selectorType.getCurrentIndex() != SELTYPE_ALL && (flags & ONE_ONLY) == 0) {
+				countField.checkValid();
+			}
 
 			switch (positionalConstraints.getSelectedIndex()) {
 			case POSTYPE_RADIUS:
-				if (!rOriginX.getText().isEmpty() && !rOriginX.isValid())
-					return false;
-				if (!rOriginY.getText().isEmpty() && !rOriginY.isValid())
-					return false;
-				if (!rOriginZ.getText().isEmpty() && !rOriginZ.isValid())
-					return false;
-				if (!minRadius.getText().isEmpty() && !minRadius.isValid())
-					return false;
-				if (!maxRadius.getText().isEmpty() && !maxRadius.isValid())
-					return false;
+				if (!rOriginX.getText().isEmpty())
+					rOriginX.checkValid();
+				if (!rOriginY.getText().isEmpty())
+					rOriginY.checkValid();
+				if (!rOriginZ.getText().isEmpty())
+					rOriginZ.checkValid();
+				if (!minRadius.getText().isEmpty())
+					minRadius.checkValid();
+				if (!maxRadius.getText().isEmpty())
+					maxRadius.checkValid();
 				break;
 			case POSTYPE_BB_KNOWN_COORDS:
-				if (!boundsX1.isValid() || !boundsY1.isValid() || !boundsZ1.isValid() || !boundsX2.isValid()
-						|| !boundsY2.isValid() || !boundsZ2.isValid())
-					return false;
+				boundsX1.checkValid();
+				boundsY1.checkValid();
+				boundsZ1.checkValid();
+				boundsX2.checkValid();
+				boundsY2.checkValid();
+				boundsZ2.checkValid();
 				break;
 			case POSTYPE_BB_UNKNOWN_COORDS:
-				if (!dOriginX.getText().isEmpty() && !dOriginX.isValid())
-					return false;
-				if (!dOriginY.getText().isEmpty() && !dOriginY.isValid())
-					return false;
-				if (!dOriginZ.getText().isEmpty() && !dOriginZ.isValid())
-					return false;
-				if (!distX.getText().isEmpty() && !distX.isValid())
-					return false;
-				if (!distY.getText().isEmpty() && !distY.isValid())
-					return false;
-				if (!distZ.getText().isEmpty() && !distZ.isValid())
-					return false;
+				if (!dOriginX.getText().isEmpty())
+					dOriginX.checkValid();
+				if (!dOriginY.getText().isEmpty())
+					dOriginY.checkValid();
+				if (!dOriginZ.getText().isEmpty())
+					dOriginZ.checkValid();
+				if (!distX.getText().isEmpty())
+					distX.checkValid();
+				if (!distY.getText().isEmpty())
+					distY.checkValid();
+				if (!distZ.getText().isEmpty())
+					distZ.checkValid();
 				break;
 			}
 
 			if (modifiableRotations.getChild() == rotations) {
-				if (!minHRotation.getText().isEmpty() && !minHRotation.isValid())
-					return false;
-				if (!maxHRotation.getText().isEmpty() && !maxHRotation.isValid())
-					return false;
-				if (!minVRotation.getText().isEmpty() && !minVRotation.isValid())
-					return false;
-				if (!maxVRotation.getText().isEmpty() && !maxVRotation.isValid())
-					return false;
+				if (!minHRotation.getText().isEmpty())
+					minHRotation.checkValid();
+				if (!maxHRotation.getText().isEmpty())
+					maxHRotation.checkValid();
+				if (!minVRotation.getText().isEmpty())
+					minVRotation.checkValid();
+				if (!maxVRotation.getText().isEmpty())
+					maxVRotation.checkValid();
 			}
 
 			if (modifiablePlayersOnlySlots.getChild() == playersOnlySlots) {
-				if (!minExp.getText().isEmpty() && !minExp.isValid())
-					return false;
-				if (!maxExp.getText().isEmpty() && !maxExp.isValid())
-					return false;
+				if (!minExp.getText().isEmpty())
+					minExp.checkValid();
+				if (!maxExp.getText().isEmpty())
+					maxExp.checkValid();
 			}
 
 			boolean teamsHaveBeenObtained = teamName instanceof CommandSlotMenu;
 			if (teamsHaveBeenObtained && modifiableTeamName.getChild() == teamName) {
 				if (((CommandSlotMenu) teamName).getCurrentIndex() == TEAM_ANY && teamInverted.isChecked())
-					return false;
+					throw new UIInvalidException("gui.commandEditor.notAny");
 			}
 
 			for (int i = 0; i < scoreTests.entryCount(); i++) {
-				if (!scoreTests.getEntry(i).isValid())
-					return false;
+				scoreTests.getEntry(i).checkValid();
 			}
-
-			return true;
 		}
 
 		private class CmdScoreTest extends CommandSlotHorizontalArrangement {
@@ -1467,17 +1530,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				value.setText("0");
 			}
 
-			public boolean isValid() {
+			public void checkValid() throws UIInvalidException {
 				if (objective == null) {
 					if (waitingObjective == null)
-						return false;
+						throw new UIInvalidException("gui.commandEditor.playerSelector.scoreTestInvalid.noObjective");
 				} else if (objective.wordCount() == 0) {
-					return false;
+					throw new UIInvalidException(
+							"gui.commandEditor.playerSelector.scoreTestInvalid.noObjectivesInList");
 				}
 
-				if (!value.isValid())
-					return false;
-				return true;
+				value.checkValid();
 			}
 
 		}

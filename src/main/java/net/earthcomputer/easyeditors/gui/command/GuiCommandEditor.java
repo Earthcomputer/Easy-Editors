@@ -10,6 +10,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand;
@@ -19,7 +20,9 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
  * The command editor GUI
@@ -40,6 +43,9 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 
 	private CommandSlotCommand commandSlotCommand;
 	private CommandSlotRectangle commandSlotRectangle;
+
+	private String invalidText = null;
+	private HoverChecker doneHoverChecker;
 
 	public GuiCommandEditor(GuiScreen previousGui, ICommandEditorCallback callback, ICommandSender sender) {
 		super(30, 30, 4, 500);
@@ -94,7 +100,12 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 		switch (button.id) {
 		case 0:
 			List<String> args = Lists.newArrayList();
-			commandSlotRectangle.addArgs(args);
+			try {
+				commandSlotRectangle.addArgs(args);
+			} catch (UIInvalidException e) {
+				// This should never happen, the done button will be enabled
+				e.printStackTrace();
+			}
 			callback.setCommand(SPACE_JOINER.join(args));
 			mc.displayGuiScreen(previousGui);
 			break;
@@ -109,6 +120,14 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
+
+		if (invalidText != null) {
+			if (doneHoverChecker == null)
+				doneHoverChecker = new HoverChecker(doneButton, 1000);
+
+			if (doneHoverChecker.checkHover(mouseX, mouseY))
+				GeneralUtils.drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + invalidText, width / 2);
+		}
 
 		commandSlotRectangle.drawForeground(2 - getScrollX(), 2 - getScrollY() + getHeaderHeight(), mouseX, mouseY,
 				partialTicks);
@@ -126,7 +145,14 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				getHeaderHeight() / 2 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 
-		doneButton.enabled = commandSlotCommand.isValid();
+		try {
+			commandSlotRectangle.addArgs(Lists.<String> newArrayList());
+			doneButton.enabled = true;
+			invalidText = null;
+		} catch (UIInvalidException e) {
+			doneButton.enabled = false;
+			invalidText = e.getMessage();
+		}
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 
 /**
  * A command slot which contains a number of child command slots
@@ -47,7 +48,7 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
 		for (IGuiCommandSlot child : children) {
 			child.addArgs(args);
 		}

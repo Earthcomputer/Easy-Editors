@@ -7,6 +7,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
@@ -78,7 +79,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
 		String[] argsToAdd = getText().trim().split(" ");
 		int len = wordsToConsume < 0 ? argsToAdd.length : wordsToConsume;
 		for (int i = 0; i < len; i++) {

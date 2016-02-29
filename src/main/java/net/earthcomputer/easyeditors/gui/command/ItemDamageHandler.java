@@ -56,9 +56,11 @@ public abstract class ItemDamageHandler {
 
 	/**
 	 * 
-	 * @return Whether the command slots can be read to produce a valid output
+	 * @throws UIInvalidException
+	 *             - when the UI dealt with by this item damage handler cannot
+	 *             be parsed into a damage value
 	 */
-	public abstract boolean isValid();
+	public abstract void checkValid() throws UIInvalidException;
 
 	/**
 	 * Registers an item damage handler which is active if
@@ -170,7 +172,9 @@ public abstract class ItemDamageHandler {
 			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
 					I18n.format("gui.commandEditor.item.damage.tool.durability"), Colors.itemLabel.color,
 					I18n.format("gui.commandEditor.item.damage.tool.durability.tooltip"),
-					durabilityField = new CommandSlotIntTextField(32, 32, 1, item.getMaxDamage() + 1),
+					durabilityField = new CommandSlotIntTextField(32, 32, 1, item.getMaxDamage() + 1)
+							.setNumberInvalidMessage("gui.commandEditor.item.damage.tool.durability.invalid")
+							.setOutOfBoundsMessage("gui.commandEditor.item.damage.tool.durability.outOfBounds"),
 					new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "/ " + (item.getMaxDamage() + 1),
 							Colors.itemLabel.color)) };
 		}
@@ -187,8 +191,8 @@ public abstract class ItemDamageHandler {
 		}
 
 		@Override
-		public boolean isValid() {
-			return durabilityField.isValid();
+		public void checkValid() throws UIInvalidException {
+			durabilityField.checkValid();
 		}
 
 	}
