@@ -258,6 +258,10 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	 */
 	public void addScrollX(int scrollX) {
 		setScrollX(this.scrollX + scrollX);
+		if (this.scrollX < 0)
+			this.scrollX = 0;
+		else if (this.scrollX > this.maxScrollX)
+			this.scrollX = this.maxScrollX;
 	}
 
 	/**
@@ -285,6 +289,10 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	 */
 	public void addScrollY(int scrollY) {
 		setScrollY(this.scrollY + scrollY);
+		if (this.scrollY < 0)
+			this.scrollY = 0;
+		else if (this.scrollY > this.maxScrollY)
+			this.scrollY = this.maxScrollY;
 	}
 
 	/**

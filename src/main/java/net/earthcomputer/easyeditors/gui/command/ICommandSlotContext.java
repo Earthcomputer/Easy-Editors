@@ -43,4 +43,24 @@ public interface ICommandSlotContext {
 	 */
 	boolean isMouseInBounds(int mouseX, int mouseY);
 
+	/**
+	 * Moves the horizontal scroll bar the minimum amount possible so that the
+	 * given x-position is in view
+	 * 
+	 * @param x
+	 *            - The x-position, measured as seen on screen, not the actual
+	 *            virtual coordinates
+	 */
+	void ensureXInView(int x);
+
+	/**
+	 * Moves the vertical scroll bar the minimum amount possible so that the
+	 * given y-position is in view
+	 * 
+	 * @param y
+	 *            - The y-position, measured as seen on screen, not the actual
+	 *            virtual coordinates
+	 */
+	void ensureYInView(int y);
+
 }

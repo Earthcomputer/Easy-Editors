@@ -189,12 +189,18 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 
 	@Override
 	public void onWidthChange(int oldWidth, int newWidth) {
-		setVirtualWidth(newWidth + 4);
+		int newVirtualWidth = newWidth + 4;
+		setVirtualWidth(newVirtualWidth);
+		if (getScrollX() + getShownWidth() > newVirtualWidth)
+			setScrollX(newVirtualWidth - getShownWidth());
 	}
 
 	@Override
 	public void onHeightChange(int oldHeight, int newHeight) {
-		setVirtualHeight(newHeight + 4);
+		int newVirtualHeight = newHeight + 4;
+		setVirtualHeight(newHeight);
+		if (getScrollY() + getShownHeight() > newVirtualHeight)
+			setScrollY(newVirtualHeight - getShownHeight());
 	}
 
 	private class Cxt implements ICommandSlotContext {
@@ -218,6 +224,22 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 		public boolean isMouseInBounds(int mouseX, int mouseY) {
 			return mouseX < getShownWidth() && mouseY >= getHeaderHeight()
 					&& mouseY < getHeaderHeight() + getShownHeight();
+		}
+
+		@Override
+		public void ensureXInView(int x) {
+			if (x < 0)
+				addScrollX(x);
+			else if (x > getShownWidth())
+				addScrollX(x - getShownWidth());
+		}
+
+		@Override
+		public void ensureYInView(int y) {
+			if (y < getHeaderHeight())
+				addScrollY(y - getHeaderHeight());
+			else if (y > getHeaderHeight() + getShownHeight())
+				addScrollY(y - (getHeaderHeight() + getShownHeight()));
 		}
 
 	}

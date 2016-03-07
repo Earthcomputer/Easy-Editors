@@ -157,6 +157,14 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		newTextField.setFocused(oldTextField.isFocused());
 		newTextField.func_175205_a(oldTextField.contentFilter);
 		setWidth(newTextField.width + 2);
+
+		String strBefore = newTextField.getText().substring(newTextField.getLineScrollOffset(),
+				newTextField.getCursorPosition() - newTextField.getLineScrollOffset());
+		int x = newTextField.getEnableBackgroundDrawing() ? newTextField.xPosition + 4 : newTextField.xPosition;
+		x += Minecraft.getMinecraft().fontRendererObj.getStringWidth(strBefore);
+		if (getContext() != null)
+			getContext().ensureXInView(x);
+
 		onTextChanged();
 	}
 
