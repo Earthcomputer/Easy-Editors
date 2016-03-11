@@ -54,6 +54,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	public CommandSlotPlayerSelector(int flags) {
 		this.flags = flags;
 
+		addChild(new CommandSlotHelp("gui.commandEditor.help.playerSelector", "player_selectors"));
+
 		addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				I18n.format("gui.commandEditor.playerSelector.selectBy"), Colors.playerSelectorSelectBy.color));
 
@@ -760,7 +762,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					Colors.playerSelectorLabel.color, minExp));
 			maxExp = new CommandSlotIntTextField(30, 100, 0);
 			maxExp.setNumberInvalidMessage("gui.commandEditor.playerSelector.exp.max.invalid")
-			.setOutOfBoundsMessage("gui.commandEditor.playerSelector.exp.max.outOfBounds");
+					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.exp.max.outOfBounds");
 			insideBox.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.max"),
 					Colors.playerSelectorLabel.color, maxExp));
 

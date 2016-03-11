@@ -1,0 +1,62 @@
+[
+	[
+		{
+			"text": "1",
+			"color": "red"
+		},
+		{
+			"text": "2",
+			"color": "yellow"
+		},
+		{
+			"text": "3",
+			"color": "green"
+		},
+		{
+			"text": "Testing",
+			"color": "blue",
+			"bold": "true"
+		}
+	],
+	
+	null,
+	
+	"This is just a long line of boring plain text",
+	
+	{
+		"color": "red",
+		"text": "Some\nmultiline\nred\ntext",
+		"hoverEvent":
+		{
+			"action": "show_text",
+			"value": "Google Search"
+		},
+		"clickEvent":
+		{
+			"action": "open_url",
+			"value": "http://www.google.com/"
+		}
+	},
+	{
+		"type": "image",
+		"location": "textures/gui/book.png",
+		"subimage": [0, 0, 50, 170],
+		
+		"hoverEvent":
+		{
+			"action": "show_text",
+			"value":
+			{
+				"text": "Image hovering text",
+				"color": "green",
+				"bold": "true"
+			}
+		},
+		
+		"clickEvent":
+		{
+			"action": "change_page",
+			"value": "Command Editor=command_editor"
+		}
+	}
+]

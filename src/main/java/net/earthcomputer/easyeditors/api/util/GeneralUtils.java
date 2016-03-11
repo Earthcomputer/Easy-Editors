@@ -1,18 +1,33 @@
 package net.earthcomputer.easyeditors.api.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import net.earthcomputer.easyeditors.api.EntityRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiConfirmOpenLink;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.stream.GuiTwitchUserMode;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
@@ -21,8 +36,23 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.Achievement;
+import net.minecraft.stats.StatBase;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
+import tv.twitch.chat.ChatUserInfo;
 
 /**
  * General utilities used by Easy Editors. These will work even if Easy Editors
@@ -34,6 +64,10 @@ import net.minecraft.util.ResourceLocation;
  *
  */
 public class GeneralUtils {
+
+	private static final Splitter NEWLINE_SPLITTER = Splitter.on('\n');
+	private static final Set<String> PROTOCOLS = Sets.newHashSet("http", "https");
+	private static final Logger MC_LOGGER = LogManager.getLogger();
 
 	/**
 	 * Plays the button sound, as if a button had been pressed in a GUI
@@ -231,8 +265,7 @@ public class GeneralUtils {
 
 	/**
 	 * A static alternative to
-	 * {@link net.minecraft.client.gui.GuiScreen#drawHoveringText(List, int, int)
-	 * GuiScreen.drawHoveringText(List, int, int)}
+	 * {@link GuiScreen#drawHoveringText(List, int, int)}
 	 * 
 	 * @param x
 	 * @param y
@@ -244,16 +277,26 @@ public class GeneralUtils {
 
 	/**
 	 * A static alternative to
-	 * {@link net.minecraft.client.gui.GuiScreen#drawHoveringText(List, int, int)
-	 * GuiScreen.drawHoveringText(List, int, int)}
+	 * {@link GuiScreen#drawHoveringText(List, int, int)}
 	 * 
 	 * @param x
 	 * @param y
 	 * @param lines
 	 */
 	public static void drawTooltip(int x, int y, List<String> lines) {
+		drawTooltip(x, y, lines, Minecraft.getMinecraft().fontRendererObj);
+	}
+
+	/**
+	 * Draws hovering text in a specified font
+	 * 
+	 * @param x
+	 * @param y
+	 * @param lines
+	 * @param font
+	 */
+	public static void drawTooltip(int x, int y, List<String> lines, FontRenderer font) {
 		Minecraft mc = Minecraft.getMinecraft();
-		FontRenderer font = mc.fontRendererObj;
 		ScaledResolution res = new ScaledResolution(mc);
 		int width = res.getScaledWidth();
 		int height = res.getScaledHeight();
@@ -328,6 +371,29 @@ public class GeneralUtils {
 	}
 
 	/**
+	 * Draws a tooltip for an ItemStack
+	 * 
+	 * @param stack
+	 * @param x
+	 * @param y
+	 */
+	public static void drawItemStackTooltip(ItemStack stack, int x, int y) {
+		List<String> list = stack.getTooltip(Minecraft.getMinecraft().thePlayer,
+				Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+
+		for (int i = 0; i < list.size(); ++i) {
+			if (i == 0) {
+				list.set(i, stack.getRarity().rarityColor + (String) list.get(i));
+			} else {
+				list.set(i, EnumChatFormatting.GRAY + (String) list.get(i));
+			}
+		}
+
+		FontRenderer font = stack.getItem().getFontRenderer(stack);
+		drawTooltip(x, y, list, (font == null ? Minecraft.getMinecraft().fontRendererObj : font));
+	}
+
+	/**
 	 * Equivalent of {@link Throwable#printStackTrace()}, but uses a logger
 	 * 
 	 * @param logger
@@ -341,6 +407,17 @@ public class GeneralUtils {
 		}
 	}
 
+	/**
+	 * Renders an entity at a given position (best-effort)
+	 * 
+	 * @param entity
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param mouseX
+	 * @param mouseY
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Entity> void renderEntityAt(Entity entity, int x, int y, int width, int height, int mouseX,
 			int mouseY) {
@@ -409,6 +486,199 @@ public class GeneralUtils {
 				String str = "Error drawing entity";
 				fontRenderer.drawStringWithShadow(str, x - fontRenderer.getStringWidth(str) / 2, y - 4, 0xff0000);
 			}
+		}
+	}
+
+	/**
+	 * A static alternative to
+	 * {@link GuiScreen#handleComponentHover(IChatComponent, int, int)}, with
+	 * the additional functionality that hover events from elsewhere can be
+	 * handled
+	 * 
+	 * @param event
+	 * @param mouseX
+	 * @param mouseY
+	 */
+	public static void handleHoverEvent(HoverEvent event, int mouseX, int mouseY) {
+		if (event != null) {
+			if (event.getAction() == HoverEvent.Action.SHOW_ITEM) {
+				ItemStack stackToShow = null;
+
+				try {
+					NBTBase nbtbase = JsonToNBT.getTagFromJson(event.getValue().getUnformattedText());
+
+					if (nbtbase instanceof NBTTagCompound) {
+						stackToShow = ItemStack.loadItemStackFromNBT((NBTTagCompound) nbtbase);
+					}
+				} catch (NBTException e) {
+				}
+
+				if (stackToShow != null) {
+					drawItemStackTooltip(stackToShow, mouseX, mouseY);
+				} else {
+					drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid Item!");
+				}
+			} else if (event.getAction() == HoverEvent.Action.SHOW_ENTITY) {
+				if (Minecraft.getMinecraft().gameSettings.advancedItemTooltips) {
+					try {
+						NBTBase entityNBT = JsonToNBT.getTagFromJson(event.getValue().getUnformattedText());
+
+						if (entityNBT instanceof NBTTagCompound) {
+							List<String> tooltipLines = Lists.<String> newArrayList();
+							NBTTagCompound entityCompound = (NBTTagCompound) entityNBT;
+							tooltipLines.add(entityCompound.getString("name"));
+
+							if (entityCompound.hasKey("type", 8)) {
+								String type = entityCompound.getString("type");
+								tooltipLines.add("Type: " + type + " (" + EntityList.getIDFromString(type) + ")");
+							}
+
+							tooltipLines.add(entityCompound.getString("id"));
+							drawTooltip(mouseX, mouseY, tooltipLines);
+						} else {
+							drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid Entity!");
+						}
+					} catch (NBTException e) {
+						drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid Entity!");
+					}
+				}
+			} else if (event.getAction() == HoverEvent.Action.SHOW_TEXT) {
+				drawTooltip(mouseX, mouseY, NEWLINE_SPLITTER.splitToList(event.getValue().getFormattedText()));
+			} else if (event.getAction() == HoverEvent.Action.SHOW_ACHIEVEMENT) {
+				StatBase stat = StatList.getOneShotStat(event.getValue().getUnformattedText());
+
+				if (stat != null) {
+					IChatComponent statName = stat.getStatName();
+					IChatComponent statType = new ChatComponentTranslation(
+							"stats.tooltip.type." + (stat.isAchievement() ? "achievement" : "statistic"));
+					statType.getChatStyle().setItalic(true);
+					String achievementDescription = stat instanceof Achievement ? ((Achievement) stat).getDescription()
+							: null;
+					List<String> lines = Lists.newArrayList(statName.getFormattedText(), statType.getFormattedText());
+
+					if (achievementDescription != null) {
+						lines.addAll(Minecraft.getMinecraft().fontRendererObj
+								.listFormattedStringToWidth(achievementDescription, 150));
+					}
+
+					drawTooltip(mouseX, mouseY, lines);
+				} else {
+					drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid statistic/achievement!");
+				}
+			}
+
+			GlStateManager.disableLighting();
+		}
+	}
+
+	/**
+	 * A static alternative to
+	 * {@link GuiScreen#handleComponentClick(IChatComponent)}, with the
+	 * additional functionality that click events from elsewhere can be handled
+	 * 
+	 * @param event
+	 * @return
+	 */
+	public static boolean handleClickEvent(ClickEvent event) {
+		if (event != null) {
+			if (event.getAction() == ClickEvent.Action.OPEN_URL) {
+				if (!Minecraft.getMinecraft().gameSettings.chatLinks) {
+					return false;
+				}
+
+				try {
+					final URI webUri = new URI(event.getValue());
+					String protocol = webUri.getScheme();
+
+					if (protocol == null) {
+						throw new URISyntaxException(event.getValue(), "Missing protocol");
+					}
+
+					if (!PROTOCOLS.contains(protocol.toLowerCase())) {
+						throw new URISyntaxException(event.getValue(),
+								"Unsupported protocol: " + protocol.toLowerCase());
+					}
+
+					if (Minecraft.getMinecraft().gameSettings.chatLinksPrompt) {
+						final GuiScreen prevScreen = Minecraft.getMinecraft().currentScreen;
+						GuiYesNoCallback callback = new GuiYesNoCallback() {
+
+							@Override
+							public void confirmClicked(boolean result, int id) {
+								if (id == 31102009) {
+									if (result) {
+										openWebLink(webUri);
+									}
+
+									Minecraft.getMinecraft().displayGuiScreen(prevScreen);
+								}
+							}
+
+						};
+						Minecraft.getMinecraft()
+								.displayGuiScreen(new GuiConfirmOpenLink(callback, event.getValue(), 31102009, false));
+					} else {
+						openWebLink(webUri);
+					}
+				} catch (URISyntaxException e) {
+					MC_LOGGER.error("Can't open url for " + event, e);
+				}
+			} else if (event.getAction() == ClickEvent.Action.OPEN_FILE) {
+				URI fileUri = new File(event.getValue()).toURI();
+				openWebLink(fileUri);
+			} else if (event.getAction() == ClickEvent.Action.SUGGEST_COMMAND) {
+				// Can't do insertion
+			} else if (event.getAction() == ClickEvent.Action.RUN_COMMAND) {
+				if (Minecraft.getMinecraft().thePlayer != null)
+					Minecraft.getMinecraft().thePlayer.sendChatMessage(event.getValue());
+			} else if (event.getAction() == ClickEvent.Action.TWITCH_USER_INFO) {
+				ChatUserInfo userInfo = Minecraft.getMinecraft().getTwitchStream().func_152926_a(event.getValue());
+
+				if (userInfo != null) {
+					final GuiScreen prevScreen = Minecraft.getMinecraft().currentScreen;
+					Minecraft.getMinecraft().displayGuiScreen(
+							new GuiTwitchUserMode(Minecraft.getMinecraft().getTwitchStream(), userInfo) {
+								@Override
+								public void actionPerformed(GuiButton button) throws IOException {
+									switch (button.id) {
+									case 0:
+									case 3:
+									case 2:
+									case 4:
+									case 1:
+										super.actionPerformed(button);
+										break;
+									default:
+										if (button.enabled)
+											Minecraft.getMinecraft().displayGuiScreen(prevScreen);
+									}
+								}
+							});
+				} else {
+					MC_LOGGER.error("Tried to handle twitch user but couldn't find them!");
+				}
+			} else {
+				MC_LOGGER.error("Don't know how to handle " + event);
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * A static alternative to {@link GuiScreen#openWebLink(URI)}
+	 * 
+	 * @param uri
+	 */
+	public static void openWebLink(URI uri) {
+		try {
+			Class<?> desktopClass = Class.forName("java.awt.Desktop");
+			Object desktopInstance = desktopClass.getMethod("getDesktop").invoke(null);
+			desktopClass.getMethod("browse", URI.class).invoke(desktopInstance, uri);
+		} catch (Throwable throwable) {
+			MC_LOGGER.error("Couldn't open link", throwable);
 		}
 	}
 

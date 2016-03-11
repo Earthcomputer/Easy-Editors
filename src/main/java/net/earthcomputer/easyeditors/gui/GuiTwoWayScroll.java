@@ -652,7 +652,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	protected abstract void drawForeground(int mouseX, int mouseY, float partialTicks);
 
 	@Override
-	public void keyTyped(char typedChar, int keyCode) throws IOException {
+	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		if (keyCode == leftKey) {
 			addScrollX(-20);
 		} else if (keyCode == rightKey) {
@@ -685,7 +685,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	}
 
 	@Override
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		if (mouseButton == 0) {
 			if (yScrollBarVisible && mouseX >= width - 6 && mouseY >= headerHeight && mouseX < width
 					&& mouseY >= headerHeight && mouseY < headerHeight + shownHeight) {
