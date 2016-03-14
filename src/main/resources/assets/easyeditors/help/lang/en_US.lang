@@ -1,0 +1,47 @@
+help.title=Easy Editors Help
+
+# PLAYER SELECTORS
+help.playerSelectors=Entity Selectors
+
+help.playerSelectors.paragraph.1=Entity selectors are used to select an %s to perform an action on (for example, to teleport).
+help.playerSelectors.paragraph.1.arg.1=entity
+
+help.playerSelectors.paragraph.2=There are in general three ways you can select an entity:
+help.playerSelectors.paragraph.2.way1=1. Username - typing a player's username is one way of finding them
+help.playerSelectors.paragraph.2.way2=2. UUID - typing an entity's %s is another way of finding them
+help.playerSelectors.paragraph.2.way2.arg.1=UUID
+help.playerSelectors.paragraph.2.way3=3. Using a special entity selector (described below)
+
+help.playerSelectors.paragraph.3.title=Special Entity Selectors
+help.playerSelectors.paragraph.3.part1=Look at the following, rather chaotic, scene (if you have trouble seeing it, switch to fullscreen):
+help.playerSelectors.paragraph.3.part2=Suppose you want to select one, or more, of the entities in this scene with the command block (left of the armor stands). What you want is certain features to select them by. In entity selectors in the command editor, you will see this:
+
+help.playerSelectors.image.2.caption=This is the part of the entity selector that we will be talking about from now on.
+
+help.playerSelectors.selectionMode.title=Selection Mode
+help.playerSelectors.selectionMode=This is the first option in an entity selector. There are four options:
+help.playerSelectors.selectionMode.nearest=1. Nearest - you can select the closest entity that matches the other options. If more than one entity is selectable, entities will be ordered from closest to farthest.
+help.playerSelectors.selectionMode.farthest=2. Farthest - you can select the farthest entity that matches the other options. If more than one entity is selectable, entities will be ordered from farthest to closest.
+help.playerSelectors.selectionMode.all=3. All - you can select all entities that match the other options. Entities matched are ordered from closest to farthest.
+help.playerSelectors.selectionMode.random=4. Random - you can select a random entity that matches the other options. Entities matched are ordered in a random order.
+help.playerSelectors.selectionMode.nearest.example=In the scenario above, "Nearest Villager" would select the adult villager;
+help.playerSelectors.selectionMode.farthest.example="Farthest Villager" would select the baby villager;
+help.playerSelectors.selectionMode.all.example="All Chicken" would select all of the chickens causing havoc in the background;
+help.playerSelectors.selectionMode.random.example="Random Chicken" would perform the operation on a random one of those chickens.
+
+help.playerSelectors.targetEntity.title=Target Entity
+help.playerSelectors.targetEntity=This defines what type of entity you're looking for. In the above image, we're looking for a player. In some cases (though not all) this can be changed by clicking the button with three dots on it to the right, and selecting an entity type from the list that appears.
+help.playerSelectors.targetEntity.anything="Anything" is a special entity type which basically says "I don't care what type the entity is". If this option is selected by default, it means you can't select players with this selector.
+
+help.playerSelectors.targetInverted.title=Negated Target
+help.playerSelectors.targetInverted=That small checkbox in between the selection mode and the target entity which is labeled "Not" basically means, when it is checked, that whatever entity type follows it, it is targeting anything which is not that entity.
+help.playerSelectors.targetInverted.example=For example, in the scenario above, when the negated target checkbox is checked, "All Chicken" would select every entity in the world %s the chickens.
+help.playerSelectors.targetInverted.example.arg.1=except
+help.playerSelectors.targetInverted.disclaimer1=Checking this box when the "Anything" target entity type is selected will disable the done button because this combination can never match an entity.
+help.playerSelectors.targetInverted.disclaimer2=This checkbox may not always be present, when only players can be selected.
+
+# ENTITIES
+help.entities=Entities
+
+# UUIDS
+help.uuids=UUIDs

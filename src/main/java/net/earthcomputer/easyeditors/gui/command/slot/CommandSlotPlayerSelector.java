@@ -54,7 +54,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	public CommandSlotPlayerSelector(int flags) {
 		this.flags = flags;
 
-		addChild(new CommandSlotHelp("gui.commandEditor.help.playerSelector", "player_selectors"));
+		addChild(new CommandSlotHelp("help.playerSelectors", "player_selectors"));
 
 		addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				I18n.format("gui.commandEditor.playerSelector.selectBy"), Colors.playerSelectorSelectBy.color));

@@ -1,0 +1,118 @@
+[
+	{
+		"translate": "help.playerSelectors.paragraph.1",
+		"with":
+		[
+			{
+				"translate": "help.playerSelectors.paragraph.1.arg.1",
+				"color": "blue",
+				"underlined": "true",
+				"clickEvent":
+				{
+					"action": "change_page",
+					"value": "help.entity=entities"
+				}
+			}
+		]
+	},
+	
+	null,
+	
+	"help.playerSelectors.paragraph.2",
+	null,
+	"help.playerSelectors.paragraph.2.way1",
+	{
+		"translate": "help.playerSelectors.paragraph.2.way2",
+		"with":
+		[
+			{
+				"translate": "help.playerSelectors.paragraph.2.way2.arg.1",
+				"color": "blue",
+				"underlined": "true",
+				"clickEvent":
+				{
+					"action": "change_page",
+					"value": "help.uuid=uuids"
+				}
+			}
+		]
+	},
+	"help.playerSelectors.paragraph.2.way3",
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.paragraph.3.title",
+		"bold": "true",
+		"underlined": "true"
+	},
+	null,
+	"help.playerSelectors.paragraph.3.part1",
+	null,
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors1.png",
+		"viewport": [341, 192]
+	},
+	null,
+	"help.playerSelectors.paragraph.3.part2",
+	null,
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors2.png"
+	},
+	null,
+	"help.playerSelectors.image.2.caption",
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.selectionMode.title",
+		"underlined": "true"
+	},
+	null,
+	"help.playerSelectors.selectionMode",
+	null,
+	"help.playerSelectors.selectionMode.nearest",
+	"help.playerSelectors.selectionMode.farthest",
+	"help.playerSelectors.selectionMode.all",
+	"help.playerSelectors.selectionMode.random",
+	null,
+	"help.playerSelectors.selectionMode.nearest.example",
+	"help.playerSelectors.selectionMode.farthest.example",
+	"help.playerSelectors.selectionMode.all.example",
+	"help.playerSelectors.selectionMode.random.example",
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.targetEntity.title",
+		"underlined": "true"
+	},
+	null,
+	"help.playerSelectors.targetEntity",
+	"help.playerSelectors.targetEntity.anything",
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.targetInverted.title",
+		"underlined": "true"
+	},
+	null,
+	"help.playerSelectors.targetInverted",
+	null,
+	{
+		"translate": "help.playerSelectors.targetInverted.example",
+		"with":
+		[
+			{
+				"translate": "help.playerSelectors.targetInverted.example.arg.1",
+				"bold": "true"
+			}
+		]
+	},
+	null,
+	"help.playerSelectors.targetInverted.disclaimer1",
+	"help.playerSelectors.targetInverted.disclaimer2"
+]

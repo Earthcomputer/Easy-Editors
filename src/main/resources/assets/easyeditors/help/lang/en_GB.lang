@@ -1,0 +1,8 @@
+# PLAYER SELECTORS
+
+help.playerSelectors.paragraph.3.part2=Suppose you want to select one, or more, of the entities in this scene with the command block (left of the armour stands). What you want is certain features to select them by. In entity selectors in the command editor, you will see this:
+
+help.playerSelectors.selectionMode.nearest=1. Nearest - you can select the closest entity that matches the other options. If more than one entity is selectable, entities will be ordered from closest to furthest.
+help.playerSelectors.selectionMode.farthest=2. Furthest - you can select the furthest entity that matches the other options. If more than one entity is selectable, entities will be ordered from furthest to closest.
+help.playerSelectors.selectionMode.all=3. All - you can select all entities that match the other options. Entities matched are ordered from closest to furthest.
+help.playerSelectors.selectionMode.farthest.example="Furthest Villager" would select the baby villager;

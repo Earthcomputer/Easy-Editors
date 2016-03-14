@@ -10,6 +10,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -22,15 +23,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import net.earthcomputer.easyeditors.EasyEditors;
+import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiUtilRenderComponents;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -69,10 +73,10 @@ public class CommandHelpManager {
 			Minecraft.getMinecraft()
 					.displayGuiScreen(new GuiHelpScreen(name,
 							deserializeComponents(Minecraft.getMinecraft().getResourceManager()
-									.getResource(new ResourceLocation(modid, "command_help/" + id + ".json"))
+									.getResource(new ResourceLocation(modid, "help/" + id + ".json"))
 									.getInputStream())));
 		} catch (Exception e) {
-			e.printStackTrace();
+			GeneralUtils.logStackTrace(EasyEditorsApi.logger, e);
 		}
 	}
 
@@ -121,25 +125,40 @@ public class CommandHelpManager {
 					return new ComponentChat((IChatComponent) context.deserialize(object, IChatComponent.class));
 				} else if ("image".equals(typeString)) {
 					int u, v, w, h;
-					JsonElement subimage = object.get("subimage");
-					if (subimage == null) {
+					if (!object.has("subimage")) {
 						u = 0;
 						v = 0;
 						w = 0;
 						h = 0;
 					} else {
-						JsonArray subimageArray = subimage.getAsJsonArray();
-						if (subimageArray.size() != 4) {
+						JsonArray subimage = object.getAsJsonArray("subimage");
+						if (subimage.size() != 4) {
 							throw new JsonParseException("The subimage array must be of length 4");
 						}
-						u = subimageArray.get(0).getAsInt();
+						u = subimage.get(0).getAsInt();
 						if (u < 0)
 							u = 0;
-						v = subimageArray.get(1).getAsInt();
+						v = subimage.get(1).getAsInt();
 						if (v < 0)
 							v = 0;
-						w = subimageArray.get(2).getAsInt();
-						h = subimageArray.get(3).getAsInt();
+						w = subimage.get(2).getAsInt();
+						h = subimage.get(3).getAsInt();
+					}
+					int vw, vh;
+					if (!object.has("viewport")) {
+						vw = 0;
+						vh = 0;
+					} else {
+						JsonArray viewport = object.getAsJsonArray("viewport");
+						if (viewport.size() != 2) {
+							throw new JsonParseException("The viewport array must be of length 2");
+						}
+						vw = viewport.get(0).getAsInt();
+						if (vw < 0)
+							vw = 0;
+						vh = viewport.get(1).getAsInt();
+						if (vh < 0)
+							vh = 0;
 					}
 
 					HoverEvent hoverEvent = null;
@@ -173,7 +192,8 @@ public class CommandHelpManager {
 
 					JsonElement imageLocation = object.get("location");
 					if (imageLocation != null && imageLocation.isJsonPrimitive())
-						return new ComponentImage(imageLocation.getAsString(), u, v, w, h, hoverEvent, clickEvent);
+						return new ComponentImage(imageLocation.getAsString(), u, v, w, h, vw, vh, hoverEvent,
+								clickEvent);
 					else
 						throw new JsonParseException(
 								"Don't know how to turn anything but a json string into an image location");
@@ -238,7 +258,7 @@ public class CommandHelpManager {
 			IChatComponent hoveredComponent = getHoveredComponent(virtualWidth, y, mouseX, mouseY);
 			if (hoveredComponent != null) {
 				ClickEvent clickEvent = hoveredComponent.getChatStyle().getChatClickEvent();
-				if (clickEvent.getAction() == ClickEvent.Action.CHANGE_PAGE) {
+				if (clickEvent != null && clickEvent.getAction() == ClickEvent.Action.CHANGE_PAGE) {
 					String value = clickEvent.getValue();
 					String name = null;
 					if (value.contains("=")) {
@@ -294,11 +314,13 @@ public class CommandHelpManager {
 		private final int v;
 		private final int width;
 		private final int height;
+		private final int viewportWidth;
+		private final int viewportHeight;
 		private final HoverEvent hoverEvent;
 		private final ClickEvent clickEvent;
 
-		public ComponentImage(String location, int u, int v, int width, int height, HoverEvent hoverEvent,
-				ClickEvent clickEvent) {
+		public ComponentImage(String location, int u, int v, int width, int height, int viewportWidth,
+				int viewportHeight, HoverEvent hoverEvent, ClickEvent clickEvent) {
 			this.fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 			this.textureManager = Minecraft.getMinecraft().getTextureManager();
 			this.location = new ResourceLocation(location);
@@ -324,10 +346,17 @@ public class CommandHelpManager {
 				height = theImage.getHeight();
 			}
 
+			if (viewportWidth == 0)
+				viewportWidth = width;
+			if (viewportHeight == 0)
+				viewportHeight = height;
+
 			this.u = u;
 			this.v = v;
 			this.width = width;
 			this.height = height;
+			this.viewportWidth = viewportWidth;
+			this.viewportHeight = viewportHeight;
 			this.hoverEvent = hoverEvent;
 			this.clickEvent = clickEvent;
 		}
@@ -345,11 +374,22 @@ public class CommandHelpManager {
 				fontRenderer.drawString(str, imageLeft, y, 0xffffff);
 			} else {
 				textureManager.bindTexture(location);
-				imageLeft = virtualWidth / 2 - width / 2;
-				imageRight = imageLeft + width;
-				imageBottom = y + height;
-				Gui.drawModalRectWithCustomSizedTexture(imageLeft, y, u, v, width, height, theImage.getWidth(),
-						theImage.getHeight());
+				imageLeft = virtualWidth / 2 - viewportWidth / 2;
+				imageRight = imageLeft + viewportWidth;
+				imageBottom = y + viewportHeight;
+				int imageWidth = theImage.getWidth();
+				int imageHeight = theImage.getHeight();
+				Tessellator tessellator = Tessellator.getInstance();
+				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+				worldRenderer.pos(imageLeft, imageBottom, 0)
+						.tex((double) u / imageWidth, (double) (v + height) / imageHeight).endVertex();
+				worldRenderer.pos(imageRight, imageBottom, 0)
+						.tex((double) (u + width) / imageWidth, (double) (v + height) / imageHeight).endVertex();
+				worldRenderer.pos(imageRight, y, 0).tex((double) (u + width) / imageWidth, (double) v / imageHeight)
+						.endVertex();
+				worldRenderer.pos(imageLeft, y, 0).tex((double) u / imageWidth, (double) v / imageHeight).endVertex();
+				tessellator.draw();
 			}
 
 			if (hoverEvent != null) {
@@ -361,7 +401,7 @@ public class CommandHelpManager {
 
 		@Override
 		public int getHeight(int virtualWidth) {
-			return theImage == null ? fontRenderer.FONT_HEIGHT : height;
+			return theImage == null ? fontRenderer.FONT_HEIGHT : viewportHeight;
 		}
 
 		@Override
@@ -374,9 +414,9 @@ public class CommandHelpManager {
 					imageRight = imageLeft + fontRenderer.getStringWidth(str);
 					imageBottom = y + fontRenderer.FONT_HEIGHT;
 				} else {
-					imageLeft = virtualWidth / 2 - width / 2;
-					imageRight = imageLeft + width;
-					imageBottom = y + height;
+					imageLeft = virtualWidth / 2 - viewportWidth / 2;
+					imageRight = imageLeft + viewportWidth;
+					imageBottom = y + viewportHeight;
 				}
 				if (mouseX >= imageLeft && mouseX < imageRight && mouseY >= y && mouseY < imageBottom) {
 					if (clickEvent.getAction() == ClickEvent.Action.CHANGE_PAGE) {
@@ -431,11 +471,14 @@ public class CommandHelpManager {
 			this.prevScreen = Minecraft.getMinecraft().currentScreen;
 
 			setXScrollBarPolicy(SHOWN_NEVER);
+
+			setUpKey(Keyboard.KEY_UP);
+			setDownKey(Keyboard.KEY_DOWN);
 		}
 
 		@Override
 		public void initGui() {
-			int totalHeight = components.size() * 2 - 2;
+			int totalHeight = components.size() * 2 + 2;
 			for (ICommandHelpComponent component : components) {
 				totalHeight += component.getHeight(width - 6);
 			}
@@ -457,7 +500,7 @@ public class CommandHelpManager {
 		protected void drawVirtualScreen(int mouseX, int mouseY, float partialTicks, int scrollX, int scrollY,
 				int headerHeight) {
 			int virtualWidth = width - 6;
-			int y = headerHeight + 2 - scrollY;
+			int y = headerHeight + 4 - scrollY;
 
 			for (ICommandHelpComponent component : components) {
 				component.draw(mouseX, mouseY, y, virtualWidth);
@@ -467,7 +510,7 @@ public class CommandHelpManager {
 
 		@Override
 		protected void drawForeground(int mouseX, int mouseY, float partialTicks) {
-			String str = I18n.format("gui.commandEditor.help.title");
+			String str = I18n.format("help.title");
 			drawString(fontRendererObj, str, width / 2 - fontRendererObj.getStringWidth(str) / 2, 10, 0xffffff);
 			if (name != null)
 				drawString(fontRendererObj, name, width / 2 - fontRendererObj.getStringWidth(name) / 2, 22, 0xa0a0a0);
@@ -488,7 +531,7 @@ public class CommandHelpManager {
 				if (mouseX < getShownWidth() && mouseY >= getHeaderHeight()
 						&& mouseY < getHeaderHeight() + getShownHeight()) {
 					int virtualWidth = width - 6;
-					int y = getHeaderHeight() + 2 - getScrollY();
+					int y = getHeaderHeight() + 4 - getScrollY();
 
 					for (ICommandHelpComponent component : components) {
 						component.mouseClicked(mouseX, mouseY, y, virtualWidth);
