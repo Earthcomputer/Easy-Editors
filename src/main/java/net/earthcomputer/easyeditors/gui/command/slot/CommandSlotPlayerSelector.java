@@ -163,6 +163,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private CommandSlotExpand expand;
 
+		private IGuiCommandSlot count;
 		private CommandSlotIntTextField countField;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableCountField;
 
@@ -398,7 +399,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						if (getCurrentIndex() == SELTYPE_ALL)
 							modifiableCountField.setChild(null);
 						else
-							modifiableCountField.setChild(countField);
+							modifiableCountField.setChild(count);
 					}
 				}
 
@@ -470,9 +471,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			countField = new CommandSlotIntTextField(50, 50, 1);
 			countField.setNumberInvalidMessage("gui.commandEditor.playerSelector.count.invalid")
 					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.count.outOfBounds");
-			modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.count"),
-							Colors.playerSelectorLabel.color, countField));
+			count = CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.count"),
+					Colors.playerSelectorLabel.color, countField);
+			modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(count);
 
 			countField.setText("1");
 
