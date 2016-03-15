@@ -1,10 +1,18 @@
 package net.earthcomputer.easyeditors.gui.command.slot;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import org.lwjgl.opengl.GL11;
+
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
@@ -15,10 +23,19 @@ import net.minecraftforge.fml.client.config.HoverChecker;
  */
 public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 
+	private static final ResourceLocation buttonTextures = new ResourceLocation("textures/gui/widgets.png");
+
 	private int x;
 	private int y;
-	private GuiClickListenerButton wrappedButton;
+	private String text;
 	private String hoverText;
+	private boolean enabled = true;
+	private int textColor;
+
+	private boolean drawBackground = true;
+	private ResourceLocation buttonImage;
+	private int imageWidth;
+	private int imageHeight;
 
 	private HoverChecker hoverChecker;
 
@@ -28,7 +45,17 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 
 	public CommandSlotButton(int width, int height, String text, String hoverText) {
 		super(width, height);
-		wrappedButton = new GuiClickListenerButton(0, 0, width, height, text);
+		this.text = text;
+		this.hoverText = hoverText;
+	}
+
+	public CommandSlotButton(int width, int height, ResourceLocation image) {
+		this(width, height, image, null);
+	}
+
+	public CommandSlotButton(int width, int height, ResourceLocation image, String hoverText) {
+		super(width, height);
+		setImage(image);
 		this.hoverText = hoverText;
 	}
 
@@ -46,7 +73,41 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	 * @return The text displayed in the button
 	 */
 	public String getText() {
-		return wrappedButton.displayString;
+		return text;
+	}
+
+	/**
+	 * Sets the text displayed in the button
+	 * 
+	 * @param text
+	 */
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	/**
+	 * 
+	 * @return The image displayed in the button
+	 */
+	public ResourceLocation getImage() {
+		return buttonImage;
+	}
+
+	/**
+	 * Sets the image displayed in the button
+	 * 
+	 * @param image
+	 */
+	public void setImage(ResourceLocation image) {
+		this.buttonImage = image;
+		try {
+			BufferedImage buffImage = ImageIO
+					.read(Minecraft.getMinecraft().getResourceManager().getResource(image).getInputStream());
+			this.imageWidth = buffImage.getWidth();
+			this.imageHeight = buffImage.getHeight();
+		} catch (IOException e) {
+			this.buttonImage = null;
+		}
 	}
 
 	/**
@@ -71,7 +132,7 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	 * @return Whether the button is enabled
 	 */
 	public boolean isEnabled() {
-		return wrappedButton.enabled;
+		return enabled;
 	}
 
 	/**
@@ -80,7 +141,7 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	 * @param enabled
 	 */
 	public void setEnabled(boolean enabled) {
-		wrappedButton.enabled = enabled;
+		this.enabled = enabled;
 	}
 
 	/**
@@ -88,7 +149,7 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	 * @return The text color in the button
 	 */
 	public int getTextColor() {
-		return wrappedButton.packedFGColour;
+		return textColor;
 	}
 
 	/**
@@ -97,23 +158,67 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	 * @param textColor
 	 */
 	public void setTextColor(int textColor) {
-		wrappedButton.packedFGColour = textColor;
+		this.textColor = textColor;
+	}
+
+	/**
+	 * 
+	 * @return Whether the background is drawn
+	 */
+	public boolean isBackgroundDrawn() {
+		return drawBackground;
+	}
+
+	/**
+	 * Sets whether the background is drawn
+	 * 
+	 * @param drawBackground
+	 */
+	public void setBackgroundDrawn(boolean drawBackground) {
+		this.drawBackground = drawBackground;
 	}
 
 	@Override
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
-		if (x != this.x || y != this.y) {
-			this.x = x;
-			this.y = y;
-			GuiClickListenerButton oldButton = wrappedButton;
-			GuiClickListenerButton newButton = wrappedButton = new GuiClickListenerButton(x, y, getWidth(), getHeight(),
-					oldButton.displayString);
-			newButton.enabled = oldButton.enabled;
-			newButton.packedFGColour = oldButton.packedFGColour;
+		this.x = x;
+		this.y = y;
+
+		FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+		boolean hovered = mouseX >= x && mouseY >= y && mouseX < x + getWidth() && mouseY < y + getHeight()
+				&& getContext().isMouseInBounds(mouseX, mouseY);
+
+		if (drawBackground) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(buttonTextures);
+			GlStateManager.color(1, 1, 1, 1);
+			int hoverState = !enabled ? 0 : (hovered ? 2 : 1);
+			GlStateManager.enableBlend();
+			GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+			GlStateManager.blendFunc(770, 771);
+			drawTexturedModalRect(x, y, 0, 46 + hoverState * 20, getWidth() / 2, getHeight());
+			drawTexturedModalRect(x + getWidth() / 2, y, 200 - getWidth() / 2, 46 + hoverState * 20, getWidth() / 2,
+					getHeight());
 		}
-		wrappedButton.drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
+
+		if (buttonImage != null) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(buttonImage);
+			GlStateManager.color(1, 1, 1, 1);
+			drawModalRectWithCustomSizedTexture(x + getWidth() / 2 - imageWidth / 2,
+					y + getHeight() / 2 - imageHeight / 2, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+		}
+
+		int textColor = 0xe0e0e0;
+
+		if (this.textColor != 0) {
+			textColor = this.textColor;
+		} else if (!enabled) {
+			textColor = 0xa0a0a0;
+		} else if (hovered) {
+			textColor = 0xffffa0;
+		}
+
+		drawCenteredString(fontRenderer, text, x + getWidth() / 2, y + (getHeight() - 8) / 2, textColor);
 
 		if (hoverText != null) {
 			if (hoverChecker == null)
@@ -131,9 +236,10 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 
 	@Override
 	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (getContext().isMouseInBounds(mouseX, mouseY)
-				&& wrappedButton.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)) {
-			wrappedButton.playPressSound(Minecraft.getMinecraft().getSoundHandler());
+		boolean hovered = mouseX >= x && mouseY >= y && mouseX < x + getWidth() && mouseY < y + getHeight()
+				&& getContext().isMouseInBounds(mouseX, mouseY);
+		if (hovered) {
+			GeneralUtils.playButtonSound();
 			onPress();
 		}
 
@@ -144,13 +250,5 @@ public abstract class CommandSlotButton extends GuiCommandSlotImpl {
 	 * Invoked when the button is pressed
 	 */
 	public abstract void onPress();
-
-	private static class GuiClickListenerButton extends GuiButton {
-
-		public GuiClickListenerButton(int x, int y, int width, int height, String text) {
-			super(0, x, y, width, height, text);
-		}
-
-	}
 
 }
