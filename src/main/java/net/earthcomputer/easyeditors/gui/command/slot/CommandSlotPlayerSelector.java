@@ -54,10 +54,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	public CommandSlotPlayerSelector(int flags) {
 		this.flags = flags;
 
-		addChild(new CommandSlotHelp("help.playerSelectors", "player_selectors"));
-
-		addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-				I18n.format("gui.commandEditor.playerSelector.selectBy"), Colors.playerSelectorSelectBy.color));
+		addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.selectBy"),
+				Colors.playerSelectorSelectBy.color, new CommandSlotHelp("help.playerSelectors", "player_selectors")));
 
 		radioList = new CommandSlotRadioList() {
 			@Override
