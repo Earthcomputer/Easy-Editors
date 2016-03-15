@@ -40,6 +40,19 @@ help.playerSelectors.targetInverted.example.arg.1=except
 help.playerSelectors.targetInverted.disclaimer1=Checking this box when the "Anything" target entity type is selected will disable the done button because this combination can never match an entity.
 help.playerSelectors.targetInverted.disclaimer2=This checkbox may not always be present, when only players can be selected.
 
+help.playerSelectors.count.title=Count
+help.playerSelectors.count=This is the maximum number of entities to match. If this number is set to 1, the default, only one entity will be matched (the nearest, farthest, or a random one); If it is set to 2, the nearest 2, the farthest 2 or 2 random entities will be matched; and so on.
+help.playerSelectors.count.example=For example, say we're looking for "Nearest Armor Stand". In the scenario above, if count is 1, only the armor stand with the leather armor will be selected; if count is 2, the armor stand with the iron armor will be selected as well; if count is 3, the armor stand with the diamond armor is selected as well as the other two. If we're looking for "Farthest Villager", if count is 1, the baby villager will be selected; if count is two, the adult villager will also be selected.
+help.playerSelectors.count.disclaimer=This option may not always be visible: either the command doesn't allow more than one. entity to be selected, or the selector type is "All", when count doesn't make sense.
+
+help.playerSelectors.name.title=Name
+help.playerSelectors.name=This can select players by username, or other entities by how they've been named with a name tag.
+help.playerSelectors.name.example=For example, to select the sheep called jeb_, we would set the value in the text field to "jeb_" (without the quotation marks).
+help.playerSelectors.nameInverted=The checkbox labeled "Not" can negate this test, in a similar way to the negated target above. If this is checked, all entities that do %s have the given name will be matched.
+help.playerSelectors.nameInverted.arg.1=not
+help.playerSelectors.nameInverted.example=For example, to select all entities in the scene %s the sheep called jeb_, we would check this checkbox and type "jeb_" into the text field.
+help.playerSelectors.nameInverted.example.arg.1=except
+
 # ENTITIES
 help.entities=Entities
 

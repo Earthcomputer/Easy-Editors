@@ -6,3 +6,10 @@ help.playerSelectors.selectionMode.nearest=1. Nearest - you can select the close
 help.playerSelectors.selectionMode.farthest=2. Furthest - you can select the furthest entity that matches the other options. If more than one entity is selectable, entities will be ordered from furthest to closest.
 help.playerSelectors.selectionMode.all=3. All - you can select all entities that match the other options. Entities matched are ordered from closest to furthest.
 help.playerSelectors.selectionMode.farthest.example="Furthest Villager" would select the baby villager;
+
+help.playerSelectors.targetInverted=That small checkbox in between the selection mode and the target entity which is labelled "Not" basically means, when it is checked, that whatever entity type follows it, it is targeting anything which is not that entity.
+
+help.playerSelectors.count=This is the maximum number of entities to match. If this number is set to 1, the default, only one entity will be matched (the nearest, furthest, or a random one); If it is set to 2, the nearest 2, the furthest 2 or 2 random entities will be matched; and so on.
+help.playerSelectors.count.example=For example, say we're looking for "Nearest Armour Stand". In the scenario above, if count is 1, only the armour stand with the leather armour will be selected; if count is 2, the armour stand with the iron armour will be selected as well; if count is 3, the armour stand with the diamond armour is selected as well as the other two. If we're looking for "Furthest Villager", if count is 1, the baby villager will be selected; if count is two, the adult villager will also be selected.
+
+help.playerSelectors.nameInverted=The checkbox labelled "Not" can negate this test, in a similar way to the negated target above. If this is checked, all entities that do %s have the given name will be matched.

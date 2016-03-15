@@ -114,5 +114,57 @@
 	},
 	null,
 	"help.playerSelectors.targetInverted.disclaimer1",
-	"help.playerSelectors.targetInverted.disclaimer2"
+	"help.playerSelectors.targetInverted.disclaimer2",
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.count.title",
+		"underlined": "true"
+	},
+	null,
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors3.png"
+	},
+	null,
+	"help.playerSelectors.count",
+	"help.playerSelectors.count.example",
+	"help.playerSelectors.count.disclaimer",
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.name.title",
+		"underlined": "true"
+	},
+	null,
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors4.png",
+		"viewport": [261, 23]
+	},
+	null,
+	"help.playerSelectors.name",
+	"help.playerSelectors.name.example",
+	{
+		"translate": "help.playerSelectors.nameInverted",
+		"with":
+		[
+			{
+				"translate": "help.playerSelectors.nameInverted.arg.1",
+				"bold": "true"
+			}
+		]
+	},
+	{
+		"translate": "help.playerSelectors.nameInverted.example",
+		"with":
+		[
+			{
+				"translate": "help.playerSelectors.nameInverted.example.arg.1",
+				"bold": "true"
+			}
+		]
+	}
 ]
