@@ -166,5 +166,39 @@
 				"bold": "true"
 			}
 		]
-	}
+	},
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.pos.title",
+		"underlined": "true"
+	},
+	"help.playerSelectors.pos",
+	null,
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors5.png",
+		"viewport": [196, 72]
+	},
+	"help.playerSelectors.pos.radius",
+	null,
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors6.png",
+		"viewport": [202, 47]
+	},
+	"help.playerSelectors.pos.boundsFromTo",
+	null,
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors7.png",
+		"viewport": [229, 48]
+	},
+	"help.playerSelectors.pos.boundsDist",
+	null,
+	"help.playerSelectors.pos.radius.example1",
+	"help.playerSelectors.pos.radius.example2",
+	"help.playerSelectors.pos.boundsFromTo.example",
+	"help.playerSelectors.pos.boundsDist.example"
 ]
