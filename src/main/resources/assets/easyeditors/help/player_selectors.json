@@ -200,5 +200,25 @@
 	"help.playerSelectors.pos.radius.example1",
 	"help.playerSelectors.pos.radius.example2",
 	"help.playerSelectors.pos.boundsFromTo.example",
-	"help.playerSelectors.pos.boundsDist.example"
+	"help.playerSelectors.pos.boundsDist.example",
+	
+	null,
+	
+	{
+		"translate": "help.playerSelectors.facing.title",
+		"underlined": "true"
+	},
+	
+	null,
+	
+	{
+		"type": "image",
+		"location": "easyeditors:help/images/player_selectors8.png"
+	},
+	
+	null,
+	
+	"help.playerSelectors.facing",
+	"help.playerSelectors.facing.example1",
+	"help.playerSelectors.facing.example2"
 ]
