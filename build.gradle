@@ -8,7 +8,23 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply from: 'lang_constants.gradle'
+setupDecompWorkspace.dependsOn buildLangConstantsFile
+setupDevWorkspace.dependsOn buildLangConstantsFile
+setupCiWorkspace.dependsOn buildLangConstantsFile
 
+sourceSets {
+	generated {
+		java {
+			srcDirs = ["$buildDir/src/generated/java"]
+		}
+		compileClasspath += sourceSets.main.output
+	}
+}
+eclipse.classpath.file.whenMerged {
+	cp ->
+	cp.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder('src/generated/java', null))
+}
 
 version = "1.11.2-alphatests"
 group = "net.earthcomputer.easyeditors"

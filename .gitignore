@@ -7,5 +7,7 @@
 !/LICENSE.txt
 !/README.md
 !/COPYING.lesser
-!build.gradle
+!*.gradle
 !.travis.yml
+src/generated/
+.gradle/

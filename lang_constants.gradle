@@ -1,0 +1,28 @@
+task buildLangConstantsFile << {
+	File langFile = project.file('src/main/resources/assets/easyeditors/lang/en_US.lang')
+	File javaFile = project.file('src/generated/java/net/earthcomputer/easyeditors/util/LangTranslate.java')
+	if (javaFile.exists()) javaFile.delete()
+	javaFile.getParentFile().mkdirs()
+	javaFile.createNewFile()
+	
+	String nl = System.getProperty('line.separator')
+	javaFile.append('package net.earthcomputer.easyeditors.util;' + nl)
+	javaFile.append(nl)
+	javaFile.append('public class LangTranslate {' + nl)
+	javaFile.append(nl)
+	
+	langFile.eachLine {
+		line ->
+		if (!line.isEmpty() && !line.startsWith('#')) {
+			String[] key = line.split('=', 2)
+			javaFile.append('\tpublic static final String ')
+			javaFile.append(key[0].toUpperCase().replace('.', '_'))
+			javaFile.append(' = "')
+			javaFile.append(key[0])
+			javaFile.append('";' + nl)
+		}
+	}
+	
+	javaFile.append(nl)
+	javaFile.append('}' + nl)
+}
