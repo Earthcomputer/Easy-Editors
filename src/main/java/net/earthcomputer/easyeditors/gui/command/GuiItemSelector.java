@@ -193,13 +193,13 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
 		if (mouseY < getHeaderHeight() || mouseY >= height - getFooterHeight()) {
-			hoveredItem = null;
+			hoveredItem = ItemStack.EMPTY;
 		} else {
 			int hoveredSlot = (mouseY + getScrollY() - getHeaderHeight()) / 18;
 			if (hoveredSlot >= shownItems.size())
 				hoveredSlot = -1;
 			if (hoveredSlot < 0) {
-				hoveredItem = null;
+				hoveredItem = ItemStack.EMPTY;
 			} else {
 				ItemStack stack = shownItems.get(hoveredSlot);
 				int top = hoveredSlot * 18 + getHeaderHeight() - getScrollY();

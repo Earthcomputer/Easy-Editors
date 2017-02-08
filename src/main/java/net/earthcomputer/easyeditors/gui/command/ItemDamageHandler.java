@@ -75,7 +75,7 @@ public abstract class ItemDamageHandler {
 			Class<? extends ItemDamageHandler> damageHandler) {
 		if (handlers.containsKey(itemPredicate))
 			itemPredicate = Predicates2.copyOf(itemPredicate);
-		
+
 		handlers.put(itemPredicate, damageHandler);
 	}
 
@@ -155,7 +155,7 @@ public abstract class ItemDamageHandler {
 		registerHandler(new Predicate<ItemStack>() {
 			@Override
 			public boolean apply(ItemStack input) {
-				return input != null && input.getItem().isDamageable();
+				return !input.isEmpty() && input.getItem().isDamageable();
 			}
 		}, ToolHandler.class);
 	}

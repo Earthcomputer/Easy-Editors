@@ -49,7 +49,7 @@ public abstract class NBTTagHandler {
 		registerItemStackHandler(new Predicate<ItemStack>() {
 			@Override
 			public boolean apply(ItemStack stack) {
-				if (stack == null)
+				if (stack.isEmpty())
 					return false;
 				Item item = stack.getItem();
 				return (item instanceof ItemArmor)

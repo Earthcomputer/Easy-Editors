@@ -503,7 +503,7 @@ public class GeneralUtils {
 	public static void handleHoverEvent(HoverEvent event, int mouseX, int mouseY) {
 		if (event != null) {
 			if (event.getAction() == HoverEvent.Action.SHOW_ITEM) {
-				ItemStack stackToShow = null;
+				ItemStack stackToShow = ItemStack.EMPTY;
 
 				try {
 					NBTBase nbtbase = JsonToNBT.getTagFromJson(event.getValue().getUnformattedText());
@@ -514,7 +514,7 @@ public class GeneralUtils {
 				} catch (NBTException e) {
 				}
 
-				if (stackToShow != null) {
+				if (!stackToShow.isEmpty()) {
 					drawItemStackTooltip(stackToShow, mouseX, mouseY);
 				} else {
 					drawTooltip(mouseX, mouseY, TextFormatting.RED + "Invalid Item!");

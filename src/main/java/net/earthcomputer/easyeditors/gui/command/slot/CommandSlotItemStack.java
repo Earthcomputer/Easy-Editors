@@ -204,7 +204,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	@Override
 	public void setItem(ItemStack item) {
-		if (item == null || item.getItem() == null) {
+		if (item.isEmpty()) {
 			this.item = null;
 			if (stackSizeField != null)
 				stackSizeField.setText("1");
@@ -287,7 +287,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 			RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
 
-			ItemStack stack = null;
+			ItemStack stack = ItemStack.EMPTY;
 
 			if (item != null) {
 				RenderHelper.disableStandardItemLighting();
