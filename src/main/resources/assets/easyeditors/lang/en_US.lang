@@ -1,6 +1,7 @@
 entity.EnderCrystal.name=Ender Crystal
 entity.LightningBolt.name=Bolt of Lightning
 entity.MinecartSpawner.name=Minecart with Spawner
+entity.Player.name=Player
 smartTranslations.entity.thrown=Thrown %s
 
 gui.commandBlock.goToCommandEditor=Command Editor
