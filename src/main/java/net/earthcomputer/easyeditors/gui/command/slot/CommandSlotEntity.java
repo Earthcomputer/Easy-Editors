@@ -21,7 +21,7 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 
 	private boolean includePlayer;
 	private boolean includeLightning;
-	private String[] additionalOptions;
+	private ResourceLocation[] additionalOptions;
 
 	private CommandSlotLabel entityLabel;
 	private ResourceLocation entity;
@@ -30,7 +30,7 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 		this(false, false);
 	}
 
-	public CommandSlotEntity(boolean includePlayer, boolean includeLightning, String... additionalOptions) {
+	public CommandSlotEntity(boolean includePlayer, boolean includeLightning, ResourceLocation... additionalOptions) {
 		this.includePlayer = includePlayer;
 		this.includeLightning = includeLightning;
 		this.additionalOptions = additionalOptions;

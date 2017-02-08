@@ -48,6 +48,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	public static final int NON_PLAYERS_ONLY = 16;
 	public static final int ONE_ONLY = 32;
 
+	private static final ResourceLocation ENTITY_ANYTHING = new ResourceLocation("anything");
+
 	public CommandSlotPlayerSelector() {
 		this(0);
 	}
@@ -170,8 +172,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private CommandSlotCheckbox nameInverted;
 		private CommandSlotTextField entityName;
-
-		private static final String ENTITY_ANYTHING = "Anything";
 
 		private CommandSlotRadioList positionalConstraints;
 		private CommandSlotIntTextField rOriginX;
@@ -419,7 +419,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				public void setEntity(ResourceLocation entityName) {
 					super.setEntity(entityName);
 
-					if (new ResourceLocation("Player").equals(entityName)) {
+					if (GuiSelectEntity.PLAYER.equals(entityName)) {
 						modifiablePlayersOnlySlots.setChild(playersOnlySlots);
 					} else {
 						modifiablePlayersOnlySlots.setChild(null);
@@ -438,16 +438,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			};
 
 			if ((flags & NON_PLAYERS_ONLY) == 0)
-				targetEntity.setEntity(new ResourceLocation("Player"));
+				targetEntity.setEntity(GuiSelectEntity.PLAYER);
 			else
-				targetEntity.setEntity(new ResourceLocation(ENTITY_ANYTHING));
+				targetEntity.setEntity(ENTITY_ANYTHING);
 
 			return targetEntity;
 		}
 
 		private IGuiCommandSlot setupPlayersOnlyTargetEntitySlot() {
 			return new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					GuiSelectEntity.getEntityName(new ResourceLocation("Player")), 0);
+					GuiSelectEntity.getEntityName(GuiSelectEntity.PLAYER), 0);
 		}
 
 		private void setupSpecifics() {
@@ -833,40 +833,42 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			if (this.targetInverted != null)
 				this.targetInverted.setChecked(false);
 
-			String targetType;
+			ResourceLocation targetType;
 			if (selectorType.equals("p") || selectorType.equals("a")) {
 				// @p or @a both imply we're searching for Player
-				targetType = "Player";
+				targetType = GuiSelectEntity.PLAYER;
 			} else if (specifiers.containsKey("type")) {
 				// There may be a specified target type
-				targetType = specifiers.get("type");
+				String strType = specifiers.get("type");
 
-				if (targetType.startsWith("!")) {
+				if (strType.startsWith("!")) {
 					// If the target type starts with !, it is inverted
 					if (this.targetInverted != null)
 						this.targetInverted.setChecked(true);
-					targetType = targetType.substring(1);
+					strType = strType.substring(1);
 				}
 
-				if (targetType.isEmpty()) {
+				if (strType.isEmpty()) {
 					// If nothing else is specified, it could be Anything
 					targetType = ENTITY_ANYTHING;
+				} else {
+					targetType = new ResourceLocation(strType);
 				}
 			} else if (selectorType.equals("r")) {
 				// @r implies Player if type isn't specified
-				targetType = "Player";
+				targetType = GuiSelectEntity.PLAYER;
 			} else {
 				// If nothing is specified, it could be Anything
 				targetType = ENTITY_ANYTHING;
 			}
 			if (this.targetEntity != null) {
 				if ((flags & NON_PLAYERS_ONLY) != 0) {
-					if (targetType.equals("Player")) {
+					if (targetType.equals("player")) {
 						this.targetInverted.setChecked(false);
 						targetType = ENTITY_ANYTHING;
 					}
 				}
-				this.targetEntity.setEntity(new ResourceLocation(targetType));
+				this.targetEntity.setEntity(targetType);
 			}
 
 			// Not expanded by default
@@ -1157,8 +1159,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			// Decide @p/@a/@r/@e
 			if (this.selectorType.getCurrentIndex() == SELTYPE_RANDOM) {
 				selectorType = "r";
-			} else if (this.targetEntity != null
-					&& (!this.targetEntity.getEntity().equals("Player") || this.targetInverted.isChecked())) {
+			} else if (this.targetEntity != null && (!this.targetEntity.getEntity().equals(GuiSelectEntity.PLAYER)
+					|| this.targetInverted.isChecked())) {
 				selectorType = "e";
 			} else if (this.selectorType.getCurrentIndex() == SELTYPE_ALL && (flags & ONE_ONLY) == 0) {
 				selectorType = "a";
@@ -1247,13 +1249,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			// type
 			if (this.targetEntity != null) {
-				boolean targetImplied = this.targetEntity.getEntity().equals("Player")
+				boolean targetImplied = this.targetEntity.getEntity().equals(GuiSelectEntity.PLAYER)
 						&& !this.targetInverted.isChecked();
 				if (!targetImplied) {
 					ResourceLocation targetTypeLocation = targetEntity.getEntity();
 					String targetType = targetTypeLocation.getResourceDomain().equals("minecraft")
 							? targetTypeLocation.getResourcePath() : targetTypeLocation.toString();
-					if (targetTypeLocation.equals(new ResourceLocation(ENTITY_ANYTHING))) {
+					if (targetTypeLocation.equals(ENTITY_ANYTHING)) {
 						// Anything is still sometimes specified as an empty
 						// string
 						targetType = "";

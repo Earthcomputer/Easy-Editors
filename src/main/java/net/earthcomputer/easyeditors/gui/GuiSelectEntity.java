@@ -32,6 +32,8 @@ import net.minecraft.world.World;
  */
 public class GuiSelectEntity extends GuiScreen {
 
+	public static final ResourceLocation PLAYER = new ResourceLocation("player");
+
 	private GuiScreen previousScreen;
 	private IEntitySelectorCallback callback;
 
@@ -49,17 +51,17 @@ public class GuiSelectEntity extends GuiScreen {
 	}
 
 	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
-			boolean includeLightning, String... additionalOptions) {
+			boolean includeLightning, ResourceLocation... additionalOptions) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 
 		entities = Lists.newArrayList(EntityList.getEntityNameList());
 		if (includePlayer)
-			entities.add(new ResourceLocation("player"));
+			entities.add(PLAYER);
 		if (includeLightning)
 			entities.remove(EntityList.LIGHTNING_BOLT);
-		for (String additionalOption : additionalOptions)
-			entities.add(new ResourceLocation(additionalOption));
+		for (ResourceLocation additionalOption : additionalOptions)
+			entities.add(additionalOption);
 		Collections.sort(entities, new Comparator<ResourceLocation>() {
 			@Override
 			public int compare(ResourceLocation s1, ResourceLocation s2) {
@@ -146,7 +148,7 @@ public class GuiSelectEntity extends GuiScreen {
 
 	private Entity createEntity(int slotIndex) {
 		ResourceLocation entityName = entities.get(slotIndex);
-		if (new ResourceLocation("player").equals(entityName)) {
+		if (PLAYER.equals(entityName)) {
 			return Minecraft.getMinecraft().player;
 		} else if (EntityList.LIGHTNING_BOLT.equals(entityName)) {
 			return new EntityLightningBolt(theWorld, 0, 0, 0, true);
