@@ -8,6 +8,8 @@ import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 /**
  * A command slot which represents a selection of an entity
@@ -22,7 +24,7 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 	private String[] additionalOptions;
 
 	private CommandSlotLabel entityLabel;
-	private String entity;
+	private ResourceLocation entity;
 
 	public CommandSlotEntity() {
 		this(false, false);
@@ -49,23 +51,23 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 		if (index >= args.length)
 			throw new CommandSyntaxException();
-		setEntity(args[index]);
+		setEntity(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(args[index])).delegate.name());
 		return 1;
 	}
 
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
-		args.add(entity);
+		args.add(entity.getResourceDomain().equals("minecraft") ? entity.getResourcePath() : entity.toString());
 	}
 
 	@Override
-	public String getEntity() {
+	public ResourceLocation getEntity() {
 		return entity;
 	}
 
 	@Override
-	public void setEntity(String entityName) {
+	public void setEntity(ResourceLocation entityName) {
 		this.entity = entityName;
 		entityLabel.setText(GuiSelectEntity.getEntityName(entityName));
 		entityLabel.setColor(0);

@@ -18,6 +18,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
 /**
@@ -28,14 +29,14 @@ import net.minecraftforge.common.MinecraftForge;
  */
 public abstract class ItemDamageHandler {
 
-	private static final Map<Predicate<Item>, Class<? extends ItemDamageHandler>> handlers = Maps.newHashMap();
+	private static final Map<Predicate<ItemStack>, Class<? extends ItemDamageHandler>> handlers = Maps.newHashMap();
 
 	/**
 	 * Sets up the command slots in the user-friendly interface
 	 * 
 	 * @return
 	 */
-	public abstract IGuiCommandSlot[] setupCommandSlot(Item item);
+	public abstract IGuiCommandSlot[] setupCommandSlot(ItemStack item);
 
 	/**
 	 * Sets up the pre-existing command slots so that they represent the given
@@ -70,7 +71,7 @@ public abstract class ItemDamageHandler {
 	 * @param itemPredicate
 	 * @param damageHandler
 	 */
-	public static void registerHandler(Predicate<Item> itemPredicate,
+	public static void registerHandler(Predicate<ItemStack> itemPredicate,
 			Class<? extends ItemDamageHandler> damageHandler) {
 		if (handlers.containsKey(itemPredicate))
 			itemPredicate = Predicates2.copyOf(itemPredicate);
@@ -86,9 +87,9 @@ public abstract class ItemDamageHandler {
 	 * @param item
 	 * @return
 	 */
-	public static List<ItemDamageHandler> getHandlers(Item item) {
+	public static List<ItemDamageHandler> getHandlers(ItemStack item) {
 		List<ItemDamageHandler> handlers = Lists.newArrayList();
-		for (Map.Entry<Predicate<Item>, Class<? extends ItemDamageHandler>> entry : ItemDamageHandler.handlers
+		for (Map.Entry<Predicate<ItemStack>, Class<? extends ItemDamageHandler>> entry : ItemDamageHandler.handlers
 				.entrySet()) {
 			if (entry.getKey().apply(item)
 					&& !MinecraftForge.EVENT_BUS.post(new ItemDamageHandlerEvent(item, entry.getValue()))) {
@@ -109,7 +110,7 @@ public abstract class ItemDamageHandler {
 	 * @param handlers
 	 * @return
 	 */
-	public static IGuiCommandSlot setupCommandSlot(List<ItemDamageHandler> handlers, Item item) {
+	public static IGuiCommandSlot setupCommandSlot(List<ItemDamageHandler> handlers, ItemStack item) {
 		List<IGuiCommandSlot> slots = Lists.newArrayList();
 		for (ItemDamageHandler handler : handlers) {
 			for (IGuiCommandSlot slot : handler.setupCommandSlot(item)) {
@@ -151,10 +152,10 @@ public abstract class ItemDamageHandler {
 	}
 
 	static {
-		registerHandler(new Predicate<Item>() {
+		registerHandler(new Predicate<ItemStack>() {
 			@Override
-			public boolean apply(Item input) {
-				return input != null && input.isDamageable();
+			public boolean apply(ItemStack input) {
+				return input != null && input.getItem().isDamageable();
 			}
 		}, ToolHandler.class);
 	}
@@ -167,11 +168,11 @@ public abstract class ItemDamageHandler {
 	 */
 	public static class ToolHandler extends ItemDamageHandler {
 
-		private Item item;
+		private ItemStack item;
 		private CommandSlotIntTextField durabilityField;
 
 		@Override
-		public IGuiCommandSlot[] setupCommandSlot(Item item) {
+		public IGuiCommandSlot[] setupCommandSlot(ItemStack item) {
 			this.item = item;
 			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
 					I18n.format("gui.commandEditor.item.damage.tool.durability"), Colors.itemLabel.color,

@@ -1,6 +1,7 @@
 package net.earthcomputer.easyeditors.gui.command;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
@@ -25,13 +26,13 @@ public class ItemDamageHandlerEvent extends Event {
 	/**
 	 * The item the handler is being constructed for
 	 */
-	public final Item item;
+	public final ItemStack item;
 	/**
 	 * The class of the handler to be constructed
 	 */
 	public final Class<? extends ItemDamageHandler> handler;
 
-	public ItemDamageHandlerEvent(Item item, Class<? extends ItemDamageHandler> handler) {
+	public ItemDamageHandlerEvent(ItemStack item, Class<? extends ItemDamageHandler> handler) {
 		this.item = item;
 		this.handler = handler;
 	}

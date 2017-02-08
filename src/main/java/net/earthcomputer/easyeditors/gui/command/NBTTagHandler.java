@@ -21,6 +21,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
@@ -43,8 +44,8 @@ public abstract class NBTTagHandler {
 			.newLinkedHashMap();
 
 	static {
-		registerItemStackHandler(Predicates.<ItemStack> alwaysTrue(), DisplayHandler.class);
-		registerItemStackHandler(Predicates.<ItemStack> alwaysTrue(), EnchantmentHandler.class);
+		registerItemStackHandler(Predicates.<ItemStack>alwaysTrue(), DisplayHandler.class);
+		registerItemStackHandler(Predicates.<ItemStack>alwaysTrue(), EnchantmentHandler.class);
 		registerItemStackHandler(new Predicate<ItemStack>() {
 			@Override
 			public boolean apply(ItemStack stack) {
@@ -144,7 +145,7 @@ public abstract class NBTTagHandler {
 	public static void registerHandler(String handlerType, Predicate<?> predicate,
 			Class<? extends NBTTagHandler> handler) {
 		if (!handlers.containsKey(handlerType))
-			handlers.put(handlerType, Maps.<Predicate<?>, Class<? extends NBTTagHandler>> newLinkedHashMap());
+			handlers.put(handlerType, Maps.<Predicate<?>, Class<? extends NBTTagHandler>>newLinkedHashMap());
 
 		Map<Predicate<?>, Class<? extends NBTTagHandler>> map = handlers.get(handlerType);
 
@@ -417,7 +418,7 @@ public abstract class NBTTagHandler {
 							int enchId = ench.getInteger("id");
 							int enchLvl = ench.getInteger("lvl");
 							CommandSlotEnchantment cmdEnch = new CommandSlotEnchantment();
-							cmdEnch.setEnchantment(enchId);
+							cmdEnch.setEnchantment(Enchantment.getEnchantmentByID(enchId).delegate.name());
 							cmdEnch.setLevel(enchLvl);
 							list.addEntry(cmdEnch);
 						}
@@ -434,7 +435,8 @@ public abstract class NBTTagHandler {
 				for (int i = 0; i < list.entryCount(); i++) {
 					CommandSlotEnchantment cmdEnch = list.getEntry(i);
 					NBTTagCompound ench = new NBTTagCompound();
-					ench.setInteger("id", cmdEnch.getEnchantment());
+					ench.setInteger("id", Enchantment.getEnchantmentID(
+							Enchantment.getEnchantmentByLocation(cmdEnch.getEnchantment().toString())));
 					ench.setInteger("lvl", cmdEnch.getLevel());
 					enchs.appendTag(ench);
 				}

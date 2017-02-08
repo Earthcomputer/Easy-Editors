@@ -12,8 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.crash.CrashReport;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 /**
@@ -112,7 +112,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	 * @param contentFilter
 	 */
 	public void setContentFilter(Predicate<String> contentFilter) {
-		wrappedTextField.func_175205_a(contentFilter);
+		wrappedTextField.setValidator(contentFilter);
 	}
 
 	@Override
@@ -146,16 +146,15 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	private void privateOnTextChanged() {
 		GuiTypeListenerTextField oldTextField = wrappedTextField;
 		GuiTypeListenerTextField newTextField = wrappedTextField = new GuiTypeListenerTextField(this, x + 1, y + 1,
-				MathHelper.clamp_int(
-						Minecraft.getMinecraft().fontRendererObj.getStringWidth(oldTextField.getText()) + 8, minWidth,
-						maxWidth),
+				MathHelper.clamp(Minecraft.getMinecraft().fontRendererObj.getStringWidth(oldTextField.getText()) + 8,
+						minWidth, maxWidth),
 				20);
 		newTextField.setMaxStringLengthDangerously(oldTextField.getMaxStringLength());
 		newTextField.setTextDangerously(oldTextField.getText());
 		newTextField.setSelectionPos(oldTextField.getLineScrollOffset());
 		newTextField.setCursorPosition(oldTextField.getCursorPosition());
 		newTextField.setFocused(oldTextField.isFocused());
-		newTextField.func_175205_a(oldTextField.contentFilter);
+		newTextField.setValidator(oldTextField.contentFilter);
 		setWidth(newTextField.width + 2);
 
 		String strBefore = newTextField.getText().substring(newTextField.getLineScrollOffset(),
@@ -273,8 +272,8 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		}
 
 		@Override
-		public void func_175205_a(Predicate<String> contentFilter) {
-			super.func_175205_a(contentFilter);
+		public void setValidator(Predicate<String> contentFilter) {
+			super.setValidator(contentFilter);
 			this.contentFilter = contentFilter;
 		}
 

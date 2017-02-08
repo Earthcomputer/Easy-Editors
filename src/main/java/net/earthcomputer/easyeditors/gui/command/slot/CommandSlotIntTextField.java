@@ -7,7 +7,7 @@ import com.google.common.base.Predicate;
 import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * A text field which has an integer value
@@ -110,10 +110,10 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		int intVal;
 		try {
 			intVal = Integer.parseInt(getText());
-		} catch (NumberFormatException e) { 
+		} catch (NumberFormatException e) {
 			intVal = 0;
 		}
-		return MathHelper.clamp_int(intVal, minValue, maxValue);
+		return MathHelper.clamp(intVal, minValue, maxValue);
 	}
 
 }

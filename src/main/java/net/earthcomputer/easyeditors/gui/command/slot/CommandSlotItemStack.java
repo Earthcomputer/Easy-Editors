@@ -17,7 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -172,7 +172,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		for (int i = 0; i < argOrder.length; i++) {
 			switch (argOrder[i]) {
 			case COMPONENT_ITEM:
-				String itemName = String.valueOf(Item.itemRegistry.getNameForObject(item));
+				String itemName = String.valueOf(item.delegate.name());
 				if (itemName.startsWith("minecraft:"))
 					itemName = itemName.substring(10);
 				potentialArgs.add(itemName);
@@ -215,10 +215,10 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		} else {
 			this.item = item.getItem();
 			if (stackSizeField != null)
-				stackSizeField.setText(String.valueOf(item.stackSize));
+				stackSizeField.setText(String.valueOf(item.getCount()));
 			if (this.damageSlot != null) {
-				damageHandlers = ItemDamageHandler.getHandlers(item.getItem());
-				this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item.getItem()));
+				damageHandlers = ItemDamageHandler.getHandlers(item);
+				this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item));
 				this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
 			} else {
 				this.damage = 0;
@@ -322,7 +322,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				if (!getContext().isMouseInBounds(mouseX, mouseY))
 					hoverChecker.resetHoverTimer();
 				else if (hoverChecker.checkHover(mouseX, mouseY)) {
-					drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().thePlayer,
+					drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().player,
 							Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
 				}
 			}

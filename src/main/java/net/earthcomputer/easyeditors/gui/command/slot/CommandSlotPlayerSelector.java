@@ -23,8 +23,9 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.WorldSettings.GameType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.GameType;
 
 /**
  * A command slot representing a player selector
@@ -415,16 +416,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			targetEntity = new CommandSlotEntity((flags & NON_PLAYERS_ONLY) == 0, false, ENTITY_ANYTHING) {
 
 				@Override
-				public void setEntity(String entityName) {
+				public void setEntity(ResourceLocation entityName) {
 					super.setEntity(entityName);
 
-					if ("Player".equals(entityName)) {
+					if (new ResourceLocation("Player").equals(entityName)) {
 						modifiablePlayersOnlySlots.setChild(playersOnlySlots);
 					} else {
 						modifiablePlayersOnlySlots.setChild(null);
 					}
 
-					Class<? extends Entity> entityClass = EntityList.stringToClassMapping.get(entityName);
+					Class<? extends Entity> entityClass = EntityList.getClass(entityName);
 					if (entityClass == null || EntityLivingBase.class.isAssignableFrom(entityClass)) {
 						modifiableRotations.setChild(CmdPlayerSelector.this.rotations);
 						modifiableTeam.setChild(team);
@@ -437,16 +438,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			};
 
 			if ((flags & NON_PLAYERS_ONLY) == 0)
-				targetEntity.setEntity("Player");
+				targetEntity.setEntity(new ResourceLocation("Player"));
 			else
-				targetEntity.setEntity(ENTITY_ANYTHING);
+				targetEntity.setEntity(new ResourceLocation(ENTITY_ANYTHING));
 
 			return targetEntity;
 		}
 
 		private IGuiCommandSlot setupPlayersOnlyTargetEntitySlot() {
 			return new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					GuiSelectEntity.getEntityName("Player"), 0);
+					GuiSelectEntity.getEntityName(new ResourceLocation("Player")), 0);
 		}
 
 		private void setupSpecifics() {
@@ -865,7 +866,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						targetType = ENTITY_ANYTHING;
 					}
 				}
-				this.targetEntity.setEntity(targetType);
+				this.targetEntity.setEntity(new ResourceLocation(targetType));
 			}
 
 			// Not expanded by default
@@ -976,17 +977,17 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			if (this.modifiableRotations.getChild() == this.rotations) {
 				// If rotations is expanded, map the rotations onto the fields
 				if (specifiers.containsKey("rym"))
-					this.minHRotation.setText(
-							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rym")))));
+					this.minHRotation
+							.setText(String.valueOf((int) MathHelper.wrapDegrees(parseInt(specifiers.get("rym")))));
 				if (specifiers.containsKey("ry"))
-					this.maxHRotation.setText(
-							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("ry")))));
+					this.maxHRotation
+							.setText(String.valueOf((int) MathHelper.wrapDegrees(parseInt(specifiers.get("ry")))));
 				if (specifiers.containsKey("rxm"))
-					this.minVRotation.setText(
-							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rxm")))));
+					this.minVRotation
+							.setText(String.valueOf((int) MathHelper.wrapDegrees(parseInt(specifiers.get("rxm")))));
 				if (specifiers.containsKey("rx"))
-					this.maxVRotation.setText(
-							String.valueOf((int) MathHelper.wrapAngleTo180_float(parseInt(specifiers.get("rx")))));
+					this.maxVRotation
+							.setText(String.valueOf((int) MathHelper.wrapDegrees(parseInt(specifiers.get("rx")))));
 			}
 
 			// All experience fields default to empty
@@ -1249,8 +1250,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				boolean targetImplied = this.targetEntity.getEntity().equals("Player")
 						&& !this.targetInverted.isChecked();
 				if (!targetImplied) {
-					String targetType = targetEntity.getEntity();
-					if (targetType.equals(ENTITY_ANYTHING)) {
+					ResourceLocation targetTypeLocation = targetEntity.getEntity();
+					String targetType = targetTypeLocation.getResourceDomain().equals("minecraft")
+							? targetTypeLocation.getResourcePath() : targetTypeLocation.toString();
+					if (targetTypeLocation.equals(new ResourceLocation(ENTITY_ANYTHING))) {
 						// Anything is still sometimes specified as an empty
 						// string
 						targetType = "";

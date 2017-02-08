@@ -15,7 +15,7 @@ public interface IEntitySelectorCallback {
 	 * 
 	 * @return The internal entity name of the currently selected entity
 	 */
-	String getEntity();
+	ResourceLocation getEntity();
 
 	/**
 	 * Sets the selected entity by internal entity name

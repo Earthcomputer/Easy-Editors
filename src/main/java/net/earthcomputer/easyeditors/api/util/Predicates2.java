@@ -21,6 +21,7 @@ public class Predicates2 {
 	 * <ul>
 	 * <li><code>x != Predicates2.copyOf(x)</code></li>
 	 * <li><code>!x.equals(Predicates2.copyOf(x))</code></li>
+	 * <li><code>x.apply(y) == Predicates2.copyOf(x).apply(y)</code></li>
 	 * </ul>
 	 * 
 	 * @param predicate

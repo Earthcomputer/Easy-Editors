@@ -6,6 +6,7 @@ import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * A command slot which represents a selection of an enchantment
@@ -15,7 +16,7 @@ import net.minecraft.enchantment.Enchantment;
  */
 public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement implements IEnchantmentSelectorCallback {
 
-	private int enchantmentId = -1;
+	private ResourceLocation enchantmentId = null;
 	private CommandSlotLabel enchantmentName;
 	private CommandSlotIntTextField enchantmentLevel;
 
@@ -36,16 +37,16 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 	}
 
 	@Override
-	public int getEnchantment() {
+	public ResourceLocation getEnchantment() {
 		return enchantmentId;
 	}
 
 	@Override
-	public void setEnchantment(int id) {
+	public void setEnchantment(ResourceLocation id) {
 		if (id != this.enchantmentId) {
 			this.enchantmentId = id;
 			enchantmentName.setColor(0);
-			enchantmentName.setText(I18n.format(Enchantment.getEnchantmentById(id).getName()));
+			enchantmentName.setText(I18n.format(Enchantment.getEnchantmentByLocation(id.toString()).getName()));
 			onChanged();
 		}
 	}
@@ -82,7 +83,7 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 	 *             - when this doesn't have a valid set of child components
 	 */
 	public void checkValid() throws UIInvalidException {
-		if (Enchantment.getEnchantmentById(enchantmentId) == null)
+		if (Enchantment.getEnchantmentByLocation(enchantmentId.toString()) == null)
 			throw new UIInvalidException("gui.commandEditor.enchantmentInvalid.noEnchantment");
 		enchantmentLevel.checkValid();
 	}
