@@ -53,10 +53,10 @@ public class GuiReplacementRegistry {
 
 	@SubscribeEvent
 	public void openGui(GuiOpenEvent e) throws Exception {
-		if (EasyEditorsApi.isEasyEditorsActive && e.gui != null) {
-			Class<? extends GuiScreen> oldClass = e.gui.getClass();
+		if (EasyEditorsApi.isEasyEditorsActive && e.getGui() != null) {
+			Class<? extends GuiScreen> oldClass = e.getGui().getClass();
 			if (replacementMap.containsKey(oldClass)) {
-				e.gui = replacementMap.get(oldClass).getConstructor(oldClass).newInstance(e.gui);
+				e.setGui(replacementMap.get(oldClass).getConstructor(oldClass).newInstance(e.getGui()));
 			}
 		}
 	}

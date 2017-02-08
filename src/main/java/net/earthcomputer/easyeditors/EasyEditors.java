@@ -16,7 +16,7 @@ import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -84,21 +84,23 @@ public class EasyEditors {
 
 		tablessTab = new CreativeTabs("tabless") {
 			@Override
-			public Item getTabIconItem() {
-				return Item.getItemFromBlock(Blocks.command_block);
+			public ItemStack getTabIconItem() {
+				return new ItemStack(Blocks.COMMAND_BLOCK);
 			}
 		};
-		Blocks.mob_spawner.setCreativeTab(tablessTab);
-		Blocks.farmland.setCreativeTab(tablessTab);
-		Blocks.lit_furnace.setCreativeTab(tablessTab);
-		Blocks.brown_mushroom_block.setCreativeTab(tablessTab);
-		Blocks.red_mushroom_block.setCreativeTab(tablessTab);
-		Blocks.dragon_egg.setCreativeTab(tablessTab);
-		Blocks.command_block.setCreativeTab(tablessTab);
-		Blocks.barrier.setCreativeTab(tablessTab);
-		Items.fireworks.setCreativeTab(tablessTab);
-		Items.command_block_minecart.setCreativeTab(tablessTab);
-		
+		Blocks.MOB_SPAWNER.setCreativeTab(tablessTab);
+		Blocks.FARMLAND.setCreativeTab(tablessTab);
+		Blocks.LIT_FURNACE.setCreativeTab(tablessTab);
+		Blocks.BROWN_MUSHROOM_BLOCK.setCreativeTab(tablessTab);
+		Blocks.RED_MUSHROOM_BLOCK.setCreativeTab(tablessTab);
+		Blocks.DRAGON_EGG.setCreativeTab(tablessTab);
+		Blocks.COMMAND_BLOCK.setCreativeTab(tablessTab);
+		Blocks.REPEATING_COMMAND_BLOCK.setCreativeTab(tablessTab);
+		Blocks.CHAIN_COMMAND_BLOCK.setCreativeTab(tablessTab);
+		Blocks.BARRIER.setCreativeTab(tablessTab);
+		Items.FIREWORKS.setCreativeTab(tablessTab);
+		Items.COMMAND_BLOCK_MINECART.setCreativeTab(tablessTab);
+
 		SmartTranslationRegistry.registerAlias("entity.MinecartRideable.name", "item.minecart.name");
 		SmartTranslationRegistry.registerAlias("entity.MinecartChest.name", "item.minecartChest.name");
 		SmartTranslationRegistry.registerAlias("entity.MinecartCommandBlock.name", "item.minecartCommandBlock.name");
@@ -110,7 +112,7 @@ public class EasyEditors {
 		SmartTranslationRegistry.registerAlias("entity.ItemFrame.name", "item.frame.name");
 		SmartTranslationRegistry.registerAlias("entity.FireworksRocketEntity.name", "item.fireworks.name");
 		SmartTranslationRegistry.registerAlias("entity.WitherSkull.name", "item.skull.wither.name");
-		
+
 		SmartTranslationRegistry.registerTranslation("entity.ThrownEnderpearl.name",
 				new ThrownTranslation("item.enderPearl.name"));
 		SmartTranslationRegistry.registerTranslation("entity.EyeOfEnderSignal.name",
@@ -131,7 +133,7 @@ public class EasyEditors {
 
 	@SubscribeEvent
 	public void configChanged(ConfigChangedEvent.PostConfigChangedEvent e) {
-		if (ID.equals(e.modID))
+		if (ID.equals(e.getModID()))
 			readFromConfig();
 	}
 

@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.HoverChecker;
@@ -61,13 +61,13 @@ public class CommandSlotColor extends GuiCommandSlotImpl implements IColorPicker
 			GlStateManager.color(1, 1, 1, 1);
 			Minecraft.getMinecraft().getTextureManager().bindTexture(GuiColorPicker.transparentBackground);
 			Tessellator tessellator = Tessellator.getInstance();
-			WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			worldRenderer.pos(x, y + getHeight(), 0).tex(0, (float) getHeight() / 16).endVertex();
-			worldRenderer.pos(x + getWidth(), y + getHeight(), 0).tex((float) getWidth() / 16, (float) getHeight() / 16)
+			VertexBuffer buffer = tessellator.getBuffer();
+			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			buffer.pos(x, y + getHeight(), 0).tex(0, (float) getHeight() / 16).endVertex();
+			buffer.pos(x + getWidth(), y + getHeight(), 0).tex((float) getWidth() / 16, (float) getHeight() / 16)
 					.endVertex();
-			worldRenderer.pos(x + getWidth(), y, 0).tex((float) getWidth() / 16, 0).endVertex();
-			worldRenderer.pos(x, y, 0).tex(0, 0).endVertex();
+			buffer.pos(x + getWidth(), y, 0).tex((float) getWidth() / 16, 0).endVertex();
+			buffer.pos(x, y, 0).tex(0, 0).endVertex();
 			tessellator.draw();
 		}
 		Gui.drawRect(x, y, x + getWidth(), y + getHeight(), color);

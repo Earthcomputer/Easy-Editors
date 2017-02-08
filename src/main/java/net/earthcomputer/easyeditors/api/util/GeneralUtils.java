@@ -1,7 +1,6 @@
 package net.earthcomputer.easyeditors.api.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
@@ -22,24 +21,21 @@ import net.earthcomputer.easyeditors.api.EntityRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiConfirmOpenLink;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.gui.stream.GuiTwitchUserMode;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.HoverEvent;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
@@ -48,11 +44,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.Achievement;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
-import tv.twitch.chat.ChatUserInfo;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 
 /**
  * General utilities used by Easy Editors. These will work even if Easy Editors
@@ -74,7 +71,7 @@ public class GeneralUtils {
 	 */
 	public static void playButtonSound() {
 		Minecraft.getMinecraft().getSoundHandler()
-				.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1));
+				.playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1));
 	}
 
 	/**
@@ -232,15 +229,15 @@ public class GeneralUtils {
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-		worldRenderer.pos(right, top, zLevel).color((coltr & 0x00ff0000) >> 16, (coltr & 0x0000ff00) >> 8,
+		VertexBuffer buffer = tessellator.getBuffer();
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+		buffer.pos(right, top, zLevel).color((coltr & 0x00ff0000) >> 16, (coltr & 0x0000ff00) >> 8,
 				(coltr & 0x000000ff), (coltr & 0xff000000) >>> 24).endVertex();
-		worldRenderer.pos(left, top, zLevel).color((coltl & 0x00ff0000) >> 16, (coltl & 0x0000ff00) >> 8,
-				(coltl & 0x000000ff), (coltl & 0xff000000) >>> 24).endVertex();
-		worldRenderer.pos(left, bottom, zLevel).color((colbl & 0x00ff0000) >> 16, (colbl & 0x0000ff00) >> 8,
+		buffer.pos(left, top, zLevel).color((coltl & 0x00ff0000) >> 16, (coltl & 0x0000ff00) >> 8, (coltl & 0x000000ff),
+				(coltl & 0xff000000) >>> 24).endVertex();
+		buffer.pos(left, bottom, zLevel).color((colbl & 0x00ff0000) >> 16, (colbl & 0x0000ff00) >> 8,
 				(colbl & 0x000000ff), (colbl & 0xff000000) >>> 24).endVertex();
-		worldRenderer.pos(right, bottom, zLevel).color((colbr & 0x00ff0000) >> 16, (colbr & 0x0000ff00) >> 8,
+		buffer.pos(right, bottom, zLevel).color((colbr & 0x00ff0000) >> 16, (colbr & 0x0000ff00) >> 8,
 				(colbr & 0x000000ff), (colbr & 0xff000000) >>> 24).endVertex();
 		tessellator.draw();
 
@@ -378,14 +375,14 @@ public class GeneralUtils {
 	 * @param y
 	 */
 	public static void drawItemStackTooltip(ItemStack stack, int x, int y) {
-		List<String> list = stack.getTooltip(Minecraft.getMinecraft().thePlayer,
+		List<String> list = stack.getTooltip(Minecraft.getMinecraft().player,
 				Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
 
 		for (int i = 0; i < list.size(); ++i) {
 			if (i == 0) {
 				list.set(i, stack.getRarity().rarityColor + (String) list.get(i));
 			} else {
-				list.set(i, EnumChatFormatting.GRAY + (String) list.get(i));
+				list.set(i, TextFormatting.GRAY + (String) list.get(i));
 			}
 		}
 
@@ -465,7 +462,7 @@ public class GeneralUtils {
 			rendermanager.setRenderShadow(false);
 			boolean errored = false;
 			try {
-				rendermanager.renderEntityWithPosYaw(eLiving, 0, 0, 0, 0, 1);
+				rendermanager.doRenderEntity(eLiving, 0, 0, 0, 0, 1, false);
 			} catch (Exception e) {
 				errored = true;
 			}
@@ -508,7 +505,7 @@ public class GeneralUtils {
 					NBTBase nbtbase = JsonToNBT.getTagFromJson(event.getValue().getUnformattedText());
 
 					if (nbtbase instanceof NBTTagCompound) {
-						stackToShow = ItemStack.loadItemStackFromNBT((NBTTagCompound) nbtbase);
+						stackToShow = new ItemStack((NBTTagCompound) nbtbase);
 					}
 				} catch (NBTException e) {
 				}
@@ -516,7 +513,7 @@ public class GeneralUtils {
 				if (stackToShow != null) {
 					drawItemStackTooltip(stackToShow, mouseX, mouseY);
 				} else {
-					drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid Item!");
+					drawTooltip(mouseX, mouseY, TextFormatting.RED + "Invalid Item!");
 				}
 			} else if (event.getAction() == HoverEvent.Action.SHOW_ENTITY) {
 				if (Minecraft.getMinecraft().gameSettings.advancedItemTooltips) {
@@ -530,16 +527,17 @@ public class GeneralUtils {
 
 							if (entityCompound.hasKey("type", 8)) {
 								String type = entityCompound.getString("type");
-								tooltipLines.add("Type: " + type + " (" + EntityList.getIDFromString(type) + ")");
+								tooltipLines.add("Type: " + type + " ("
+										+ EntityList.getID(EntityList.getClass(new ResourceLocation(type))) + ")");
 							}
 
 							tooltipLines.add(entityCompound.getString("id"));
 							drawTooltip(mouseX, mouseY, tooltipLines);
 						} else {
-							drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid Entity!");
+							drawTooltip(mouseX, mouseY, TextFormatting.RED + "Invalid Entity!");
 						}
 					} catch (NBTException e) {
-						drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid Entity!");
+						drawTooltip(mouseX, mouseY, TextFormatting.RED + "Invalid Entity!");
 					}
 				}
 			} else if (event.getAction() == HoverEvent.Action.SHOW_TEXT) {
@@ -548,10 +546,10 @@ public class GeneralUtils {
 				StatBase stat = StatList.getOneShotStat(event.getValue().getUnformattedText());
 
 				if (stat != null) {
-					IChatComponent statName = stat.getStatName();
-					IChatComponent statType = new ChatComponentTranslation(
+					ITextComponent statName = stat.getStatName();
+					ITextComponent statType = new TextComponentTranslation(
 							"stats.tooltip.type." + (stat.isAchievement() ? "achievement" : "statistic"));
-					statType.getChatStyle().setItalic(true);
+					statType.getStyle().setItalic(true);
 					String achievementDescription = stat instanceof Achievement ? ((Achievement) stat).getDescription()
 							: null;
 					List<String> lines = Lists.newArrayList(statName.getFormattedText(), statType.getFormattedText());
@@ -563,7 +561,7 @@ public class GeneralUtils {
 
 					drawTooltip(mouseX, mouseY, lines);
 				} else {
-					drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + "Invalid statistic/achievement!");
+					drawTooltip(mouseX, mouseY, TextFormatting.RED + "Invalid statistic/achievement!");
 				}
 			}
 
@@ -629,34 +627,8 @@ public class GeneralUtils {
 			} else if (event.getAction() == ClickEvent.Action.SUGGEST_COMMAND) {
 				// Can't do insertion
 			} else if (event.getAction() == ClickEvent.Action.RUN_COMMAND) {
-				if (Minecraft.getMinecraft().thePlayer != null)
-					Minecraft.getMinecraft().thePlayer.sendChatMessage(event.getValue());
-			} else if (event.getAction() == ClickEvent.Action.TWITCH_USER_INFO) {
-				ChatUserInfo userInfo = Minecraft.getMinecraft().getTwitchStream().func_152926_a(event.getValue());
-
-				if (userInfo != null) {
-					final GuiScreen prevScreen = Minecraft.getMinecraft().currentScreen;
-					Minecraft.getMinecraft().displayGuiScreen(
-							new GuiTwitchUserMode(Minecraft.getMinecraft().getTwitchStream(), userInfo) {
-								@Override
-								public void actionPerformed(GuiButton button) throws IOException {
-									switch (button.id) {
-									case 0:
-									case 3:
-									case 2:
-									case 4:
-									case 1:
-										super.actionPerformed(button);
-										break;
-									default:
-										if (button.enabled)
-											Minecraft.getMinecraft().displayGuiScreen(prevScreen);
-									}
-								}
-							});
-				} else {
-					MC_LOGGER.error("Tried to handle twitch user but couldn't find them!");
-				}
+				if (Minecraft.getMinecraft().player != null)
+					Minecraft.getMinecraft().player.sendChatMessage(event.getValue());
 			} else {
 				MC_LOGGER.error("Don't know how to handle " + event);
 			}

@@ -11,7 +11,7 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.Locale;
-import net.minecraft.util.StringTranslate;
+import net.minecraft.util.text.translation.LanguageMap;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
@@ -26,10 +26,10 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
  */
 public class SmartTranslationRegistry {
 
-	private static final Map<String, String> translationMap = ReflectionHelper.getPrivateValue(StringTranslate.class,
-			ReflectionHelper.<StringTranslate, StringTranslate> getPrivateValue(StringTranslate.class, null,
-					"field_74817_a", "instance"),
-			"field_74816_c", "languageList");
+	private static final LanguageMap languageMapInstance = ReflectionHelper.getPrivateValue(LanguageMap.class, null,
+			"field_74817_a", "instance");
+	private static final Map<String, String> translationMap = ReflectionHelper.getPrivateValue(LanguageMap.class,
+			languageMapInstance, "field_74816_c", "languageList");
 	private static final Map<String, String> i18nProps = ReflectionHelper.getPrivateValue(Locale.class,
 			ReflectionHelper.<Locale, I18n> getPrivateValue(I18n.class, null, "field_135054_a", "i18nLocale"),
 			"field_135032_a", "properties");
@@ -47,6 +47,16 @@ public class SmartTranslationRegistry {
 	static {
 		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager())
 				.registerReloadListener(new ResourceManagerReloadListener());
+	}
+
+	/**
+	 * Utility method for getting the LanguageMap instance (the vanilla getter
+	 * is package-private)
+	 * 
+	 * @return The LanguageMap instance
+	 */
+	public static LanguageMap getLanguageMapInstance() {
+		return languageMapInstance;
 	}
 
 	/**

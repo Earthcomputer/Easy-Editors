@@ -1,5 +1,7 @@
 package net.earthcomputer.easyeditors.gui;
 
+import net.minecraft.util.ResourceLocation;
+
 /**
  * An interface for use with GuiSelectEntity. When the user has chosen an
  * entity, setEntity will be invoked
@@ -20,6 +22,6 @@ public interface IEntitySelectorCallback {
 	 * 
 	 * @param entityName
 	 */
-	void setEntity(String entityName);
+	void setEntity(ResourceLocation entityName);
 
 }

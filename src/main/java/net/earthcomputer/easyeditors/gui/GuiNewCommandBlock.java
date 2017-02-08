@@ -13,9 +13,9 @@ import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.command.server.CommandBlockLogic;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.C17PacketCustomPayload;
+import net.minecraft.network.play.client.CPacketCustomPayload;
+import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 /**
@@ -26,10 +26,10 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
  */
 public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallback {
 
-	private static final Field localCommandBlockField = ReflectionHelper.findField(GuiCommandBlock.class,
-			"field_146489_h", "localCommandBlock");
+	private static final Field commandBlockField = ReflectionHelper.findField(GuiCommandBlock.class, "field_184078_g",
+			"commandBlock");
 
-	private final CommandBlockLogic theCommandBlock;
+	private final TileEntityCommandBlock theCommandBlock;
 	private GuiButton doneButton;
 	private GuiButton cancelButton;
 	private GuiButton ignoringButton;
@@ -44,7 +44,7 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 	private boolean hadFirstInit = false;
 
 	public GuiNewCommandBlock(GuiCommandBlock old) throws Exception {
-		theCommandBlock = (CommandBlockLogic) localCommandBlockField.get(old);
+		theCommandBlock = (TileEntityCommandBlock) commandBlockField.get(old);
 	}
 
 	@Override
@@ -65,12 +65,12 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 		commandText = new GuiTextField(2, fontRendererObj, width / 2 - 150, 50, 196, 20);
 		commandText.setMaxStringLength(32767);
 		commandText.setFocused(true);
-		commandText.setText(hadFirstInit ? command : theCommandBlock.getCommand());
+		commandText.setText(hadFirstInit ? command : theCommandBlock.getCommandBlockLogic().getCommand());
 		trackedOutput = new GuiTextField(3, fontRendererObj, width / 2 - 150, 150, 196, 20);
 		trackedOutput.setMaxStringLength(32767);
 		trackedOutput.setEnabled(false);
 		trackedOutput.setText(I18n.format("gui.commandBlock.noOutput"));
-		shouldTrackOutput = theCommandBlock.shouldTrackOutput();
+		shouldTrackOutput = theCommandBlock.getCommandBlockLogic().shouldTrackOutput();
 		updateTrackOutputButton();
 		doneButton.enabled = commandText.getText().trim().length() > 0;
 
@@ -88,30 +88,33 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 			switch (button.id) {
 			case 0:
 				PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
-				buffer.writeByte(theCommandBlock.func_145751_f());
-				theCommandBlock.func_145757_a(buffer);
+				theCommandBlock.getCommandBlockLogic().fillInInfo(buffer);
 				buffer.writeString(commandText.getText());
-				buffer.writeBoolean(theCommandBlock.shouldTrackOutput());
-				mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload("MC|AdvCdm", buffer));
+				buffer.writeBoolean(theCommandBlock.getCommandBlockLogic().shouldTrackOutput());
+				buffer.writeString("REDSTONE");
+				buffer.writeBoolean(false);
+				buffer.writeBoolean(false);
+				mc.getConnection().sendPacket(new CPacketCustomPayload("MC|AutoCmd", buffer));
 
-				if (!theCommandBlock.shouldTrackOutput()) {
-					theCommandBlock.setLastOutput(null);
+				if (!theCommandBlock.getCommandBlockLogic().shouldTrackOutput()) {
+					theCommandBlock.getCommandBlockLogic().setLastOutput(null);
 				}
 				mc.displayGuiScreen(null);
 				break;
 
 			case 1:
-				theCommandBlock.setTrackOutput(shouldTrackOutput);
+				theCommandBlock.getCommandBlockLogic().setTrackOutput(shouldTrackOutput);
 				mc.displayGuiScreen(null);
 				break;
 
 			case 4:
-				theCommandBlock.setTrackOutput(!theCommandBlock.shouldTrackOutput());
+				theCommandBlock.getCommandBlockLogic()
+						.setTrackOutput(!theCommandBlock.getCommandBlockLogic().shouldTrackOutput());
 				updateTrackOutputButton();
 				break;
 
 			case 5:
-				mc.displayGuiScreen(new GuiCommandEditor(this, this, theCommandBlock));
+				mc.displayGuiScreen(new GuiCommandEditor(this, this, theCommandBlock.getCommandBlockLogic()));
 				break;
 			}
 		}
@@ -166,11 +169,11 @@ public class GuiNewCommandBlock extends GuiScreen implements ICommandEditorCallb
 	}
 
 	private void updateTrackOutputButton() {
-		if (theCommandBlock.shouldTrackOutput()) {
+		if (theCommandBlock.getCommandBlockLogic().shouldTrackOutput()) {
 			ignoringButton.displayString = I18n.format("gui.commandBlock.trackingOutput");
 
-			if (theCommandBlock.getLastOutput() != null) {
-				trackedOutput.setText(theCommandBlock.getLastOutput().getUnformattedText());
+			if (theCommandBlock.getCommandBlockLogic().getLastOutput() != null) {
+				trackedOutput.setText(theCommandBlock.getCommandBlockLogic().getLastOutput().getUnformattedText());
 			}
 		} else {
 			ignoringButton.displayString = I18n.format("gui.commandBlock.ignoringOutput");

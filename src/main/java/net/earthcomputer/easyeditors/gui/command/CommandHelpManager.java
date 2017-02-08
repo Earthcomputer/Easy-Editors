@@ -32,18 +32,18 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.HoverEvent;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumTypeAdapterFactory;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 
 public class CommandHelpManager {
 
@@ -88,8 +88,8 @@ public class CommandHelpManager {
 	private static class CommandHelpDeserializer implements JsonDeserializer<List<ICommandHelpComponent>> {
 
 		public static final Gson GSON = new GsonBuilder().registerTypeAdapter(List.class, new CommandHelpDeserializer())
-				.registerTypeHierarchyAdapter(IChatComponent.class, new IChatComponent.Serializer())
-				.registerTypeHierarchyAdapter(ChatStyle.class, new ChatStyle.Serializer())
+				.registerTypeHierarchyAdapter(ITextComponent.class, new ITextComponent.Serializer())
+				.registerTypeHierarchyAdapter(Style.class, new Style.Serializer())
 				.registerTypeAdapterFactory(new EnumTypeAdapterFactory()).create();
 
 		@Override
@@ -110,9 +110,9 @@ public class CommandHelpManager {
 		private ICommandHelpComponent deserializeSingleComponent(JsonElement json, JsonDeserializationContext context) {
 			if (json.isJsonPrimitive()) {
 				String value = json.getAsString();
-				return new ComponentChat(new ChatComponentTranslation(value));
+				return new ComponentChat(new TextComponentTranslation(value));
 			} else if (json.isJsonArray()) {
-				return new ComponentChat((IChatComponent) context.deserialize(json, IChatComponent.class));
+				return new ComponentChat((ITextComponent) context.deserialize(json, ITextComponent.class));
 			} else if (json.isJsonNull()) {
 				return new ComponentNewline();
 			} else if (json.isJsonObject()) {
@@ -122,7 +122,7 @@ public class CommandHelpManager {
 				if (type != null && type.isJsonPrimitive())
 					typeString = type.getAsString();
 				if ("text".equals(typeString)) {
-					return new ComponentChat((IChatComponent) context.deserialize(object, IChatComponent.class));
+					return new ComponentChat((ITextComponent) context.deserialize(object, ITextComponent.class));
 				} else if ("image".equals(typeString)) {
 					int u, v, w, h;
 					if (!object.has("subimage")) {
@@ -171,8 +171,8 @@ public class CommandHelpManager {
 						if (action == null)
 							throw new JsonParseException(
 									"No such hover event action " + hoverEventObj.get("action").getAsString());
-						IChatComponent value = (IChatComponent) context.deserialize(hoverEventObj.get("value"),
-								IChatComponent.class);
+						ITextComponent value = (ITextComponent) context.deserialize(hoverEventObj.get("value"),
+								ITextComponent.class);
 						hoverEvent = new HoverEvent(action, value);
 					}
 
@@ -218,21 +218,21 @@ public class CommandHelpManager {
 
 	private static class ComponentChat implements ICommandHelpComponent {
 		private FontRenderer fontRenderer;
-		private IChatComponent text;
+		private ITextComponent text;
 
-		public ComponentChat(IChatComponent text) {
+		public ComponentChat(ITextComponent text) {
 			this.fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 			this.text = text;
 		}
 
 		@Override
 		public void draw(int mouseX, int mouseY, int y, int virtualWidth) {
-			List<IChatComponent> lines = GuiUtilRenderComponents.func_178908_a(text, virtualWidth - 20, fontRenderer,
-					false, false);
+			List<ITextComponent> lines = GuiUtilRenderComponents.splitText(text, virtualWidth - 20, fontRenderer, false,
+					false);
 
 			int runningY = y;
 
-			for (IChatComponent line : lines) {
+			for (ITextComponent line : lines) {
 				String strLine = line.getFormattedText();
 				int halfLineWidth = fontRenderer.getStringWidth(strLine) / 2;
 				int lineLeft = virtualWidth / 2 - halfLineWidth;
@@ -241,23 +241,23 @@ public class CommandHelpManager {
 				runningY += fontRenderer.FONT_HEIGHT;
 			}
 
-			IChatComponent hoveredComponent = getHoveredComponent(virtualWidth, y, mouseX, mouseY);
+			ITextComponent hoveredComponent = getHoveredComponent(virtualWidth, y, mouseX, mouseY);
 			if (hoveredComponent != null)
-				GeneralUtils.handleHoverEvent(hoveredComponent.getChatStyle().getChatHoverEvent(), mouseX, mouseY);
+				GeneralUtils.handleHoverEvent(hoveredComponent.getStyle().getHoverEvent(), mouseX, mouseY);
 
 		}
 
 		@Override
 		public int getHeight(int virtualWidth) {
-			return GuiUtilRenderComponents.func_178908_a(text, virtualWidth - 20, fontRenderer, false, false).size()
+			return GuiUtilRenderComponents.splitText(text, virtualWidth - 20, fontRenderer, false, false).size()
 					* fontRenderer.FONT_HEIGHT;
 		}
 
 		@Override
 		public boolean mouseClicked(int mouseX, int mouseY, int y, int virtualWidth) {
-			IChatComponent hoveredComponent = getHoveredComponent(virtualWidth, y, mouseX, mouseY);
+			ITextComponent hoveredComponent = getHoveredComponent(virtualWidth, y, mouseX, mouseY);
 			if (hoveredComponent != null) {
-				ClickEvent clickEvent = hoveredComponent.getChatStyle().getChatClickEvent();
+				ClickEvent clickEvent = hoveredComponent.getStyle().getClickEvent();
 				if (clickEvent != null && clickEvent.getAction() == ClickEvent.Action.CHANGE_PAGE) {
 					String value = clickEvent.getValue();
 					String name = null;
@@ -275,22 +275,22 @@ public class CommandHelpManager {
 				return false;
 		}
 
-		private IChatComponent getHoveredComponent(int virtualWidth, int y, int mouseX, int mouseY) {
-			List<IChatComponent> lines = GuiUtilRenderComponents.func_178908_a(text, virtualWidth - 20, fontRenderer,
-					false, false);
+		private ITextComponent getHoveredComponent(int virtualWidth, int y, int mouseX, int mouseY) {
+			List<ITextComponent> lines = GuiUtilRenderComponents.splitText(text, virtualWidth - 20, fontRenderer, false,
+					false);
 
-			for (IChatComponent line : lines) {
+			for (ITextComponent line : lines) {
 				String strLine = line.getFormattedText();
 				int halfLineWidth = fontRenderer.getStringWidth(strLine) / 2;
 				int lineLeft = virtualWidth / 2 - halfLineWidth;
 				int lineRight = virtualWidth / 2 + halfLineWidth;
 
 				if (mouseY >= y && mouseY < y + fontRenderer.FONT_HEIGHT && mouseX >= lineLeft && mouseX < lineRight) {
-					IChatComponent hoveredComponent = null;
-					for (IChatComponent sibling : line) {
+					ITextComponent hoveredComponent = null;
+					for (ITextComponent sibling : line) {
 						hoveredComponent = sibling;
-						lineLeft += fontRenderer.getStringWidth(
-								GuiUtilRenderComponents.func_178909_a(sibling.getUnformattedTextForChat(), false));
+						lineLeft += fontRenderer.getStringWidth(GuiUtilRenderComponents
+								.removeTextColorsIfConfigured(sibling.getUnformattedComponentText(), false));
 						if (mouseX < lineLeft)
 							break;
 					}
@@ -367,7 +367,7 @@ public class CommandHelpManager {
 			int imageRight;
 			int imageBottom;
 			if (theImage == null) {
-				String str = EnumChatFormatting.RED + "No image found at " + location;
+				String str = TextFormatting.RED + "No image found at " + location;
 				imageLeft = virtualWidth / 2 - fontRenderer.getStringWidth(str) / 2;
 				imageRight = imageLeft + fontRenderer.getStringWidth(str);
 				imageBottom = y + fontRenderer.FONT_HEIGHT;
@@ -380,15 +380,15 @@ public class CommandHelpManager {
 				int imageWidth = theImage.getWidth();
 				int imageHeight = theImage.getHeight();
 				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-				worldRenderer.pos(imageLeft, imageBottom, 0)
+				VertexBuffer buffer = tessellator.getBuffer();
+				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+				buffer.pos(imageLeft, imageBottom, 0)
 						.tex((double) u / imageWidth, (double) (v + height) / imageHeight).endVertex();
-				worldRenderer.pos(imageRight, imageBottom, 0)
+				buffer.pos(imageRight, imageBottom, 0)
 						.tex((double) (u + width) / imageWidth, (double) (v + height) / imageHeight).endVertex();
-				worldRenderer.pos(imageRight, y, 0).tex((double) (u + width) / imageWidth, (double) v / imageHeight)
+				buffer.pos(imageRight, y, 0).tex((double) (u + width) / imageWidth, (double) v / imageHeight)
 						.endVertex();
-				worldRenderer.pos(imageLeft, y, 0).tex((double) u / imageWidth, (double) v / imageHeight).endVertex();
+				buffer.pos(imageLeft, y, 0).tex((double) u / imageWidth, (double) v / imageHeight).endVertex();
 				tessellator.draw();
 			}
 
@@ -407,7 +407,7 @@ public class CommandHelpManager {
 		@Override
 		public boolean mouseClicked(int mouseX, int mouseY, int y, int virtualWidth) {
 			if (clickEvent != null) {
-				String str = EnumChatFormatting.RED + "No image found at " + location;
+				String str = TextFormatting.RED + "No image found at " + location;
 				int imageLeft, imageRight, imageBottom;
 				if (theImage == null) {
 					imageLeft = virtualWidth / 2 - fontRenderer.getStringWidth(str) / 2;

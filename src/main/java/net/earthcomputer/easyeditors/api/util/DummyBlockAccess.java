@@ -1,13 +1,14 @@
 package net.earthcomputer.easyeditors.api.util;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 
 class DummyBlockAccess implements IBlockAccess {
 
@@ -29,28 +30,23 @@ class DummyBlockAccess implements IBlockAccess {
 	}
 
 	@Override
-	public int getCombinedLight(BlockPos pos, int p_175626_2_) {
+	public int getCombinedLight(BlockPos pos, int lightValue) {
 		return (15 << 20) | (15 << 4);
 	}
 
 	@Override
 	public IBlockState getBlockState(BlockPos pos) {
-		return pos.equals(blockPos) ? blockAtCenter : Blocks.air.getDefaultState();
+		return pos.equals(blockPos) ? blockAtCenter : Blocks.AIR.getDefaultState();
 	}
 
 	@Override
 	public boolean isAirBlock(BlockPos pos) {
-		return getBlockState(pos).getBlock().isAir(this, pos);
+		return pos.equals(blockPos) ? blockAtCenter.getBlock().isAir(blockAtCenter, this, pos) : true;
 	}
 
 	@Override
-	public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
-		return BiomeGenBase.plains;
-	}
-
-	@Override
-	public boolean extendedLevelsInChunkCache() {
-		return false;
+	public Biome getBiome(BlockPos pos) {
+		return Biomes.PLAINS;
 	}
 
 	@Override
@@ -65,7 +61,8 @@ class DummyBlockAccess implements IBlockAccess {
 
 	@Override
 	public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
-		return getBlockState(pos).getBlock().isSideSolid(this, pos, side);
+		IBlockState state = getBlockState(pos);
+		return state.getBlock().isSideSolid(state, this, pos, side);
 	}
 
 }

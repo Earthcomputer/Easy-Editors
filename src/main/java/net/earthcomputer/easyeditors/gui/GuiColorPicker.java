@@ -14,11 +14,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * The GuiScreen for the color picker
@@ -114,25 +114,25 @@ public class GuiColorPicker extends GuiScreen {
 		}
 		hueField = new GuiTextField(0, fontRendererObj, width / 2 + 10, height / 2 - 70, 40, 20);
 		hueField.setText(String.valueOf(hue));
-		hueField.func_175205_a(new NumberPredicate(359));
+		hueField.setValidator(new NumberPredicate(359));
 		saturationField = new GuiTextField(0, fontRendererObj, width / 2 + 70, height / 2 - 70, 40, 20);
 		saturationField.setText(String.valueOf(saturation));
-		saturationField.func_175205_a(new NumberPredicate(100));
+		saturationField.setValidator(new NumberPredicate(100));
 		valueField = new GuiTextField(0, fontRendererObj, width / 2 + 130, height / 2 - 70, 40, 20);
 		valueField.setText(String.valueOf(value));
-		valueField.func_175205_a(new NumberPredicate(100));
+		valueField.setValidator(new NumberPredicate(100));
 		redField = new GuiTextField(0, fontRendererObj, width / 2 + 10, height / 2 + 50, 40, 20);
 		redField.setText(String.valueOf((rgb & 0xff0000) >> 16));
-		redField.func_175205_a(new NumberPredicate(255));
+		redField.setValidator(new NumberPredicate(255));
 		greenField = new GuiTextField(0, fontRendererObj, width / 2 + 70, height / 2 + 50, 40, 20);
 		greenField.setText(String.valueOf((rgb & 0x00ff00) >> 8));
-		greenField.func_175205_a(new NumberPredicate(255));
+		greenField.setValidator(new NumberPredicate(255));
 		blueField = new GuiTextField(0, fontRendererObj, width / 2 + 130, height / 2 + 50, 40, 20);
 		blueField.setText(String.valueOf(rgb & 0x0000ff));
-		blueField.func_175205_a(new NumberPredicate(255));
+		blueField.setValidator(new NumberPredicate(255));
 		alphaField = new GuiTextField(0, fontRendererObj, width / 2 - 190, height / 2 + 37, 40, 20);
 		alphaField.setText(String.valueOf(alpha));
-		alphaField.func_175205_a(new NumberPredicate(255));
+		alphaField.setValidator(new NumberPredicate(255));
 	}
 
 	@Override
@@ -154,17 +154,17 @@ public class GuiColorPicker extends GuiScreen {
 		int col2;
 
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+		VertexBuffer buffer = tessellator.getBuffer();
 
 		// Color wheel
 		int x = width / 2 - 80;
 		int y = height / 2 - 30;
 		for (float f = 0; f < 360; f += 0.25) {
-			worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+			buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 			float fRads = (float) Math.toRadians(f);
 			col1 = GeneralUtils.hsvToRgb((int) f, 100, 100);
-			worldRenderer.pos(x, y, 0).color(1f, 1f, 1f, 1f).endVertex();
-			worldRenderer.pos(x + Math.cos(fRads) * 50, y + Math.sin(fRads) * 50, 0)
+			buffer.pos(x, y, 0).color(1f, 1f, 1f, 1f).endVertex();
+			buffer.pos(x + Math.cos(fRads) * 50, y + Math.sin(fRads) * 50, 0)
 					.color((col1 & 0xff0000) >> 16, (col1 & 0x00ff00) >> 8, col1 & 0x0000ff, 255).endVertex();
 			tessellator.draw();
 		}
@@ -213,11 +213,11 @@ public class GuiColorPicker extends GuiScreen {
 			y = height / 2 - 32;
 			GlStateManager.enableTexture2D();
 			mc.getTextureManager().bindTexture(transparentBackground);
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			worldRenderer.pos(x, y + 64, 0).tex(0, 64d / 16).endVertex();
-			worldRenderer.pos(x + 20, y + 64, 0).tex(20d / 16, 64d / 16).endVertex();
-			worldRenderer.pos(x + 20, y, 0).tex(20d / 16, 0).endVertex();
-			worldRenderer.pos(x, y, 0).tex(0, 0).endVertex();
+			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			buffer.pos(x, y + 64, 0).tex(0, 64d / 16).endVertex();
+			buffer.pos(x + 20, y + 64, 0).tex(20d / 16, 64d / 16).endVertex();
+			buffer.pos(x + 20, y, 0).tex(20d / 16, 0).endVertex();
+			buffer.pos(x, y, 0).tex(0, 0).endVertex();
 			tessellator.draw();
 
 			GeneralUtils.drawGradientRect(x, y, x + 20, y + 64, rgb | 0xff000000, rgb | 0xff000000, rgb, rgb);
@@ -228,11 +228,11 @@ public class GuiColorPicker extends GuiScreen {
 		if (enableAlpha && alpha != 255) {
 			// color transparent background
 			GlStateManager.enableTexture2D();
-			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			worldRenderer.pos(x - 30, y + 20, 0).tex(0, 20f / 16).endVertex();
-			worldRenderer.pos(x + 30, y + 20, 0).tex(60f / 16, 20f / 16).endVertex();
-			worldRenderer.pos(x + 30, y, 0).tex(60f / 16, 0).endVertex();
-			worldRenderer.pos(x - 30, y, 0).tex(0, 0).endVertex();
+			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			buffer.pos(x - 30, y + 20, 0).tex(0, 20f / 16).endVertex();
+			buffer.pos(x + 30, y + 20, 0).tex(60f / 16, 20f / 16).endVertex();
+			buffer.pos(x + 30, y, 0).tex(60f / 16, 0).endVertex();
+			buffer.pos(x - 30, y, 0).tex(0, 0).endVertex();
 			tessellator.draw();
 			GlStateManager.disableTexture2D();
 		}
@@ -246,54 +246,54 @@ public class GuiColorPicker extends GuiScreen {
 		x = width / 2;
 		// hue marker
 		y = height / 2 - 40;
-		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + hue * 64 / 360, y, 0).endVertex();
-		worldRenderer.pos(x + hue * 64 / 360, y + 20, 0).endVertex();
+		buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		buffer.pos(x + hue * 64 / 360, y, 0).endVertex();
+		buffer.pos(x + hue * 64 / 360, y + 20, 0).endVertex();
 		tessellator.draw();
 
 		// saturation marker
 		y += 30;
-		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + saturation * 64 / 100, y, 0).endVertex();
-		worldRenderer.pos(x + saturation * 64 / 100, y + 20, 0).endVertex();
+		buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		buffer.pos(x + saturation * 64 / 100, y, 0).endVertex();
+		buffer.pos(x + saturation * 64 / 100, y + 20, 0).endVertex();
 		tessellator.draw();
 
 		// value marker
 		y += 30;
-		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + value * 64 / 100, y, 0).endVertex();
-		worldRenderer.pos(x + value * 64 / 100, y + 20, 0).endVertex();
+		buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		buffer.pos(x + value * 64 / 100, y, 0).endVertex();
+		buffer.pos(x + value * 64 / 100, y + 20, 0).endVertex();
 		tessellator.draw();
 
 		// red marker
 		x += 100;
 		y = height / 2 - 40;
-		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + ((rgb & 0xff0000) >> 16) * 64 / 255, y, 0).endVertex();
-		worldRenderer.pos(x + ((rgb & 0xff0000) >> 16) * 64 / 255, y + 20, 0).endVertex();
+		buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		buffer.pos(x + ((rgb & 0xff0000) >> 16) * 64 / 255, y, 0).endVertex();
+		buffer.pos(x + ((rgb & 0xff0000) >> 16) * 64 / 255, y + 20, 0).endVertex();
 		tessellator.draw();
 
 		// green marker
 		y += 30;
-		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + ((rgb & 0x00ff00) >> 8) * 64 / 255, y, 0).endVertex();
-		worldRenderer.pos(x + ((rgb & 0x00ff00) >> 8) * 64 / 255, y + 20, 0).endVertex();
+		buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		buffer.pos(x + ((rgb & 0x00ff00) >> 8) * 64 / 255, y, 0).endVertex();
+		buffer.pos(x + ((rgb & 0x00ff00) >> 8) * 64 / 255, y + 20, 0).endVertex();
 		tessellator.draw();
 
 		// blue marker
 		y += 30;
-		worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		worldRenderer.pos(x + (rgb & 0x0000ff) * 64 / 255, y, 0).endVertex();
-		worldRenderer.pos(x + (rgb & 0x0000ff) * 64 / 255, y + 20, 0).endVertex();
+		buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		buffer.pos(x + (rgb & 0x0000ff) * 64 / 255, y, 0).endVertex();
+		buffer.pos(x + (rgb & 0x0000ff) * 64 / 255, y + 20, 0).endVertex();
 		tessellator.draw();
 
 		if (enableAlpha) {
 			// alpha marker
 			x = width / 2 - 170;
 			y = height / 2 - 32;
-			worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-			worldRenderer.pos(x, y + 64 - alpha * 64 / 255, 0).endVertex();
-			worldRenderer.pos(x + 20, y + 64 - alpha * 64 / 255, 0).endVertex();
+			buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+			buffer.pos(x, y + 64 - alpha * 64 / 255, 0).endVertex();
+			buffer.pos(x + 20, y + 64 - alpha * 64 / 255, 0).endVertex();
 			tessellator.draw();
 		}
 
@@ -303,7 +303,7 @@ public class GuiColorPicker extends GuiScreen {
 		x = width / 2 - 80;
 		y = height / 2 - 30;
 		int dist = saturation / 2;
-		mc.getTextureManager().bindTexture(Gui.icons);
+		mc.getTextureManager().bindTexture(Gui.ICONS);
 		this.drawTexturedModalRect(x + (int) (Math.cos(Math.toRadians(hue)) * dist - 7),
 				y + (int) (Math.sin(Math.toRadians(hue)) * dist) - 7, 0, 0, 16, 16);
 
@@ -614,25 +614,25 @@ public class GuiColorPicker extends GuiScreen {
 	}
 
 	private void updateHueClick(int dx) {
-		hue = MathHelper.clamp_int(dx * 360 / 64, 0, 360);
+		hue = MathHelper.clamp(dx * 360 / 64, 0, 360);
 
 		rgb = GeneralUtils.hsvToRgb(hue, saturation, value);
 	}
 
 	private void updateSaturationClick(int dx) {
-		saturation = MathHelper.clamp_int(dx * 100 / 64, 0, 100);
+		saturation = MathHelper.clamp(dx * 100 / 64, 0, 100);
 
 		rgb = GeneralUtils.hsvToRgb(hue, saturation, value);
 	}
 
 	private void updateValueClick(int dx) {
-		value = MathHelper.clamp_int(dx * 100 / 64, 0, 100);
+		value = MathHelper.clamp(dx * 100 / 64, 0, 100);
 
 		rgb = GeneralUtils.hsvToRgb(hue, saturation, value);
 	}
 
 	private void updateRedClick(int dx) {
-		dx = MathHelper.clamp_int(dx, 0, 64);
+		dx = MathHelper.clamp(dx, 0, 64);
 		rgb &= 0x00ffff;
 		rgb |= (dx * 255 / 64) << 16;
 		int[] hsv = GeneralUtils.rgbToHsv(rgb);
@@ -643,7 +643,7 @@ public class GuiColorPicker extends GuiScreen {
 	}
 
 	private void updateGreenClick(int dx) {
-		dx = MathHelper.clamp_int(dx, 0, 64);
+		dx = MathHelper.clamp(dx, 0, 64);
 		rgb &= 0xff00ff;
 		rgb |= (dx * 255 / 64) << 8;
 		int[] hsv = GeneralUtils.rgbToHsv(rgb);
@@ -654,7 +654,7 @@ public class GuiColorPicker extends GuiScreen {
 	}
 
 	private void updateBlueClick(int dx) {
-		dx = MathHelper.clamp_int(dx, 0, 64);
+		dx = MathHelper.clamp(dx, 0, 64);
 		rgb &= 0xffff00;
 		rgb |= dx * 255 / 64;
 		int[] hsv = GeneralUtils.rgbToHsv(rgb);
@@ -665,7 +665,7 @@ public class GuiColorPicker extends GuiScreen {
 	}
 
 	private void updateAlphaClick(int dy) {
-		dy = MathHelper.clamp_int(dy, 0, 64);
+		dy = MathHelper.clamp(dy, 0, 64);
 		dy = 64 - dy;
 		alpha = dy * 255 / 64;
 	}

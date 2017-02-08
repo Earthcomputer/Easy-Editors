@@ -9,6 +9,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.api.SmartTranslationRegistry;
 import net.earthcomputer.easyeditors.api.util.FakeWorld;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.minecraft.client.Minecraft;
@@ -20,7 +21,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 /**
@@ -34,7 +35,7 @@ public class GuiSelectEntity extends GuiScreen {
 	private GuiScreen previousScreen;
 	private IEntitySelectorCallback callback;
 
-	private List<String> entities;
+	private List<ResourceLocation> entities;
 	private int selectedIndex;
 
 	private World theWorld;
@@ -54,14 +55,14 @@ public class GuiSelectEntity extends GuiScreen {
 
 		entities = Lists.newArrayList(EntityList.getEntityNameList());
 		if (includePlayer)
-			entities.add("Player");
-		if (!includeLightning)
-			entities.remove("LightningBolt");
+			entities.add(new ResourceLocation("player"));
+		if (includeLightning)
+			entities.remove(EntityList.LIGHTNING_BOLT);
 		for (String additionalOption : additionalOptions)
-			entities.add(additionalOption);
-		Collections.sort(entities, new Comparator<String>() {
+			entities.add(new ResourceLocation(additionalOption));
+		Collections.sort(entities, new Comparator<ResourceLocation>() {
 			@Override
-			public int compare(String s1, String s2) {
+			public int compare(ResourceLocation s1, ResourceLocation s2) {
 				return String.CASE_INSENSITIVE_ORDER.compare(getEntityName(s1), getEntityName(s2));
 			}
 		});
@@ -136,21 +137,21 @@ public class GuiSelectEntity extends GuiScreen {
 	 * @param entity
 	 * @return
 	 */
-	public static String getEntityName(String entity) {
-		String unlocalized = "entity." + entity + ".name";
-		if (StatCollector.canTranslate(unlocalized))
+	public static String getEntityName(ResourceLocation entity) {
+		String unlocalized = "entity." + EntityList.getTranslationName(entity) + ".name";
+		if (SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(unlocalized))
 			return I18n.format(unlocalized);
-		return entity;
+		return entity.getResourcePath();
 	}
 
 	private Entity createEntity(int slotIndex) {
-		String entityName = entities.get(slotIndex);
-		if ("Player".equals(entityName)) {
-			return Minecraft.getMinecraft().thePlayer;
-		} else if ("LightningBolt".equals(entityName)) {
-			return new EntityLightningBolt(theWorld, 0, 0, 0);
+		ResourceLocation entityName = entities.get(slotIndex);
+		if (new ResourceLocation("player").equals(entityName)) {
+			return Minecraft.getMinecraft().player;
+		} else if (EntityList.LIGHTNING_BOLT.equals(entityName)) {
+			return new EntityLightningBolt(theWorld, 0, 0, 0, true);
 		} else {
-			return EntityList.createEntityByName(entityName, theWorld);
+			return EntityList.createEntityByIDFromName(entityName, theWorld);
 		}
 	}
 
@@ -184,12 +185,13 @@ public class GuiSelectEntity extends GuiScreen {
 		@Override
 		protected void drawSlot(int entryID, int x, int y, int height, int mouseX, int mouseY) {
 			FontRenderer fontRenderer = GuiSelectEntity.this.fontRendererObj;
-			String entityName = entities.get(entryID);
+			ResourceLocation entityName = entities.get(entryID);
 
 			String str = getEntityName(entityName);
 			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2, y + 2,
 					0xffffff);
-			fontRenderer.drawString(entityName, x + getListWidth() / 2 - fontRenderer.getStringWidth(entityName) / 2,
+			fontRenderer.drawString(entityName.toString(),
+					x + getListWidth() / 2 - fontRenderer.getStringWidth(entityName.toString()) / 2,
 					y + 4 + fontRenderer.FONT_HEIGHT, 0xc0c0c0);
 		}
 

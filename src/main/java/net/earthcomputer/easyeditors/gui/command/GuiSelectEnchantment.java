@@ -38,13 +38,13 @@ public class GuiSelectEnchantment extends GuiScreen {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 		enchantments = Lists.newArrayList();
-		for (ResourceLocation rl : Enchantment.func_181077_c()) {
+		for (ResourceLocation rl : Enchantment.REGISTRY.getKeys()) {
 			enchantments.add(rl.toString());
 		}
 		Collections.sort(enchantments, String.CASE_INSENSITIVE_ORDER);
-		if (callback.getEnchantment() != -1) {
-			Set<ResourceLocation> names = Enchantment.func_181077_c();
-			Enchantment enchantment = Enchantment.getEnchantmentById(callback.getEnchantment());
+		if (callback.getEnchantment() != null) {
+			Set<ResourceLocation> names = Enchantment.REGISTRY.getKeys();
+			Enchantment enchantment = Enchantment.getEnchantmentByLocation(callback.getEnchantment().toString());
 			String enchName = null;
 			for (ResourceLocation name : names) {
 				if (Enchantment.getEnchantmentByLocation(name.toString()) == enchantment) {
@@ -86,7 +86,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 	public void actionPerformed(GuiButton button) {
 		switch (button.id) {
 		case 0:
-			callback.setEnchantment(Enchantment.getEnchantmentByLocation(enchantments.get(selectedIndex)).effectId);
+			callback.setEnchantment(Enchantment.getEnchantmentByLocation(enchantments.get(selectedIndex)).delegate.name());
 			mc.displayGuiScreen(previousScreen);
 			break;
 		case 1:

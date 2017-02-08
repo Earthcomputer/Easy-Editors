@@ -19,8 +19,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
@@ -126,7 +126,7 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 				doneHoverChecker = new HoverChecker(doneButton, 1000);
 
 			if (doneHoverChecker.checkHover(mouseX, mouseY))
-				GeneralUtils.drawTooltip(mouseX, mouseY, EnumChatFormatting.RED + invalidText, width / 2);
+				GeneralUtils.drawTooltip(mouseX, mouseY, TextFormatting.RED + invalidText, width / 2);
 		}
 
 		commandSlotRectangle.drawForeground(2 - getScrollX(), 2 - getScrollY() + getHeaderHeight(), mouseX, mouseY,

@@ -4,7 +4,7 @@
   "name": "Easy Editors",
   "description": "Easy Editor GUIs for command blocks, books and more!",
   "version": "alphatests",
-  "mcversion": "1.8",
+  "mcversion": "1.11.2",
   "url": "https://github.com/Earthcomputer/Easy-Editors",
   "updateUrl": "",
   "authorList": ["Earthcomputer"],

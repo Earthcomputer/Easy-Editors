@@ -1,7 +1,7 @@
 package net.earthcomputer.easyeditors.gui.command;
 
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**

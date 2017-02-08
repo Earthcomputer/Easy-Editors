@@ -2,12 +2,12 @@ package net.earthcomputer.easyeditors.api.util;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
@@ -18,38 +18,40 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.IProgressUpdate;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IWorldAccess;
+import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.MinecraftException;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.IChunkLoader;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.IPlayerFileData;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
 
 /**
  * This class represents a fake world, used for rendering entities. Use
@@ -69,13 +71,13 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
-		return BiomeGenBase.plains;
+	public Biome getBiome(BlockPos pos) {
+		return Biomes.PLAINS;
 	}
 
 	@Override
-	public BiomeGenBase getBiomeGenForCoordsBody(BlockPos pos) {
-		return BiomeGenBase.plains;
+	public Biome getBiomeForCoordsBody(BlockPos pos) {
+		return Biomes.PLAINS;
 	}
 
 	@Override
@@ -84,8 +86,8 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public Block getGroundAboveSeaLevel(BlockPos pos) {
-		return Blocks.grass;
+	public IBlockState getGroundAboveSeaLevel(BlockPos pos) {
+		return Blocks.GRASS.getDefaultState();
 	}
 
 	@Override
@@ -173,11 +175,11 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void markBlockForUpdate(BlockPos pos) {
+	public void notifyBlockUpdate(BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
 	}
 
 	@Override
-	public void notifyNeighborsRespectDebug(BlockPos pos, Block blockType) {
+	public void notifyNeighborsRespectDebug(BlockPos pos, Block blockType, boolean updateObservers) {
 	}
 
 	@Override
@@ -193,7 +195,11 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void notifyNeighborsOfStateChange(BlockPos pos, Block blockType) {
+	public void updateObservingBlocksAt(BlockPos pos, Block blockType) {
+	}
+
+	@Override
+	public void notifyNeighborsOfStateChange(BlockPos pos, Block blockType, boolean updateObservers) {
 	}
 
 	@Override
@@ -201,7 +207,11 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void notifyBlockOfStateChange(BlockPos pos, Block blockIn) {
+	public void neighborChanged(BlockPos pos, Block blockIn, BlockPos fromPos) {
+	}
+
+	@Override
+	public void observedNeighborChanged(BlockPos pos, Block blockIn, BlockPos fromPos) {
 	}
 
 	@Override
@@ -275,9 +285,9 @@ public class FakeWorld extends World {
 	@Override
 	public IBlockState getBlockState(BlockPos pos) {
 		int y = pos.getY();
-		return y == 0 ? Blocks.bedrock.getDefaultState()
-				: (y < 63 ? Blocks.dirt.getDefaultState()
-						: (y == 63 ? Blocks.grass.getDefaultState() : Blocks.air.getDefaultState()));
+		return y == 0 ? Blocks.BEDROCK.getDefaultState()
+				: (y < 63 ? Blocks.DIRT.getDefaultState()
+						: (y == 63 ? Blocks.GRASS.getDefaultState() : Blocks.AIR.getDefaultState()));
 	}
 
 	@Override
@@ -286,40 +296,34 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public MovingObjectPosition rayTraceBlocks(Vec3 p_72933_1_, Vec3 p_72933_2_) {
+	public RayTraceResult rayTraceBlocks(Vec3d p_72933_1_, Vec3d p_72933_2_) {
 		return null;
 	}
 
 	@Override
-	public MovingObjectPosition rayTraceBlocks(Vec3 start, Vec3 end, boolean stopOnLiquid) {
+	public RayTraceResult rayTraceBlocks(Vec3d start, Vec3d end, boolean stopOnLiquid) {
 		return null;
 	}
 
 	@Override
-	public MovingObjectPosition rayTraceBlocks(Vec3 vec31, Vec3 vec32, boolean stopOnLiquid,
+	public RayTraceResult rayTraceBlocks(Vec3d vec31, Vec3d vec32, boolean stopOnLiquid,
 			boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock) {
 		return null;
 	}
 
-	@Override
-	public void playSoundAtEntity(Entity entityIn, String name, float volume, float pitch) {
+	public void playSound(EntityPlayer player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume,
+			float pitch) {
 	}
 
-	@Override
-	public void playSoundToNearExcept(EntityPlayer player, String name, float volume, float pitch) {
+	public void playSound(EntityPlayer player, double x, double y, double z, SoundEvent soundIn, SoundCategory category,
+			float volume, float pitch) {
 	}
 
-	@Override
-	public void playSoundEffect(double x, double y, double z, String soundName, float volume, float pitch) {
+	public void playSound(double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume,
+			float pitch, boolean distanceDelay) {
 	}
 
-	@Override
-	public void playSound(double x, double y, double z, String soundName, float volume, float pitch,
-			boolean distanceDelay) {
-	}
-
-	@Override
-	public void playRecord(BlockPos pos, String name) {
+	public void playRecord(BlockPos blockPositionIn, SoundEvent soundEventIn) {
 	}
 
 	@Override
@@ -338,7 +342,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public boolean spawnEntityInWorld(Entity entityIn) {
+	public boolean spawnEntity(Entity entityIn) {
 		return false;
 	}
 
@@ -355,26 +359,21 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void removePlayerEntityDangerously(Entity entityIn) {
+	public void removeEntityDangerously(Entity entityIn) {
 	}
 
 	@Override
-	public void addWorldAccess(IWorldAccess worldAccess) {
+	public void addEventListener(IWorldEventListener worldAccess) {
 	}
 
 	@Override
-	public List<AxisAlignedBB> getCollidingBoundingBoxes(Entity entityIn, AxisAlignedBB bb) {
+	public List<AxisAlignedBB> getCollisionBoxes(Entity entityIn, AxisAlignedBB bb) {
 		return Lists.newArrayList();
 	}
 
 	@Override
 	public boolean isInsideBorder(WorldBorder worldBorderIn, Entity entityIn) {
 		return true;
-	}
-
-	@Override
-	public List<AxisAlignedBB> func_147461_a(AxisAlignedBB bb) {
-		return Lists.newArrayList();
 	}
 
 	@Override
@@ -388,7 +387,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void removeWorldAccess(IWorldAccess worldAccess) {
+	public void removeEventListener(IWorldEventListener worldAccess) {
 	}
 
 	@Override
@@ -402,12 +401,12 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public Vec3 getSkyColor(Entity entityIn, float partialTicks) {
+	public Vec3d getSkyColor(Entity entityIn, float partialTicks) {
 		return getSkyColorBody(entityIn, partialTicks);
 	}
 
 	@Override
-	public Vec3 getSkyColorBody(Entity entityIn, float partialTicks) {
+	public Vec3d getSkyColorBody(Entity entityIn, float partialTicks) {
 		// TODO Auto-generated method stub
 		return super.getSkyColorBody(entityIn, partialTicks);
 	}
@@ -440,13 +439,13 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public Vec3 getCloudColour(float partialTicks) {
-		return new Vec3(1, 1, 1);
+	public Vec3d getCloudColour(float partialTicks) {
+		return new Vec3d(1, 1, 1);
 	}
 
 	@Override
-	public Vec3 getFogColor(float partialTicks) {
-		return new Vec3(1, 1, 1);
+	public Vec3d getFogColor(float partialTicks) {
+		return new Vec3d(1, 1, 1);
 	}
 
 	@Override
@@ -518,7 +517,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public boolean isAnyLiquid(AxisAlignedBB bb) {
+	public boolean containsAnyLiquid(AxisAlignedBB bb) {
 		return false;
 	}
 
@@ -538,12 +537,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public boolean isAABBInMaterial(AxisAlignedBB bb, Material materialIn) {
-		return false;
-	}
-
-	@Override
-	public float getBlockDensity(Vec3 vec, AxisAlignedBB bb) {
+	public float getBlockDensity(Vec3d vec, AxisAlignedBB bb) {
 		return 0;
 	}
 
@@ -618,11 +612,6 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	protected int getRenderDistanceChunks() {
-		return 2;
-	}
-
-	@Override
 	protected void playMoodSoundAndCheckLight(int p_147467_1_, int p_147467_2_, Chunk chunkIn) {
 	}
 
@@ -631,7 +620,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void forceBlockUpdateTick(Block blockType, BlockPos pos, Random random) {
+	public void immediateBlockTick(BlockPos pos, IBlockState state, Random random) {
 	}
 
 	@Override
@@ -685,7 +674,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public List<NextTickListEntry> func_175712_a(StructureBoundingBox structureBB, boolean p_175712_2_) {
+	public List<NextTickListEntry> getPendingBlockUpdates(StructureBoundingBox structureBB, boolean p_175712_2_) {
 		return Lists.newArrayList();
 	}
 
@@ -755,8 +744,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public boolean canBlockBePlaced(Block blockIn, BlockPos pos, boolean p_175716_3_, EnumFacing side, Entity entityIn,
-			ItemStack itemStackIn) {
+	public boolean mayPlace(Block blockIn, BlockPos pos, boolean p_175716_3_, EnumFacing side, Entity entityIn) {
 		return false;
 	}
 
@@ -804,13 +792,20 @@ public class FakeWorld extends World {
 		return 0;
 	}
 
-	@Override
 	public EntityPlayer getClosestPlayerToEntity(Entity entityIn, double distance) {
 		return null;
 	}
 
-	@Override
-	public EntityPlayer getClosestPlayer(double x, double y, double z, double distance) {
+	public EntityPlayer getNearestPlayerNotCreative(Entity entityIn, double distance) {
+		return null;
+	}
+
+	public EntityPlayer getClosestPlayer(double posX, double posY, double posZ, double distance, boolean spectator) {
+		return null;
+	}
+
+	public EntityPlayer getClosestPlayer(double x, double y, double z, double p_190525_7_,
+			Predicate<Entity> p_190525_9_) {
 		return null;
 	}
 
@@ -920,7 +915,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public boolean canLightningStrike(BlockPos strikePosition) {
+	public boolean isRainingAt(BlockPos strikePosition) {
 		return false;
 	}
 
@@ -930,7 +925,7 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void setItemData(String dataID, WorldSavedData worldSavedDataIn) {
+	public void setData(String dataID, WorldSavedData worldSavedDataIn) {
 	}
 
 	@Override
@@ -938,16 +933,11 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public void playAuxSFX(int p_175718_1_, BlockPos pos, int p_175718_3_) {
+	public void playEvent(int p_175718_1_, BlockPos pos, int p_175718_3_) {
 	}
 
 	@Override
-	public void playAuxSFXAtEntity(EntityPlayer player, int sfxType, BlockPos pos, int p_180498_4_) {
-	}
-
-	@Override
-	public BlockPos getStrongholdPos(String name, BlockPos pos) {
-		return new BlockPos(0, 0, 0);
+	public void playEvent(EntityPlayer player, int sfxType, BlockPos pos, int p_180498_4_) {
 	}
 
 	@Override
@@ -983,11 +973,6 @@ public class FakeWorld extends World {
 	}
 
 	@Override
-	public boolean isFindingSpawnPoint() {
-		return false;
-	}
-
-	@Override
 	public boolean isSpawnChunk(int x, int z) {
 		return false;
 	}
@@ -1000,11 +985,6 @@ public class FakeWorld extends World {
 	@Override
 	public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
 		return pos.getY() <= 63;
-	}
-
-	@Override
-	public ImmutableSetMultimap<ChunkCoordIntPair, Ticket> getPersistentChunks() {
-		return ImmutableSetMultimap.of();
 	}
 
 	@Override
@@ -1022,7 +1002,7 @@ public class FakeWorld extends World {
 		}
 
 		@Override
-		public IChunkProvider createChunkGenerator() {
+		public IChunkGenerator createChunkGenerator() {
 			return new FakeChunkProvider();
 		}
 
@@ -1033,12 +1013,12 @@ public class FakeWorld extends World {
 
 		@Override
 		public float calculateCelestialAngle(long p_76563_1_, float p_76563_3_) {
-			return worldObj.getCelestialAngle(p_76563_3_);
+			return world.getCelestialAngle(p_76563_3_);
 		}
 
 		@Override
 		public int getMoonPhase(long p_76559_1_) {
-			return worldObj.getMoonPhase();
+			return world.getMoonPhase();
 		}
 
 		@Override
@@ -1047,8 +1027,8 @@ public class FakeWorld extends World {
 		}
 
 		@Override
-		public Vec3 getFogColor(float p_76562_1_, float p_76562_2_) {
-			return worldObj.getFogColor(p_76562_2_);
+		public Vec3d getFogColor(float p_76562_1_, float p_76562_2_) {
+			return world.getFogColor(p_76562_2_);
 		}
 
 		@Override
@@ -1068,7 +1048,7 @@ public class FakeWorld extends World {
 
 		@Override
 		public BlockPos getSpawnCoordinate() {
-			return worldObj.getSpawnPoint();
+			return world.getSpawnPoint();
 		}
 
 		@Override
@@ -1087,32 +1067,13 @@ public class FakeWorld extends World {
 		}
 
 		@Override
-		public String getDimensionName() {
-			return "Fake dimension which does not exist";
-		}
-
-		@Override
-		public String getInternalNameSuffix() {
-			return "ThisShouldNeverAppearReportToEarthcomputer";
-		}
-
-		@Override
 		public boolean doesWaterVaporize() {
 			return false;
 		}
 
 		@Override
-		public boolean getHasNoSky() {
+		public boolean hasNoSky() {
 			return false;
-		}
-
-		@Override
-		public int getDimensionId() {
-			return 0;
-		}
-
-		@Override
-		public void setDimension(int dim) {
 		}
 
 		@Override
@@ -1127,7 +1088,7 @@ public class FakeWorld extends World {
 
 		@Override
 		public BlockPos getRandomizedSpawnPoint() {
-			return worldObj.getSpawnPoint();
+			return world.getSpawnPoint();
 		}
 
 		@Override
@@ -1141,8 +1102,8 @@ public class FakeWorld extends World {
 		}
 
 		@Override
-		public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
-			return BiomeGenBase.plains;
+		public Biome getBiomeForCoords(BlockPos pos) {
+			return Biomes.PLAINS;
 		}
 
 		@Override
@@ -1152,32 +1113,32 @@ public class FakeWorld extends World {
 
 		@Override
 		public float getSunBrightnessFactor(float par1) {
-			return worldObj.getSunBrightnessFactor(par1);
+			return world.getSunBrightnessFactor(par1);
 		}
 
 		@Override
 		public float getCurrentMoonPhaseFactor() {
-			return worldObj.getCurrentMoonPhaseFactor();
+			return world.getCurrentMoonPhaseFactor();
 		}
 
 		@Override
-		public Vec3 getSkyColor(Entity cameraEntity, float partialTicks) {
-			return worldObj.getSkyColor(cameraEntity, partialTicks);
+		public Vec3d getSkyColor(Entity cameraEntity, float partialTicks) {
+			return world.getSkyColor(cameraEntity, partialTicks);
 		}
 
 		@Override
-		public Vec3 drawClouds(float partialTicks) {
-			return worldObj.drawCloudsBody(partialTicks);
+		public Vec3d getCloudColor(float partialTicks) {
+			return world.getCloudColorBody(partialTicks);
 		}
 
 		@Override
 		public float getSunBrightness(float par1) {
-			return worldObj.getSunBrightness(par1);
+			return world.getSunBrightness(par1);
 		}
 
 		@Override
 		public float getStarBrightness(float par1) {
-			return worldObj.getStarBrightness(par1);
+			return world.getStarBrightness(par1);
 		}
 
 		@Override
@@ -1214,7 +1175,7 @@ public class FakeWorld extends World {
 
 		@Override
 		public BlockPos getSpawnPoint() {
-			return worldObj.getSpawnPoint();
+			return world.getSpawnPoint();
 		}
 
 		@Override
@@ -1258,6 +1219,11 @@ public class FakeWorld extends World {
 		@Override
 		public boolean canDoRainSnowIce(Chunk chunk) {
 			return false;
+		}
+
+		@Override
+		public DimensionType getDimensionType() {
+			return DimensionType.OVERWORLD;
 		}
 	}
 
@@ -1307,18 +1273,13 @@ public class FakeWorld extends World {
 		}
 
 		@Override
-		public String getWorldDirectoryName() {
+		public TemplateManager getStructureTemplateManager() {
 			return null;
 		}
 	}
 
-	public static class FakeChunkProvider implements IChunkProvider {
+	public static class FakeChunkProvider implements IChunkGenerator, IChunkProvider {
 		public FakeChunkProvider() {
-		}
-
-		@Override
-		public boolean chunkExists(int x, int z) {
-			return false;
 		}
 
 		@Override
@@ -1327,31 +1288,35 @@ public class FakeWorld extends World {
 		}
 
 		@Override
-		public Chunk provideChunk(BlockPos blockPosIn) {
+		public void populate(int x, int z) {
+		}
+
+		@Override
+		public boolean generateStructures(Chunk chunkIn, int x, int z) {
+			return false;
+		}
+
+		@Override
+		public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
+			return BlockPos.ORIGIN;
+		}
+
+		@Override
+		public void recreateStructures(Chunk chunkIn, int x, int z) {
+		}
+
+		@Override
+		public Chunk getLoadedChunk(int x, int z) {
 			return null;
 		}
 
 		@Override
-		public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_) {
-		}
-
-		@Override
-		public boolean func_177460_a(IChunkProvider p_177460_1_, Chunk p_177460_2_, int p_177460_3_, int p_177460_4_) {
-			return false;
-		}
-
-		@Override
-		public boolean saveChunks(boolean p_73151_1_, IProgressUpdate progressCallback) {
-			return false;
-		}
-
-		@Override
-		public boolean unloadQueuedChunks() {
-			return false;
-		}
-
-		@Override
-		public boolean canSave() {
+		public boolean tick() {
 			return false;
 		}
 
@@ -1361,26 +1326,8 @@ public class FakeWorld extends World {
 		}
 
 		@Override
-		public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
-			return null;
-		}
-
-		@Override
-		public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position) {
-			return null;
-		}
-
-		@Override
-		public int getLoadedChunkCount() {
-			return 0;
-		}
-
-		@Override
-		public void recreateStructures(Chunk p_180514_1_, int p_180514_2_, int p_180514_3_) {
-		}
-
-		@Override
-		public void saveExtraData() {
+		public boolean isChunkGeneratedAt(int p_191062_1_, int p_191062_2_) {
+			return false;
 		}
 	}
 }

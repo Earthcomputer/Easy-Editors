@@ -17,7 +17,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.ConfigElement;
@@ -54,6 +54,7 @@ public class GuiFactory implements IModGuiFactory {
 		return null;
 	}
 
+	@Deprecated
 	@Override
 	public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
 		return null;
@@ -262,14 +263,14 @@ public class GuiFactory implements IModGuiFactory {
 				int color = getColor();
 				int rx = owningEntryList.controlX + textFieldValue.width + 6;
 				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+				VertexBuffer buffer = tessellator.getBuffer();
 				if (allowAlpha && ((color & 0xff000000) >>> 24) != 255) {
 					mc.getTextureManager().bindTexture(GuiColorPicker.transparentBackground);
-					worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-					worldRenderer.pos(rx, y + 17, 0).tex(0, 16f / 16).endVertex();
-					worldRenderer.pos(rx + 32, y + 17, 0).tex(32f / 16, 16f / 16).endVertex();
-					worldRenderer.pos(rx + 32, y + 1, 0).tex(32f / 16, 0).endVertex();
-					worldRenderer.pos(rx, y + 1, 0).tex(0, 0).endVertex();
+					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+					buffer.pos(rx, y + 17, 0).tex(0, 16f / 16).endVertex();
+					buffer.pos(rx + 32, y + 17, 0).tex(32f / 16, 16f / 16).endVertex();
+					buffer.pos(rx + 32, y + 1, 0).tex(32f / 16, 0).endVertex();
+					buffer.pos(rx, y + 1, 0).tex(0, 0).endVertex();
 					tessellator.draw();
 				}
 				GlStateManager.disableTexture2D();
@@ -277,11 +278,11 @@ public class GuiFactory implements IModGuiFactory {
 				int green = (color & 0x0000ff00) >> 8;
 				int blue = color & 0x000000ff;
 				int alpha = (color & 0xff000000) >>> 24;
-				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-				worldRenderer.pos(rx, y + 17, 0).tex(0, 1).color(red, green, blue, alpha).endVertex();
-				worldRenderer.pos(rx + 32, y + 17, 0).tex(1, 1).color(red, green, blue, alpha).endVertex();
-				worldRenderer.pos(rx + 32, y + 1, 0).tex(1, 0).color(red, green, blue, alpha).endVertex();
-				worldRenderer.pos(rx, y + 1, 0).tex(0, 0).color(red, green, blue, alpha).endVertex();
+				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+				buffer.pos(rx, y + 17, 0).tex(0, 1).color(red, green, blue, alpha).endVertex();
+				buffer.pos(rx + 32, y + 17, 0).tex(1, 1).color(red, green, blue, alpha).endVertex();
+				buffer.pos(rx + 32, y + 1, 0).tex(1, 0).color(red, green, blue, alpha).endVertex();
+				buffer.pos(rx, y + 1, 0).tex(0, 0).color(red, green, blue, alpha).endVertex();
 				tessellator.draw();
 				GlStateManager.enableTexture2D();
 

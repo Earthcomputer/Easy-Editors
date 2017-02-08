@@ -32,11 +32,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
@@ -55,7 +55,8 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 	private List<IBlockState> shownBlocks = Lists.newArrayList();
 
 	private static void initializeBlocks() {
-		for (Object obj : Block.blockRegistry) {
+		// TODO: switch to ForgeRegistries.BLOCK
+		for (Object obj : Block.REGISTRY) {
 			String name = String.valueOf(obj);
 			Block block = Block.getBlockFromName(name);
 			allBlocks.put(name, block.getDefaultState());
@@ -247,7 +248,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 	public void drawVirtualScreen(int mouseX, int mouseY, float partialTicks, int scrollX, int scrollY,
 			int headerHeight) {
 		int top = scrollY / 18;
-		int bottom = MathHelper.ceiling_float_int((float) (scrollY + getShownHeight()) / 18);
+		int bottom = MathHelper.ceil((float) (scrollY + getShownHeight()) / 18);
 		if (bottom >= shownBlocks.size())
 			bottom = shownBlocks.size() - 1;
 		for (int i = top; i <= bottom; i++) {
@@ -257,16 +258,16 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 				GlStateManager.color(1, 1, 1, 1);
 				GlStateManager.disableTexture2D();
 				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-				worldRenderer.pos(7, y + 18, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 7, y + 18, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 7, y - 2, 0).tex(1, 0).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(7, y - 2, 0).tex(0, 0).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(8, y + 17, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 8, y + 17, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 8, y - 1, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
-				worldRenderer.pos(8, y - 1, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
+				VertexBuffer buffer = tessellator.getBuffer();
+				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+				buffer.pos(7, y + 18, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(getShownWidth() - 7, y + 18, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(getShownWidth() - 7, y - 2, 0).tex(1, 0).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(7, y - 2, 0).tex(0, 0).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(8, y + 17, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
+				buffer.pos(getShownWidth() - 8, y + 17, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
+				buffer.pos(getShownWidth() - 8, y - 1, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
+				buffer.pos(8, y - 1, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
 				tessellator.draw();
 				GlStateManager.enableTexture2D();
 			}
@@ -276,9 +277,8 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 			GlStateManager.disableLighting();
 			GlStateManager.disableFog();
 			String displayName = getDisplayName(block);
-			drawString(
-					fontRendererObj, displayName + EnumChatFormatting.GRAY + " "
-							+ Block.blockRegistry.getNameForObject(block.getBlock()) + EnumChatFormatting.RESET,
+			drawString(fontRendererObj,
+					displayName + TextFormatting.GRAY + " " + block.getBlock().delegate.name() + TextFormatting.RESET,
 					28, y + 4, 0xffffff);
 		}
 	}
@@ -320,7 +320,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 	 * @return
 	 */
 	public static String getDisplayName(IBlockState block) {
-		return getDisplayName(String.valueOf(Block.blockRegistry.getNameForObject(block.getBlock())));
+		return getDisplayName(String.valueOf(block.getBlock().delegate.name()));
 	}
 
 	/**
@@ -391,9 +391,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		tooltip.add(currentLine);
 
 		List<String> otherLines = Lists.newArrayList();
-		// Why oh why do you have to force me to use raw types?
-		@SuppressWarnings("rawtypes")
-		Iterator<IProperty> iterator1 = blockState.getProperties().keySet().iterator();
+		Iterator<IProperty<?>> iterator1 = blockState.getProperties().keySet().iterator();
 		Iterator<IProperty<? extends Comparable<?>>> iterator2 = Iterators
 				.forArray(BlockPropertyRegistry.getVariantProperties(blockState.getBlock()));
 		while (advanced ? iterator1.hasNext() : iterator2.hasNext()) {
@@ -402,22 +400,21 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 				prop = iterator1.next();
 			else
 				prop = iterator2.next();
-			currentLine = EnumChatFormatting.BLUE + prop.getName() + EnumChatFormatting.RESET + ": ";
+			currentLine = TextFormatting.BLUE + prop.getName() + TextFormatting.RESET + ": ";
 			Comparable<?> value = blockState.getValue(prop);
 			String valueStr = value.toString();
 			if (value == Boolean.TRUE)
-				valueStr = EnumChatFormatting.GREEN + valueStr;
+				valueStr = TextFormatting.GREEN + valueStr;
 			else if (value == Boolean.FALSE)
-				valueStr = EnumChatFormatting.RED + valueStr;
+				valueStr = TextFormatting.RED + valueStr;
 			else
-				valueStr = EnumChatFormatting.YELLOW + valueStr;
+				valueStr = TextFormatting.YELLOW + valueStr;
 			currentLine += valueStr;
 			otherLines.add(currentLine);
 		}
 
 		if (advanced) {
-			otherLines.add(EnumChatFormatting.DARK_GRAY
-					+ String.valueOf(Block.blockRegistry.getNameForObject(blockState.getBlock())));
+			otherLines.add(TextFormatting.DARK_GRAY + String.valueOf(blockState.getBlock().delegate.name()));
 		}
 
 		if (!otherLines.isEmpty()) {
@@ -431,7 +428,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		return Iterables.any(getTooltip(block), new Predicate<String>() {
 			@Override
 			public boolean apply(String line) {
-				return EnumChatFormatting.getTextWithoutFormattingCodes(line).toLowerCase().contains(filterText);
+				return TextFormatting.getTextWithoutFormattingCodes(line).toLowerCase().contains(filterText);
 			}
 		});
 	}

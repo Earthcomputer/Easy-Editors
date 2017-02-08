@@ -9,9 +9,9 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Used to represent a GuiScreen whose main contents, or "virtual size", may
@@ -247,7 +247,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	 * @param scrollX
 	 */
 	public void setScrollX(int scrollX) {
-		this.scrollX = MathHelper.clamp_int(scrollX, 0, maxScrollX);
+		this.scrollX = MathHelper.clamp(scrollX, 0, maxScrollX);
 		refreshScrollBars();
 	}
 
@@ -278,7 +278,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	 * @param scrollY
 	 */
 	public void setScrollY(int scrollY) {
-		this.scrollY = MathHelper.clamp_int(scrollY, 0, maxScrollY);
+		this.scrollY = MathHelper.clamp(scrollY, 0, maxScrollY);
 		refreshScrollBars();
 	}
 
@@ -318,8 +318,8 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 	 * @param y
 	 */
 	public void scrollTo(int x, int y) {
-		scrollX = MathHelper.clamp_int(x, 0, maxScrollX);
-		scrollY = MathHelper.clamp_int(y, 0, maxScrollY);
+		scrollX = MathHelper.clamp(x, 0, maxScrollX);
+		scrollY = MathHelper.clamp(y, 0, maxScrollY);
 		refreshScrollBars();
 	}
 
@@ -530,7 +530,7 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		GlStateManager.disableLighting();
 		GlStateManager.disableFog();
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+		VertexBuffer buffer = tessellator.getBuffer();
 		GlStateManager.disableDepth();
 
 		GlStateManager.enableBlend();
@@ -538,17 +538,17 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		GlStateManager.disableAlpha();
 		GlStateManager.shadeModel(GL11.GL_SMOOTH);
 		GlStateManager.disableTexture2D();
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(0, headerHeight + 4, 0).tex(0, 1).color(0, 0, 0, 0).endVertex();
-		worldRenderer.pos(width, headerHeight + 4, 0).tex(1, 1).color(0, 0, 0, 0).endVertex();
-		worldRenderer.pos(width, headerHeight, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
-		worldRenderer.pos(0, headerHeight, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+		buffer.pos(0, headerHeight + 4, 0).tex(0, 1).color(0, 0, 0, 0).endVertex();
+		buffer.pos(width, headerHeight + 4, 0).tex(1, 1).color(0, 0, 0, 0).endVertex();
+		buffer.pos(width, headerHeight, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
+		buffer.pos(0, headerHeight, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
 		tessellator.draw();
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(0, height - footerHeight, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
-		worldRenderer.pos(width, height - footerHeight, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
-		worldRenderer.pos(width, height - footerHeight - 4, 0).tex(1, 0).color(0, 0, 0, 0).endVertex();
-		worldRenderer.pos(0, height - footerHeight - 4, 0).tex(0, 0).color(0, 0, 0, 0).endVertex();
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+		buffer.pos(0, height - footerHeight, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
+		buffer.pos(width, height - footerHeight, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
+		buffer.pos(width, height - footerHeight - 4, 0).tex(1, 0).color(0, 0, 0, 0).endVertex();
+		buffer.pos(0, height - footerHeight - 4, 0).tex(0, 0).color(0, 0, 0, 0).endVertex();
 		tessellator.draw();
 		GlStateManager.enableTexture2D();
 
@@ -595,36 +595,34 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 
 	protected void drawContainerBackground() {
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-		mc.getTextureManager().bindTexture(Gui.optionsBackground);
+		VertexBuffer buffer = tessellator.getBuffer();
+		mc.getTextureManager().bindTexture(Gui.OPTIONS_BACKGROUND);
 		GlStateManager.color(1, 1, 1, 1);
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(0, height - footerHeight, 0)
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+		buffer.pos(0, height - footerHeight, 0)
 				.tex((float) scrollX / 32, (float) (height - footerHeight + scrollY) / 32).color(0x20, 0x20, 0x20, 255)
 				.endVertex();
-		worldRenderer.pos(width, height - footerHeight, 0)
+		buffer.pos(width, height - footerHeight, 0)
 				.tex((float) (width + scrollX) / 32, (float) (height - footerHeight + scrollY) / 32)
 				.color(0x20, 0x20, 0x20, 255).endVertex();
-		worldRenderer.pos(width, headerHeight, 0)
-				.tex((float) (width + scrollX) / 32, (float) (headerHeight + scrollY) / 32).color(0x20, 0x20, 0x20, 255)
-				.endVertex();
-		worldRenderer.pos(0, headerHeight, 0).tex((float) scrollX / 32, (float) (headerHeight + scrollY) / 32)
+		buffer.pos(width, headerHeight, 0).tex((float) (width + scrollX) / 32, (float) (headerHeight + scrollY) / 32)
+				.color(0x20, 0x20, 0x20, 255).endVertex();
+		buffer.pos(0, headerHeight, 0).tex((float) scrollX / 32, (float) (headerHeight + scrollY) / 32)
 				.color(0x20, 0x20, 0x20, 255).endVertex();
 		tessellator.draw();
 	}
 
 	protected void overlayBackground(int top, int bottom) {
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-		this.mc.getTextureManager().bindTexture(Gui.optionsBackground);
+		VertexBuffer buffer = tessellator.getBuffer();
+		this.mc.getTextureManager().bindTexture(Gui.OPTIONS_BACKGROUND);
 		GlStateManager.color(1, 1, 1, 1);
-		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldRenderer.pos(0, bottom, 0).tex(0, (float) bottom / 32).color(0x40, 0x40, 0x40, 255).endVertex();
-		worldRenderer.pos(width, bottom, 0).tex((float) width / 32, (float) bottom / 32).color(0x40, 0x40, 0x40, 255)
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+		buffer.pos(0, bottom, 0).tex(0, (float) bottom / 32).color(0x40, 0x40, 0x40, 255).endVertex();
+		buffer.pos(width, bottom, 0).tex((float) width / 32, (float) bottom / 32).color(0x40, 0x40, 0x40, 255)
 				.endVertex();
-		worldRenderer.pos(width, top, 0).tex((float) width / 32, (float) top / 32).color(0x40, 0x40, 0x40, 255)
-				.endVertex();
-		worldRenderer.pos(0, top, 0).tex(0, (float) top / 32).color(0x40, 0x40, 0x40, 255).endVertex();
+		buffer.pos(width, top, 0).tex((float) width / 32, (float) top / 32).color(0x40, 0x40, 0x40, 255).endVertex();
+		buffer.pos(0, top, 0).tex(0, (float) top / 32).color(0x40, 0x40, 0x40, 255).endVertex();
 		tessellator.draw();
 	}
 
@@ -748,11 +746,11 @@ public abstract class GuiTwoWayScroll extends GuiScreen {
 		if (firstXScrollBarPos != -1) {
 			int dx = mouseX - firstMouseX;
 			float multiplier = (float) getShownWidth() / getXScrollBarWidth();
-			setScrollX(firstXScrollBarPos + MathHelper.ceiling_float_int(dx * multiplier));
+			setScrollX(firstXScrollBarPos + MathHelper.ceil(dx * multiplier));
 		} else if (firstYScrollBarPos != -1) {
 			int dy = mouseY - firstMouseY;
 			float multiplier = (float) getShownHeight() / getYScrollBarHeight();
-			setScrollY(firstYScrollBarPos + MathHelper.ceiling_float_int(dy * multiplier));
+			setScrollY(firstYScrollBarPos + MathHelper.ceil(dy * multiplier));
 		} else if (mouseY > headerHeight && mouseY < height - footerHeight) {
 			mouseClickMoveVirtual(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		}

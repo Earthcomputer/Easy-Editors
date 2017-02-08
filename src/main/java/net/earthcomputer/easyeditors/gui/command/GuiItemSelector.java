@@ -25,13 +25,14 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
@@ -50,11 +51,12 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 	private List<ItemStack> shownItems = Lists.newArrayList();
 
 	private static void initializeItems() {
-		for (Object obj : Item.itemRegistry.getKeys()) {
+		// TODO: switch to ForgeRegisties.ITEM
+		for (Object obj : Item.REGISTRY.getKeys()) {
 			String name = String.valueOf(obj);
 			Item item = Item.getByNameOrId(name);
 			allItems.put(name, new ItemStack(item));
-			List<ItemStack> subItems = Lists.newArrayList();
+			NonNullList<ItemStack> subItems = NonNullList.create();
 			item.getSubItems(item, null, subItems);
 			allItemsAndSubitems.putAll(name, subItems);
 		}
@@ -213,7 +215,7 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 				}
 
 				if (hoverChecker.checkHover(mouseX, mouseY)) {
-					GeneralUtils.drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().thePlayer,
+					GeneralUtils.drawTooltip(mouseX, mouseY, stack.getTooltip(Minecraft.getMinecraft().player,
 							Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
 				}
 			}
@@ -224,7 +226,7 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 	public void drawVirtualScreen(int mouseX, int mouseY, float partialTicks, int scrollX, int scrollY,
 			int headerHeight) {
 		int top = scrollY / 18;
-		int bottom = MathHelper.ceiling_float_int((float) (scrollY + getShownHeight()) / 18);
+		int bottom = MathHelper.ceil((float) (scrollY + getShownHeight()) / 18);
 		if (bottom >= shownItems.size())
 			bottom = shownItems.size() - 1;
 		for (int i = top; i <= bottom; i++) {
@@ -234,16 +236,16 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 				GlStateManager.color(1, 1, 1, 1);
 				GlStateManager.disableTexture2D();
 				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-				worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-				worldRenderer.pos(7, y + 18, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 7, y + 18, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 7, y - 2, 0).tex(1, 0).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(7, y - 2, 0).tex(0, 0).color(0x80, 0x80, 0x80, 255).endVertex();
-				worldRenderer.pos(8, y + 17, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 8, y + 17, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
-				worldRenderer.pos(getShownWidth() - 8, y - 1, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
-				worldRenderer.pos(8, y - 1, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
+				VertexBuffer buffer = tessellator.getBuffer();
+				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+				buffer.pos(7, y + 18, 0).tex(0, 1).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(getShownWidth() - 7, y + 18, 0).tex(1, 1).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(getShownWidth() - 7, y - 2, 0).tex(1, 0).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(7, y - 2, 0).tex(0, 0).color(0x80, 0x80, 0x80, 255).endVertex();
+				buffer.pos(8, y + 17, 0).tex(0, 1).color(0, 0, 0, 255).endVertex();
+				buffer.pos(getShownWidth() - 8, y + 17, 0).tex(1, 1).color(0, 0, 0, 255).endVertex();
+				buffer.pos(getShownWidth() - 8, y - 1, 0).tex(1, 0).color(0, 0, 0, 255).endVertex();
+				buffer.pos(8, y - 1, 0).tex(0, 0).color(0, 0, 0, 255).endVertex();
 				tessellator.draw();
 				GlStateManager.enableTexture2D();
 			}
@@ -261,10 +263,8 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 			GlStateManager.disableLighting();
 			GlStateManager.disableFog();
 			String displayName = stack.getDisplayName();
-			drawString(fontRendererObj,
-					displayName + EnumChatFormatting.GRAY + " " + Item.itemRegistry.getNameForObject(stack.getItem())
-							+ " @ " + stack.getItemDamage() + EnumChatFormatting.RESET,
-					28, y + 4, 0xffffff);
+			drawString(fontRendererObj, displayName + TextFormatting.GRAY + " " + stack.getItem().delegate.name()
+					+ " @ " + stack.getItemDamage() + TextFormatting.RESET, 28, y + 4, 0xffffff);
 		}
 	}
 
@@ -299,10 +299,10 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 	}
 
 	private boolean doesFilterTextMatch(final String filterText, ItemStack stack, String internalName) {
-		return Iterables.any(stack.getTooltip(mc.thePlayer, true), new Predicate<String>() {
+		return Iterables.any(stack.getTooltip(mc.player, true), new Predicate<String>() {
 			@Override
 			public boolean apply(String line) {
-				return EnumChatFormatting.getTextWithoutFormattingCodes(line).toLowerCase().contains(filterText);
+				return TextFormatting.getTextWithoutFormattingCodes(line).toLowerCase().contains(filterText);
 			}
 		});
 	}

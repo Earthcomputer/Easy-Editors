@@ -8,14 +8,14 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer.EnumChatVisibility;
-import net.minecraft.network.play.client.C01PacketChatMessage;
-import net.minecraft.scoreboard.IScoreObjectiveCriteria;
+import net.minecraft.network.play.client.CPacketChatMessage;
+import net.minecraft.scoreboard.IScoreCriteria;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -79,7 +79,7 @@ public class ChatBlocker {
 			mc.gameSettings.chatVisibility = EnumChatVisibility.SYSTEM;
 			mc.gameSettings.sendSettingsToServer();
 		}
-		mc.getNetHandler().addToSendQueue(new C01PacketChatMessage(command));
+		mc.getConnection().sendPacket(new CPacketChatMessage(command));
 		if (hidden) {
 			mc.gameSettings.chatVisibility = EnumChatVisibility.HIDDEN;
 			mc.gameSettings.sendSettingsToServer();
@@ -101,10 +101,10 @@ public class ChatBlocker {
 			}
 
 			@Override
-			public boolean accept(IChatComponent chat) {
-				if (!(chat instanceof ChatComponentTranslation))
+			public boolean accept(ITextComponent chat) {
+				if (!(chat instanceof TextComponentTranslation))
 					return true;
-				ChatComponentTranslation translation = (ChatComponentTranslation) chat;
+				TextComponentTranslation translation = (TextComponentTranslation) chat;
 				if (translation.getKey().equals(key)) {
 					done = true;
 					return false;
@@ -154,9 +154,9 @@ public class ChatBlocker {
 				}
 
 				@Override
-				public boolean accept(IChatComponent chat) {
-					if (chat instanceof ChatComponentTranslation) {
-						ChatComponentTranslation translation = (ChatComponentTranslation) chat;
+				public boolean accept(ITextComponent chat) {
+					if (chat instanceof TextComponentTranslation) {
+						TextComponentTranslation translation = (TextComponentTranslation) chat;
 						if (translation.getKey().equals("commands.generic.permission")) {
 							teams.abortFindingValue(1);
 							aborted = true;
@@ -171,8 +171,8 @@ public class ChatBlocker {
 							if (translation.getFormatArgs().length != 0) {
 								Object formatArgObj = translation.getFormatArgs()[0];
 								String formatArgStr;
-								if (formatArgObj instanceof IChatComponent)
-									formatArgStr = ((IChatComponent) formatArgObj).getUnformattedText();
+								if (formatArgObj instanceof ITextComponent)
+									formatArgStr = ((ITextComponent) formatArgObj).getUnformattedText();
 								else
 									formatArgStr = formatArgObj.toString();
 								valuesFound.clear();
@@ -189,13 +189,13 @@ public class ChatBlocker {
 							if (formatArgs.length >= 2) {
 								Object formatArgObj = formatArgs[0];
 								String internalTeamName, displayTeamName;
-								if (formatArgObj instanceof IChatComponent)
-									internalTeamName = ((IChatComponent) formatArgObj).getUnformattedText();
+								if (formatArgObj instanceof ITextComponent)
+									internalTeamName = ((ITextComponent) formatArgObj).getUnformattedText();
 								else
 									internalTeamName = formatArgObj.toString();
 								formatArgObj = formatArgs[1];
-								if (formatArgObj instanceof IChatComponent)
-									displayTeamName = ((IChatComponent) formatArgObj).getUnformattedText();
+								if (formatArgObj instanceof ITextComponent)
+									displayTeamName = ((ITextComponent) formatArgObj).getUnformattedText();
 								else
 									displayTeamName = formatArgObj.toString();
 								ScorePlayerTeam team = new ScorePlayerTeam(null, internalTeamName);
@@ -214,7 +214,7 @@ public class ChatBlocker {
 			});
 			executeCommand("/scoreboard teams list");
 		} else {
-			Collection<ScorePlayerTeam> teamsCollection = Minecraft.getMinecraft().theWorld.getScoreboard().getTeams();
+			Collection<ScorePlayerTeam> teamsCollection = Minecraft.getMinecraft().world.getScoreboard().getTeams();
 			teams.returnValue(Lists.newArrayList(teamsCollection));
 		}
 	}
@@ -249,9 +249,9 @@ public class ChatBlocker {
 				}
 
 				@Override
-				public boolean accept(IChatComponent chat) {
-					if (chat instanceof ChatComponentTranslation) {
-						ChatComponentTranslation translation = (ChatComponentTranslation) chat;
+				public boolean accept(ITextComponent chat) {
+					if (chat instanceof TextComponentTranslation) {
+						TextComponentTranslation translation = (TextComponentTranslation) chat;
 						if (translation.getKey().equals("commands.generic.permission")) {
 							objectives.abortFindingValue(1);
 							aborted = true;
@@ -266,8 +266,8 @@ public class ChatBlocker {
 							if (translation.getFormatArgs().length != 0) {
 								Object formatArgObj = translation.getFormatArgs()[0];
 								String formatArgStr;
-								if (formatArgObj instanceof IChatComponent)
-									formatArgStr = ((IChatComponent) formatArgObj).getUnformattedText();
+								if (formatArgObj instanceof ITextComponent)
+									formatArgStr = ((ITextComponent) formatArgObj).getUnformattedText();
 								else
 									formatArgStr = formatArgObj.toString();
 								valuesFound.clear();
@@ -284,22 +284,22 @@ public class ChatBlocker {
 							if (formatArgs.length >= 3) {
 								Object formatArgObj = formatArgs[0];
 								String objectiveName, objectiveDisplayName, objectiveCriterion;
-								if (formatArgObj instanceof IChatComponent)
-									objectiveName = ((IChatComponent) formatArgObj).getUnformattedText();
+								if (formatArgObj instanceof ITextComponent)
+									objectiveName = ((ITextComponent) formatArgObj).getUnformattedText();
 								else
 									objectiveName = formatArgObj.toString();
 								formatArgObj = formatArgs[1];
-								if (formatArgObj instanceof IChatComponent)
-									objectiveDisplayName = ((IChatComponent) formatArgObj).getUnformattedText();
+								if (formatArgObj instanceof ITextComponent)
+									objectiveDisplayName = ((ITextComponent) formatArgObj).getUnformattedText();
 								else
 									objectiveDisplayName = formatArgObj.toString();
 								formatArgObj = formatArgs[2];
-								if (formatArgObj instanceof IChatComponent)
-									objectiveCriterion = ((IChatComponent) formatArgObj).getUnformattedText();
+								if (formatArgObj instanceof ITextComponent)
+									objectiveCriterion = ((ITextComponent) formatArgObj).getUnformattedText();
 								else
 									objectiveCriterion = formatArgObj.toString();
 								ScoreObjective objective = new ScoreObjective(null, objectiveName,
-										IScoreObjectiveCriteria.INSTANCES.get(objectiveCriterion));
+										IScoreCriteria.INSTANCES.get(objectiveCriterion));
 								objective.setDisplayName(objectiveDisplayName);
 								valuesFound.add(objective);
 								lastActivity = System.nanoTime();
@@ -315,8 +315,8 @@ public class ChatBlocker {
 			});
 			executeCommand("/scoreboard objectives list");
 		} else {
-			Collection<ScoreObjective> objectivesCollection = MinecraftServer.getServer().worldServerForDimension(0)
-					.getScoreboard().getScoreObjectives();
+			Collection<ScoreObjective> objectivesCollection = DimensionManager.getWorld(0).getScoreboard()
+					.getScoreObjectives();
 			objectives.returnValue(Lists.newArrayList(objectivesCollection));
 		}
 	}
@@ -326,7 +326,7 @@ public class ChatBlocker {
 		Iterator<Blocker> blocksIterator = blocks.iterator();
 		while (blocksIterator.hasNext()) {
 			Blocker block = blocksIterator.next();
-			if (!block.accept(e.message))
+			if (!block.accept(e.getMessage()))
 				e.setCanceled(true);
 			if (block.isDone())
 				blocksIterator.remove();
@@ -358,7 +358,7 @@ public class ChatBlocker {
 		 * @param chat
 		 * @return false if the chat message should be blocked, true otherwise
 		 */
-		public abstract boolean accept(IChatComponent chat);
+		public abstract boolean accept(ITextComponent chat);
 	}
 
 }

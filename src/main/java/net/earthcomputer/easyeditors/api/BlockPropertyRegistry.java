@@ -68,8 +68,8 @@ public class BlockPropertyRegistry {
 		registerVariantProperty(BlockPistonExtension.TYPE);
 		registerVariantProperty(BlockColored.COLOR);
 		registerVariantProperty(BlockPistonMoving.TYPE);
-		registerVariantProperty(Blocks.yellow_flower.getTypeProperty());
-		registerVariantProperty(Blocks.red_flower.getTypeProperty());
+		registerVariantProperty(Blocks.YELLOW_FLOWER.getTypeProperty());
+		registerVariantProperty(Blocks.RED_FLOWER.getTypeProperty());
 		registerVariantProperty(BlockStoneSlab.VARIANT);
 		registerVariantProperty(BlockWoodSlab.VARIANT);
 		registerVariantProperty(BlockAnvil.DAMAGE);
