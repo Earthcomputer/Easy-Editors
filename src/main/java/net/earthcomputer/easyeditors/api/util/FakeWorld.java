@@ -42,7 +42,6 @@ import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
-import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -369,11 +368,6 @@ public class FakeWorld extends World {
 	@Override
 	public List<AxisAlignedBB> getCollisionBoxes(Entity entityIn, AxisAlignedBB bb) {
 		return Lists.newArrayList();
-	}
-
-	@Override
-	public boolean isInsideBorder(WorldBorder worldBorderIn, Entity entityIn) {
-		return true;
 	}
 
 	@Override
