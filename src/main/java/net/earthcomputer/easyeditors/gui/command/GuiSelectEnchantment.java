@@ -2,8 +2,8 @@ package net.earthcomputer.easyeditors.gui.command;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 
@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 /**
  * A GUI for selecting an enchantment
@@ -28,7 +29,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 	private GuiScreen previousScreen;
 	private IEnchantmentSelectorCallback callback;
 
-	private List<String> enchantments;
+	private List<ResourceLocation> enchantments;
 	private int selectedIndex = 0;
 
 	private GuiButton cancelButton;
@@ -39,21 +40,16 @@ public class GuiSelectEnchantment extends GuiScreen {
 		this.callback = callback;
 		enchantments = Lists.newArrayList();
 		for (ResourceLocation rl : Enchantment.REGISTRY.getKeys()) {
-			enchantments.add(rl.toString());
+			enchantments.add(rl);
 		}
-		Collections.sort(enchantments, String.CASE_INSENSITIVE_ORDER);
-		if (callback.getEnchantment() != null) {
-			Set<ResourceLocation> names = Enchantment.REGISTRY.getKeys();
-			Enchantment enchantment = Enchantment.getEnchantmentByLocation(callback.getEnchantment().toString());
-			String enchName = null;
-			for (ResourceLocation name : names) {
-				if (Enchantment.getEnchantmentByLocation(name.toString()) == enchantment) {
-					enchName = name.toString();
-					break;
-				}
+		Collections.sort(enchantments, new Comparator<ResourceLocation>() {
+			@Override
+			public int compare(ResourceLocation first, ResourceLocation second) {
+				return String.CASE_INSENSITIVE_ORDER.compare(first.toString(), second.toString());
 			}
-			if (enchName != null)
-				selectedIndex = enchantments.indexOf(enchName);
+		});
+		if (callback.getEnchantment() != null) {
+			selectedIndex = enchantments.indexOf(callback.getEnchantment());
 		}
 	}
 
@@ -86,7 +82,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 	public void actionPerformed(GuiButton button) {
 		switch (button.id) {
 		case 0:
-			callback.setEnchantment(Enchantment.getEnchantmentByLocation(enchantments.get(selectedIndex)).delegate.name());
+			callback.setEnchantment(enchantments.get(selectedIndex));
 			mc.displayGuiScreen(previousScreen);
 			break;
 		case 1:
@@ -143,13 +139,13 @@ public class GuiSelectEnchantment extends GuiScreen {
 		@Override
 		protected void drawSlot(int entryID, int x, int y, int height, int mouseX, int mouseY) {
 			FontRenderer fontRenderer = GuiSelectEnchantment.this.fontRendererObj;
-			String enchantmentName = enchantments.get(entryID);
+			ResourceLocation enchantmentName = enchantments.get(entryID);
 
-			String str = I18n.format(Enchantment.getEnchantmentByLocation(enchantmentName).getName());
+			String str = I18n.format(ForgeRegistries.ENCHANTMENTS.getValue(enchantmentName).getName());
 			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2, y + 2,
 					0xffffff);
-			fontRenderer.drawString(enchantmentName,
-					x + getListWidth() / 2 - fontRenderer.getStringWidth(enchantmentName) / 2,
+			fontRenderer.drawString(enchantmentName.toString(),
+					x + getListWidth() / 2 - fontRenderer.getStringWidth(enchantmentName.toString()) / 2,
 					y + 4 + fontRenderer.FONT_HEIGHT, 0xc0c0c0);
 		}
 

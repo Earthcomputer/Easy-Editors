@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 /**
  * A command slot which represents a selection of an enchantment
@@ -16,12 +17,12 @@ import net.minecraft.util.ResourceLocation;
  */
 public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement implements IEnchantmentSelectorCallback {
 
-	private ResourceLocation enchantmentId = null;
-	private CommandSlotLabel enchantmentName;
+	private ResourceLocation enchantmentName = null;
+	private CommandSlotLabel enchantmentNameLabel;
 	private CommandSlotIntTextField enchantmentLevel;
 
 	public CommandSlotEnchantment() {
-		addChild(enchantmentName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+		addChild(enchantmentNameLabel = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				I18n.format("gui.commandEditor.noEnchantment"), 0xff0000));
 		addChild(new CommandSlotButton(20, 20, "...") {
 			@Override
@@ -38,15 +39,15 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 
 	@Override
 	public ResourceLocation getEnchantment() {
-		return enchantmentId;
+		return enchantmentName;
 	}
 
 	@Override
 	public void setEnchantment(ResourceLocation id) {
-		if (id != this.enchantmentId) {
-			this.enchantmentId = id;
-			enchantmentName.setColor(0);
-			enchantmentName.setText(I18n.format(Enchantment.getEnchantmentByLocation(id.toString()).getName()));
+		if (!id.equals(this.enchantmentName)) {
+			this.enchantmentName = id;
+			enchantmentNameLabel.setColor(0);
+			enchantmentNameLabel.setText(I18n.format(Enchantment.getEnchantmentByLocation(id.toString()).getName()));
 			onChanged();
 		}
 	}
@@ -83,7 +84,7 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 	 *             - when this doesn't have a valid set of child components
 	 */
 	public void checkValid() throws UIInvalidException {
-		if (Enchantment.getEnchantmentByLocation(enchantmentId.toString()) == null)
+		if (!ForgeRegistries.ENCHANTMENTS.containsKey(enchantmentName))
 			throw new UIInvalidException("gui.commandEditor.enchantmentInvalid.noEnchantment");
 		enchantmentLevel.checkValid();
 	}
