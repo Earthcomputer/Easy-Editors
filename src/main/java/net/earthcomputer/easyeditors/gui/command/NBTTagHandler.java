@@ -434,11 +434,13 @@ public abstract class NBTTagHandler {
 				NBTTagList enchs = new NBTTagList();
 				for (int i = 0; i < list.entryCount(); i++) {
 					CommandSlotEnchantment cmdEnch = list.getEntry(i);
-					NBTTagCompound ench = new NBTTagCompound();
-					ench.setInteger("id", Enchantment.getEnchantmentID(
-							Enchantment.getEnchantmentByLocation(cmdEnch.getEnchantment().toString())));
-					ench.setInteger("lvl", cmdEnch.getLevel());
-					enchs.appendTag(ench);
+					if (cmdEnch.getEnchantment() != null) {
+						NBTTagCompound ench = new NBTTagCompound();
+						ench.setInteger("id", Enchantment.getEnchantmentID(
+								Enchantment.getEnchantmentByLocation(cmdEnch.getEnchantment().toString())));
+						ench.setInteger("lvl", cmdEnch.getLevel());
+						enchs.appendTag(ench);
+					}
 				}
 				if (nbt.hasKey("ench", Constants.NBT.TAG_LIST)) {
 					NBTTagList enchs1 = nbt.getTagList("ench", Constants.NBT.TAG_COMPOUND);
