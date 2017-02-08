@@ -2,11 +2,13 @@ package net.earthcomputer.easyeditors.api.util;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -399,9 +401,11 @@ public class GeneralUtils {
 	public static void logStackTrace(Logger logger, Throwable throwable) {
 		StringWriter sw = new StringWriter();
 		throwable.printStackTrace(new PrintWriter(sw));
-		for (String line : sw.toString().split("\n")) {
-			logger.error(line);
+		Scanner scanner = new Scanner(new StringReader(sw.toString()));
+		while (scanner.hasNextLine()) {
+			logger.error(scanner.nextLine());
 		}
+		scanner.close();
 	}
 
 	/**
@@ -521,7 +525,7 @@ public class GeneralUtils {
 						NBTBase entityNBT = JsonToNBT.getTagFromJson(event.getValue().getUnformattedText());
 
 						if (entityNBT instanceof NBTTagCompound) {
-							List<String> tooltipLines = Lists.<String> newArrayList();
+							List<String> tooltipLines = Lists.<String>newArrayList();
 							NBTTagCompound entityCompound = (NBTTagCompound) entityNBT;
 							tooltipLines.add(entityCompound.getString("name"));
 
