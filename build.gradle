@@ -9,9 +9,9 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply from: 'lang_constants.gradle'
-setupDecompWorkspace.dependsOn buildLangConstantsFile
-setupDevWorkspace.dependsOn buildLangConstantsFile
-setupCiWorkspace.dependsOn buildLangConstantsFile
+setupDecompWorkspace.dependsOn buildLangConstantsFiles
+setupDevWorkspace.dependsOn buildLangConstantsFiles
+setupCiWorkspace.dependsOn buildLangConstantsFiles
 
 sourceSets {
 	generated {

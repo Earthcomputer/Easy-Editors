@@ -1,28 +1,68 @@
-task buildLangConstantsFile << {
+task buildLangConstantsFiles << {
 	File langFile = project.file('src/main/resources/assets/easyeditors/lang/en_US.lang')
-	File javaFile = project.file('src/generated/java/net/earthcomputer/easyeditors/util/LangTranslate.java')
-	if (javaFile.exists()) javaFile.delete()
-	javaFile.getParentFile().mkdirs()
-	javaFile.createNewFile()
+	File translateKeysFile = project.file('src/generated/java/net/earthcomputer/easyeditors/util/TranslateKeys.java')
+	File translateFile = project.file('src/generated/java/net/earthcomputer/easyeditors/util/Translate.java')
+	if (translateKeysFile.exists()) translateKeysFile.delete()
+	translateKeysFile.getParentFile().mkdirs()
+	translateKeysFile.createNewFile()
+	if (translateFile.exists()) translateFile.delete()
+	translateFile.createNewFile()
 	
 	String nl = System.getProperty('line.separator')
-	javaFile.append('package net.earthcomputer.easyeditors.util;' + nl)
-	javaFile.append(nl)
-	javaFile.append('public class LangTranslate {' + nl)
-	javaFile.append(nl)
+	translateKeysFile.append('package net.earthcomputer.easyeditors.util;' + nl)
+	translateKeysFile.append(nl)
+	translateKeysFile.append('public class TranslateKeys {' + nl)
+	translateKeysFile.append(nl)
 	
 	langFile.eachLine {
 		line ->
 		if (!line.isEmpty() && !line.startsWith('#')) {
 			String[] key = line.split('=', 2)
-			javaFile.append('\tpublic static final String ')
-			javaFile.append(key[0].toUpperCase().replace('.', '_'))
-			javaFile.append(' = "')
-			javaFile.append(key[0])
-			javaFile.append('";' + nl)
+			translateKeysFile.append('\tpublic static final String ')
+			translateKeysFile.append(key[0].toUpperCase().replace('.', '_'))
+			translateKeysFile.append(' = "')
+			translateKeysFile.append(key[0])
+			translateKeysFile.append('";' + nl)
 		}
 	}
 	
-	javaFile.append(nl)
-	javaFile.append('}' + nl)
+	translateKeysFile.append(nl)
+	translateKeysFile.append('}' + nl)
+	
+	translateFile.append('package net.earthcomputer.easyeditors.util;' + nl)
+	translateFile.append(nl)
+	translateFile.append('import java.lang.reflect.Field;' + nl)
+	translateFile.append('import java.lang.reflect.Modifier;' + nl)
+	translateFile.append('import java.util.Map;' + nl)
+	translateFile.append(nl)
+	translateFile.append('import net.earthcomputer.easyeditors.api.LanguageLoadedEvent;' + nl)
+	translateFile.append('import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;' + nl)
+	translateFile.append(nl)
+	translateFile.append('public class Translate {' + nl)
+	translateFile.append(nl)
+	
+	langFile.eachLine {
+		line ->
+		if (!line.isEmpty() && !line.startsWith('#')) {
+			String[] key = line.split('=', 2)
+			translateFile.append('\tpublic static String ')
+			translateFile.append(key[0].toUpperCase().replace('.', '_'))
+			translateFile.append(';' + nl)
+		}
+	}
+	
+	translateFile.append(nl)
+	translateFile.append('\t@SubscribeEvent' + nl)
+	translateFile.append('\tpublic static void onLanguageLoaded(LanguageLoadedEvent e) throws Exception {' + nl)
+	translateFile.append('\t\tMap<String, String> translations = e.getTranslations();' + nl)
+	translateFile.append('\t\tfor (Field field : TranslateKeys.class.getFields()) {' + nl)
+	translateFile.append('\t\t\tif (!Modifier.isStatic(field.getModifiers()) || !Modifier.isFinal(field.getModifiers()) || field.getType() != String.class) {' + nl)
+	translateFile.append('\t\t\t\tcontinue;' + nl)
+	translateFile.append('\t\t\t}' + nl)
+	translateFile.append('\t\t\tField fieldHere = Translate.class.getField(field.getName());' + nl)
+	translateFile.append('\t\t\tfieldHere.set(null, translations.get(field.get(null)));' + nl)
+	translateFile.append('\t\t}' + nl)
+	translateFile.append('\t}' + nl)
+	translateFile.append(nl)
+	translateFile.append('}' + nl)
 }

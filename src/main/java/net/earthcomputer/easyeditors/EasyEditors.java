@@ -12,6 +12,7 @@ import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.Colors.Color;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiNewCommandBlock;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -79,6 +80,8 @@ public class EasyEditors {
 
 	@EventHandler
 	public void preinit(FMLPreInitializationEvent e) {
+		MinecraftForge.EVENT_BUS.register(Translate.class);
+
 		config = new Configuration(e.getSuggestedConfigurationFile());
 		config.load();
 

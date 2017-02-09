@@ -12,6 +12,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.Locale;
 import net.minecraft.util.text.translation.LanguageMap;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
@@ -31,7 +32,7 @@ public class SmartTranslationRegistry {
 	private static final Map<String, String> translationMap = ReflectionHelper.getPrivateValue(LanguageMap.class,
 			languageMapInstance, "field_74816_c", "languageList");
 	private static final Map<String, String> i18nProps = ReflectionHelper.getPrivateValue(Locale.class,
-			ReflectionHelper.<Locale, I18n> getPrivateValue(I18n.class, null, "field_135054_a", "i18nLocale"),
+			ReflectionHelper.<Locale, I18n>getPrivateValue(I18n.class, null, "field_135054_a", "i18nLocale"),
 			"field_135032_a", "properties");
 	/**
 	 * An <i>unmodifiable</i> map of all the translation keys and translated
@@ -105,6 +106,7 @@ public class SmartTranslationRegistry {
 					i18nProps.put(entry.getKey(), translation);
 				}
 			}
+			MinecraftForge.EVENT_BUS.post(new LanguageLoadedEvent(lang, Collections.unmodifiableMap(translationMap)));
 		}
 	}
 
