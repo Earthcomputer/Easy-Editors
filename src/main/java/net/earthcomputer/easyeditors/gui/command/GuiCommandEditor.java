@@ -15,6 +15,7 @@ import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -141,12 +142,12 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 
 	@Override
 	protected void drawForeground(int mouseX, int mouseY, float partialTicks) {
-		String str = I18n.format("gui.commandEditor.title");
+		String str = Translate.GUI_COMMANDEDITOR_TITLE;
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				getHeaderHeight() / 2 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 
 		try {
-			commandSlotRectangle.addArgs(Lists.<String> newArrayList());
+			commandSlotRectangle.addArgs(Lists.<String>newArrayList());
 			doneButton.enabled = true;
 			invalidText = null;
 		} catch (UIInvalidException e) {

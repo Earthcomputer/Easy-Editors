@@ -16,6 +16,8 @@ import net.earthcomputer.easyeditors.api.util.ReturnedValueListener;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -57,8 +59,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	public CommandSlotPlayerSelector(int flags) {
 		this.flags = flags;
 
-		addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.selectBy"),
-				Colors.playerSelectorSelectBy.color, new CommandSlotHelp("help.playerSelectors", "player_selectors")));
+		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SELECTBY,
+				Colors.playerSelectorSelectBy.color,
+				new CommandSlotHelp(TranslateKeys.HELP_PLAYERSELECTORS, "player_selectors")));
 
 		radioList = new CommandSlotRadioList() {
 			@Override
@@ -90,7 +93,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					return Patterns.partialPlayerName.matcher(input).matches();
 				}
 			});
-			radioList.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.username"),
+			radioList.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_USERNAME,
 					Colors.playerSelectorLabel.color, playerNameField));
 		}
 
@@ -104,13 +107,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					return Patterns.partialUUID.matcher(input).matches();
 				}
 			});
-			radioList.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.uuid"),
+			radioList.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_UUID,
 					Colors.playerSelectorLabel.color, UUIDField));
 		}
 
 		if ((flags & DISALLOW_SELECTOR) == 0) {
 			playerSelector = new CmdPlayerSelector();
-			radioList.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.selector"),
+			radioList.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SELECTOR,
 					Colors.playerSelectorLabel.color, playerSelector));
 		}
 
@@ -134,7 +137,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		if ((flags & DISALLOW_USERNAME) == 0) {
 			if (selectedIndex == i) {
 				if (playerNameField.getText().isEmpty()) {
-					throw new UIInvalidException("gui.commandEditor.playerSelector.noUsernameTyped");
+					throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_NOUSERNAMETYPED);
 				}
 			}
 			i++;
@@ -142,7 +145,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		if ((flags & DISALLOW_UUID) == 0) {
 			if (selectedIndex == i) {
 				if (!Patterns.UUID.matcher(UUIDField.getText()).matches()) {
-					throw new UIInvalidException("gui.commandEditor.playerSelector.invalidUUID");
+					throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_INVALIDUUID);
 				}
 			}
 			i++;
@@ -245,13 +248,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private void setupTeamSlot() {
-			teamInverted = new CommandSlotCheckbox(I18n.format("gui.commandEditor.playerSelector.team.inverted"));
+			teamInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_INVERTED);
 
 			teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.team.waiting"), 0x404040);
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_WAITING, 0x404040);
 			modifiableTeamName = new CommandSlotModifiable<IGuiCommandSlot>(teamName);
 
-			team = CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.team"),
+			team = CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM,
 					Colors.playerSelectorLabel.color, teamInverted, modifiableTeamName);
 			modifiableTeam = new CommandSlotModifiable<IGuiCommandSlot>(team);
 		}
@@ -266,8 +269,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					registeredNames.add(TEAM_NONE_NAME);
 
 					List<String> displayNames = Lists.newArrayList();
-					displayNames.add(I18n.format("gui.commandEditor.playerSelector.team.any"));
-					displayNames.add(I18n.format("gui.commandEditor.playerSelector.team.none"));
+					displayNames.add(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_ANY);
+					displayNames.add(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_NONE);
 
 					for (ScorePlayerTeam team : value) {
 						registeredNames.add(team.getRegisteredName());
@@ -292,8 +295,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 				@Override
 				public void abortFindingValue(int reason) {
-					String errorMessage = reason == 0 ? "gui.commandEditor.playerSelector.team.timedOut"
-							: "gui.commandEditor.playerSelector.team.noPermission";
+					String errorMessage = reason == 0 ? TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_TIMEDOUT
+							: TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_NOPERMISSION;
 					errorMessage = I18n.format(errorMessage);
 					teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, errorMessage, 0xff0000);
 					modifiableTeamName.setChild(teamName);
@@ -327,9 +330,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					return r;
 				}
 
-			}).setAppendHoverText(I18n.format("gui.commandEditor.playerSelector.score.append"))
-					.setInsertHoverText(I18n.format("gui.commandEditor.playerSelector.score.insert"))
-					.setRemoveHoverText(I18n.format("gui.commandEditor.playerSelector.score.remove"));
+			}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_APPEND)
+					.setInsertHoverText(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_INSERT)
+					.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_REMOVE);
 		}
 
 		private void obtainObjectiveList() {
@@ -354,8 +357,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 				@Override
 				public void abortFindingValue(int reason) {
-					objectiveErrorMessage = reason == 0 ? "gui.commandEditor.playerSelector.score.timedOut"
-							: "gui.commandEditor.playerSelector.score.noPermission";
+					objectiveErrorMessage = reason == 0 ? TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_TIMEDOUT
+							: TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_NOPERMISSION;
 					objectiveErrorMessage = I18n.format(objectiveErrorMessage);
 					for (int i = 0; i < scoreTests.entryCount(); i++) {
 						scoreTests.getEntry(i).modifiableObjective.setChild(new CommandSlotLabel(
@@ -389,10 +392,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private IGuiCommandSlot setupSelectorTypeSlot() {
-			return selectorType = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.nearest"),
-					I18n.format("gui.commandEditor.playerSelector.farthest"),
-					I18n.format("gui.commandEditor.playerSelector.all"),
-					I18n.format("gui.commandEditor.playerSelector.random")) {
+			return selectorType = new CommandSlotMenu(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_NEAREST,
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_FARTHEST, Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ALL,
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_RANDOM) {
 
 				@Override
 				protected void onChanged(String to) {
@@ -408,8 +410,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private IGuiCommandSlot setupTargetEntityInvertedSlot() {
-			return targetInverted = new CommandSlotCheckbox(
-					I18n.format("gui.commandEditor.playerSelector.targetInverted"));
+			return targetInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TARGETINVERTED);
 		}
 
 		private IGuiCommandSlot setupTargetEntitySlot() {
@@ -470,9 +471,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private IGuiCommandSlot setupCountSlot() {
 			countField = new CommandSlotIntTextField(50, 50, 1);
-			countField.setNumberInvalidMessage("gui.commandEditor.playerSelector.count.invalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.count.outOfBounds");
-			count = CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.count"),
+			countField.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_COUNT_INVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_COUNT_OUTOFBOUNDS);
+			count = CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_COUNT,
 					Colors.playerSelectorLabel.color, countField);
 			modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(count);
 
@@ -482,12 +483,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private IGuiCommandSlot setupNameSlot() {
-			nameInverted = new CommandSlotCheckbox(I18n.format("gui.commandEditor.playerSelector.entityNameInverted"));
+			nameInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENTITYNAMEINVERTED);
 			entityName = new CommandSlotTextField(200, 200);
 			IGuiCommandSlot r = new CommandSlotHorizontalArrangement(
 					new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-							I18n.format("gui.commandEditor.playerSelector.entityName"),
-							Colors.playerSelectorLabel.color),
+							Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENTITYNAME, Colors.playerSelectorLabel.color),
 					nameInverted, entityName);
 
 			entityName.setContentFilter(new Predicate<String>() {
@@ -506,7 +506,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			CommandSlotVerticalArrangement wholeColumn = new CommandSlotVerticalArrangement();
 
 			wholeColumn.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.positionalConstraints"),
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_POSITIONALCONSTRAINTS,
 					Colors.playerSelectorLabel.color));
 
 			positionalConstraints = new CommandSlotRadioList() {
@@ -530,38 +530,38 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			IGuiCommandSlot[] xyz = setupXYZConstraint();
 			rOriginX = (CommandSlotIntTextField) xyz[1];
-			rOriginX.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.origin.xInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.origin.xOutOfBounds");
+			rOriginX.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_ORIGIN_XINVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_ORIGIN_XOUTOFBOUNDS);
 			rOriginY = (CommandSlotIntTextField) xyz[2];
-			rOriginY.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.origin.yInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.origin.yOutOfBounds");
+			rOriginY.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_ORIGIN_YINVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_ORIGIN_YOUTOFBOUNDS);
 			rOriginZ = (CommandSlotIntTextField) xyz[3];
-			rOriginZ.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.origin.zInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.origin.zOutOfBounds");
-			radiusConstraint.addChild(
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.origin"),
+			rOriginZ.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_ORIGIN_ZINVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_ORIGIN_ZOUTOFBOUNDS);
+			radiusConstraint
+					.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_ORIGIN,
 							Colors.playerSelectorLabel.color, xyz[0]));
 
 			radiusConstraint.addChild(setupMinRadiusConstraint());
 			radiusConstraint.addChild(setupMaxRadiusConstraint());
 
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius"),
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS,
 					Colors.playerSelectorLabel.color, radiusConstraint);
 		}
 
 		private IGuiCommandSlot setupMinRadiusConstraint() {
 			minRadius = new CommandSlotIntTextField(30, 100, 0);
-			minRadius.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.min.invalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.min.outOfBounds");
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.min"),
+			minRadius.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_MIN_INVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_MIN_OUTOFBOUNDS);
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_MIN,
 					Colors.playerSelectorLabel.color, minRadius);
 		}
 
 		private IGuiCommandSlot setupMaxRadiusConstraint() {
 			maxRadius = new CommandSlotIntTextField(30, 100, 0);
-			maxRadius.setNumberInvalidMessage("gui.commandEditor.playerSelector.radius.max.invalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.radius.max.outOfBounds");
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.radius.max"),
+			maxRadius.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_MAX_INVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_MAX_OUTOFBOUNDS);
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_RADIUS_MAX,
 					Colors.playerSelectorLabel.color, maxRadius);
 		}
 
@@ -570,33 +570,36 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			IGuiCommandSlot[] xyz = setupXYZConstraint();
 			boundsX1 = (CommandSlotIntTextField) xyz[1];
-			boundsX1.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.from.xInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.from.xOutOfBounds");
+			boundsX1.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_FROM_XINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_FROM_XOUTOFBOUNDS);
 			boundsY1 = (CommandSlotIntTextField) xyz[2];
-			boundsY1.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.from.yInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.from.yOutOfBounds");
+			boundsY1.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_FROM_YINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_FROM_YOUTOFBOUNDS);
 			boundsZ1 = (CommandSlotIntTextField) xyz[3];
-			boundsZ1.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.from.zInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.from.zOutOfBounds");
-			fromToConstraint.addChild(
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo.from"),
+			boundsZ1.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_FROM_ZINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_FROM_ZOUTOFBOUNDS);
+			fromToConstraint
+					.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_FROM,
 							Colors.playerSelectorLabel.color, xyz[0]));
 
 			xyz = setupXYZConstraint();
 			boundsX2 = (CommandSlotIntTextField) xyz[1];
-			boundsX2.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.to.xInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.to.xOutOfBounds");
+			boundsX2.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_TO_XINVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_TO_XOUTOFBOUNDS);
 			boundsY2 = (CommandSlotIntTextField) xyz[2];
-			boundsY2.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.to.yInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.to.yOutOfBounds");
+			boundsY2.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_TO_YINVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_TO_YOUTOFBOUNDS);
 			boundsZ2 = (CommandSlotIntTextField) xyz[3];
-			boundsZ2.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsFromTo.to.zInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsFromTo.to.zOutOfBounds");
-			fromToConstraint.addChild(
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo.to"),
+			boundsZ2.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_TO_ZINVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_TO_ZOUTOFBOUNDS);
+			fromToConstraint
+					.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO_TO,
 							Colors.playerSelectorLabel.color, xyz[0]));
 
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsFromTo"),
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSFROMTO,
 					Colors.playerSelectorLabel.color, fromToConstraint);
 		}
 
@@ -605,33 +608,39 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			IGuiCommandSlot[] xyz = setupXYZConstraint();
 			dOriginX = (CommandSlotIntTextField) xyz[1];
-			dOriginX.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.origin.xInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.origin.xOutOfBounds");
+			dOriginX.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_ORIGIN_XINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_ORIGIN_XOUTOFBOUNDS);
 			dOriginY = (CommandSlotIntTextField) xyz[2];
-			dOriginY.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.origin.yInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.origin.yOutOfBounds");
+			dOriginY.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_ORIGIN_YINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_ORIGIN_YOUTOFBOUNDS);
 			dOriginZ = (CommandSlotIntTextField) xyz[3];
-			dOriginZ.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.origin.zInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.origin.zOutOfBounds");
-			boundsDistConstraint.addChild(
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist.origin"),
+			dOriginZ.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_ORIGIN_ZINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_ORIGIN_ZOUTOFBOUNDS);
+			boundsDistConstraint
+					.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_ORIGIN,
 							Colors.playerSelectorLabel.color, xyz[0]));
 
 			xyz = setupXYZConstraint();
 			distX = (CommandSlotIntTextField) xyz[1];
-			distX.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.distance.xInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.distance.xOutOfBounds");
+			distX.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_DISTANCE_XINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_DISTANCE_XOUTOFBOUNDS);
 			distY = (CommandSlotIntTextField) xyz[2];
-			distY.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.distance.yInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.distance.yOutOfBounds");
+			distY.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_DISTANCE_YINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_DISTANCE_YOUTOFBOUNDS);
 			distZ = (CommandSlotIntTextField) xyz[3];
-			distZ.setNumberInvalidMessage("gui.commandEditor.playerSelector.boundsDist.distance.zInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.boundsDist.distance.zOutOfBounds");
+			distZ.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_DISTANCE_ZINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_DISTANCE_ZOUTOFBOUNDS);
 			boundsDistConstraint.addChild(
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist.distance"),
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST_DISTANCE,
 							Colors.playerSelectorLabel.color, xyz[0]));
 
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.boundsDist"),
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_BOUNDSDIST,
 					Colors.playerSelectorLabel.color, boundsDistConstraint);
 		}
 
@@ -668,7 +677,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			rotations = wholeColumn;
 
 			wholeColumn.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.rotations"), Colors.playerSelectorLabel.color));
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS, Colors.playerSelectorLabel.color));
 
 			CommandSlotVerticalArrangement insideBox = new CommandSlotVerticalArrangement();
 
@@ -688,23 +697,29 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			insideBox.addChild(setupMaxHRotationSlot());
 
 			IGuiCommandSlot component = new CommandSlotRectangle(insideBox, Colors.playerSelectorLabel.color);
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.horizontal"),
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_HORIZONTAL,
 					Colors.playerSelectorLabel.color, component);
 		}
 
 		private IGuiCommandSlot setupMinHRotationSlot() {
 			minHRotation = new CommandSlotIntTextField(30, 100, -180, 179);
-			minHRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.horizontal.minInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.horizontal.minOutOfBounds");
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.min"),
+			minHRotation
+					.setNumberInvalidMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_HORIZONTAL_MININVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_HORIZONTAL_MINOUTOFBOUNDS);
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_MIN,
 					Colors.playerSelectorLabel.color, minHRotation);
 		}
 
 		private IGuiCommandSlot setupMaxHRotationSlot() {
 			maxHRotation = new CommandSlotIntTextField(30, 100, -180, 179);
-			maxHRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.horizontal.maxInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.horizontal.maxOutOfBounds");
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.max"),
+			maxHRotation
+					.setNumberInvalidMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_HORIZONTAL_MAXINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_HORIZONTAL_MAXOUTOFBOUNDS);
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_MAX,
 					Colors.playerSelectorLabel.color, maxHRotation);
 		}
 
@@ -715,23 +730,29 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			insideBox.addChild(setupMaxVRotationSlot());
 
 			IGuiCommandSlot component = new CommandSlotRectangle(insideBox, Colors.playerSelectorLabel.color);
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.vertical"),
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_VERTICAL,
 					Colors.playerSelectorLabel.color, component);
 		}
 
 		private IGuiCommandSlot setupMinVRotationSlot() {
 			minVRotation = new CommandSlotIntTextField(30, 100, -180, 179);
-			minVRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.vertical.minInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.vertical.minOutOfBounds");
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.min"),
+			minVRotation
+					.setNumberInvalidMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_VERTICAL_MININVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_VERTICAL_MINOUTOFBOUNDS);
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_MIN,
 					Colors.playerSelectorLabel.color, minVRotation);
 		}
 
 		private IGuiCommandSlot setupMaxVRotationSlot() {
 			maxVRotation = new CommandSlotIntTextField(30, 100, -180, 179);
-			maxVRotation.setNumberInvalidMessage("gui.commandEditor.playerSelector.rotations.vertical.maxInvalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.rotations.vertical.maxOutOfBounds");
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.rotations.max"),
+			maxVRotation
+					.setNumberInvalidMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_VERTICAL_MAXINVALID)
+					.setOutOfBoundsMessage(
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_VERTICAL_MAXOUTOFBOUNDS);
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ROTATIONS_MAX,
 					Colors.playerSelectorLabel.color, maxVRotation);
 		}
 
@@ -752,18 +773,18 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			CommandSlotVerticalArrangement expSlots = new CommandSlotVerticalArrangement();
 
 			expSlots.addChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					I18n.format("gui.commandEditor.playerSelector.exp"), Colors.playerSelectorLabel.color));
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_EXP, Colors.playerSelectorLabel.color));
 
 			CommandSlotVerticalArrangement insideBox = new CommandSlotVerticalArrangement();
 			minExp = new CommandSlotIntTextField(30, 100, 0);
-			minExp.setNumberInvalidMessage("gui.commandEditor.playerSelector.exp.min.invalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.exp.min.outOfBounds");
-			insideBox.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.min"),
+			minExp.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_EXP_MIN_INVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_EXP_MIN_OUTOFBOUNDS);
+			insideBox.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_EXP_MIN,
 					Colors.playerSelectorLabel.color, minExp));
 			maxExp = new CommandSlotIntTextField(30, 100, 0);
-			maxExp.setNumberInvalidMessage("gui.commandEditor.playerSelector.exp.max.invalid")
-					.setOutOfBoundsMessage("gui.commandEditor.playerSelector.exp.max.outOfBounds");
-			insideBox.addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.exp.max"),
+			maxExp.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_EXP_MAX_INVALID)
+					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_EXP_MAX_OUTOFBOUNDS);
+			insideBox.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_EXP_MAX,
 					Colors.playerSelectorLabel.color, maxExp));
 
 			expSlots.addChild(new CommandSlotRectangle(insideBox, Colors.playerSelectorLabel.color));
@@ -777,7 +798,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			String[] gamemodeIds = new String[gamemodeNames.length];
 			for (int i = 0; i < gamemodes.length; i++) {
 				if (gamemodes[i] == GameType.NOT_SET) {
-					gamemodeNames[i] = I18n.format("gui.commandEditor.playerSelector.gamemode.any");
+					gamemodeNames[i] = Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_GAMEMODE_ANY;
 				} else {
 					gamemodeNames[i] = I18n.format("gameMode." + gamemodes[i].getName());
 				}
@@ -786,12 +807,12 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 			gamemode = new CommandSlotMenu(gamemodeNames, gamemodeIds);
 
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.gamemode"),
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_GAMEMODE,
 					Colors.playerSelectorLabel.color, gamemode);
 		}
 
 		private IGuiCommandSlot setupScoresSlotWithLabel() {
-			return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.playerSelector.score"),
+			return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE,
 					Colors.playerSelectorLabel.color, scoreTests);
 		}
 
@@ -1433,9 +1454,9 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 				if (targetEntity.getEntity().equals(ENTITY_ANYTHING)) {
 					if (selectorType.getCurrentIndex() == SELTYPE_RANDOM) {
-						throw new UIInvalidException("gui.commandEditor.playerSelector.randomAnything");
+						throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_RANDOMANYTHING);
 					} else if (targetInverted.isChecked()) {
-						throw new UIInvalidException("gui.commandEditor.notAny");
+						throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOTANY);
 					}
 				}
 			}
@@ -1502,7 +1523,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			boolean teamsHaveBeenObtained = teamName instanceof CommandSlotMenu;
 			if (teamsHaveBeenObtained && modifiableTeamName.getChild() == teamName) {
 				if (((CommandSlotMenu) teamName).getCurrentIndex() == TEAM_ANY && teamInverted.isChecked())
-					throw new UIInvalidException("gui.commandEditor.notAny");
+					throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOTANY);
 			}
 
 			for (int i = 0; i < scoreTests.entryCount(); i++) {
@@ -1524,11 +1545,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			public CmdScoreTest() {
 				modifiableObjective = new CommandSlotModifiable<IGuiCommandSlot>(
 						new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-								I18n.format("gui.commandEditor.playerSelector.score.waiting"), 0x404040));
+								Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_WAITING, 0x404040));
 				addChild(modifiableObjective);
 
-				minOrMax = new CommandSlotMenu(I18n.format("gui.commandEditor.playerSelector.score.min"),
-						I18n.format("gui.commandEditor.playerSelector.score.max"));
+				minOrMax = new CommandSlotMenu(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_MIN,
+						Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_MAX);
 				addChild(minOrMax);
 
 				value = new CommandSlotIntTextField(30, 100);
@@ -1539,10 +1560,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			public void checkValid() throws UIInvalidException {
 				if (objective == null) {
 					if (waitingObjective == null)
-						throw new UIInvalidException("gui.commandEditor.playerSelector.scoreTestInvalid.noObjective");
+						throw new UIInvalidException(
+								TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORETESTINVALID_NOOBJECTIVE);
 				} else if (objective.wordCount() == 0) {
 					throw new UIInvalidException(
-							"gui.commandEditor.playerSelector.scoreTestInvalid.noObjectivesInList");
+							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORETESTINVALID_NOOBJECTIVESINLIST);
 				}
 
 				value.checkValid();

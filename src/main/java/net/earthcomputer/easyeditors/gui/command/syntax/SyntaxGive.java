@@ -6,7 +6,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
-import net.minecraft.client.resources.I18n;
+import net.earthcomputer.easyeditors.util.Translate;
 
 public class SyntaxGive extends ICommandSyntax {
 
@@ -22,11 +22,11 @@ public class SyntaxGive extends ICommandSyntax {
 				CommandSlotPlayerSelector.PLAYERS_ONLY | CommandSlotPlayerSelector.ONE_ONLY);
 
 		return new IGuiCommandSlot[] {
-				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.player"),
-						I18n.format("gui.commandEditor.give.player.tooltip"),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_GIVE_PLAYER,
+						Translate.GUI_COMMANDEDITOR_GIVE_PLAYER_TOOLTIP,
 						new CommandSlotRectangle(playerSelector, Colors.playerSelectorBox.color)),
-				CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.give.item"),
-						I18n.format("gui.commandEditor.give.item.tooltip"),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_GIVE_ITEM,
+						Translate.GUI_COMMANDEDITOR_GIVE_ITEM_TOOLTIP,
 						new CommandSlotRectangle(item, Colors.itemBox.color)) };
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.Instantiator;
-import net.minecraft.client.resources.I18n;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
 /**
@@ -26,8 +26,8 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 	private Instantiator<E> instantiator;
 	private List<E> entries = Lists.newArrayList();
 
-	private String insertHoverText = I18n.format("gui.commandEditor.list.insert");
-	private String removeHoverText = I18n.format("gui.commandEditor.list.remove");
+	private String insertHoverText = Translate.GUI_COMMANDEDITOR_LIST_INSERT;
+	private String removeHoverText = Translate.GUI_COMMANDEDITOR_LIST_REMOVE;
 
 	private CommandSlotButton appendButton;
 
@@ -45,7 +45,7 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 		for (E child : children) {
 			addEntry(child);
 		}
-		addChild(appendButton = new CommandSlotButton(20, 20, "+", I18n.format("gui.commandEditor.list.append")) {
+		addChild(appendButton = new CommandSlotButton(20, 20, "+", Translate.GUI_COMMANDEDITOR_LIST_APPEND) {
 			{
 				setTextColor(GuiUtils.getColorCode('2', true));
 			}

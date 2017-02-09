@@ -7,10 +7,10 @@ import com.google.common.base.Throwables;
 
 import net.earthcomputer.easyeditors.gui.command.GuiCommandEditor;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -61,7 +61,7 @@ public class GuiNewCommandBlock extends GuiCommandBlock implements ICommandEdito
 		}
 		commandTextField.width = 196;
 		addButton(new GuiButton(COMMAND_EDITOR_BTN_ID, width / 2 + 150 - 100, 50, 100, 20,
-				I18n.format("gui.commandBlock.goToCommandEditor")));
+				Translate.GUI_COMMANDBLOCK_GOTOCOMMANDEDITOR));
 		previousOutputTextField.width = 196;
 		outputBtn.xPosition = width / 2 + 150 - 100;
 		outputBtn.width = 100;
@@ -92,11 +92,11 @@ public class GuiNewCommandBlock extends GuiCommandBlock implements ICommandEdito
 		CommandBlockBaseLogic logic = commandBlock.getCommandBlockLogic();
 
 		if (logic.shouldTrackOutput()) {
-			outputBtn.displayString = I18n.format("gui.commandBlock.trackingOutput");
+			outputBtn.displayString = Translate.GUI_COMMANDBLOCK_TRACKINGOUTPUT;
 			// Previous output text field text already set by superclass
 		} else {
-			outputBtn.displayString = I18n.format("gui.commandBlock.ignoringOutput");
-			previousOutputTextField.setText(I18n.format("gui.commandBlock.noOutput"));
+			outputBtn.displayString = Translate.GUI_COMMANDBLOCK_IGNORINGOUTPUT;
+			previousOutputTextField.setText(Translate.GUI_COMMANDBLOCK_NOOUTPUT);
 		}
 	}
 

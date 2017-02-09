@@ -12,6 +12,8 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiColorPicker;
 import net.earthcomputer.easyeditors.gui.IColorPickerCallback;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -69,13 +71,15 @@ public class GuiFactory implements IModGuiFactory {
 	public static class EasyEditorsConfigGui extends GuiConfig {
 		public EasyEditorsConfigGui(GuiScreen previousScreen) {
 			super(previousScreen, getConfigElements(), EasyEditors.ID, false, false,
-					I18n.format("gui.easyeditorsconfig.title"));
+					Translate.GUI_EASYEDITORSCONFIG_TITLE);
 		}
 
 		private static List<IConfigElement> getConfigElements() {
 			List<IConfigElement> list = Lists.newArrayList();
-			list.add(new DummyCategoryElement("general", "gui.easyeditorsconfig.ctgy.general", GeneralEntry.class));
-			list.add(new DummyCategoryElement("colors", "gui.easyeditorsconfig.ctgy.colors", ColorsEntry.class));
+			list.add(new DummyCategoryElement("general", TranslateKeys.GUI_EASYEDITORSCONFIG_CTGY_GENERAL,
+					GeneralEntry.class));
+			list.add(new DummyCategoryElement("colors", TranslateKeys.GUI_EASYEDITORSCONFIG_CTGY_COLORS,
+					ColorsEntry.class));
 			return list;
 		}
 
@@ -120,7 +124,7 @@ public class GuiFactory implements IModGuiFactory {
 						new ConfigElement(EasyEditors.instance.config.getCategory("colors")).getChildElements(),
 						owningScreen.modID, false, false,
 						GuiConfig.getAbridgedConfigPath(EasyEditors.instance.config.toString()),
-						I18n.format("gui.easyeditorsconfig.colortitleline2"));
+						Translate.GUI_EASYEDITORSCONFIG_COLORTITLELINE2);
 			}
 
 		}
@@ -236,7 +240,7 @@ public class GuiFactory implements IModGuiFactory {
 			protected final boolean allowAlpha;
 			protected HoverChecker colorHoverChecker;
 			protected final List<String> colorHoverTooltip = Arrays
-					.asList(I18n.format("gui.easyeditorsconfig.colortooltip"));
+					.asList(Translate.GUI_EASYEDITORSCONFIG_COLORTOOLTIP);
 
 			public ColorEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
 				super(owningScreen, owningEntryList, configElement);

@@ -13,17 +13,19 @@ import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.ItemDamageHandler;
 import net.earthcomputer.easyeditors.gui.command.NBTTagHandler;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
@@ -94,11 +96,11 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		}));
 
 		if ((displayComponents & COMPONENT_STACK_SIZE) != 0)
-			addChild(CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.stackSize"),
-					Colors.itemLabel.color, I18n.format("gui.commandEditor.item.stackSize.tooltip"),
+			addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_STACKSIZE, Colors.itemLabel.color,
+					Translate.GUI_COMMANDEDITOR_ITEM_STACKSIZE_TOOLTIP,
 					stackSizeField = new CommandSlotIntTextField(32, 32, 1, 64)
-							.setNumberInvalidMessage("gui.commandEditor.item.stackSize.invalid")
-							.setOutOfBoundsMessage("gui.commandEditor.item.stackSize.outOfBounds")));
+							.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_ITEM_STACKSIZE_INVALID)
+							.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_ITEM_STACKSIZE_OUTOFBOUNDS)));
 
 		if ((displayComponents & COMPONENT_DAMAGE) != 0)
 			addChild(damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
@@ -172,10 +174,12 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		for (int i = 0; i < argOrder.length; i++) {
 			switch (argOrder[i]) {
 			case COMPONENT_ITEM:
-				String itemName = String.valueOf(item.delegate.name());
-				if (itemName.startsWith("minecraft:"))
-					itemName = itemName.substring(10);
-				potentialArgs.add(itemName);
+				ResourceLocation itemName = item.delegate.name();
+				if (itemName.getResourceDomain().equals("minecraft")) {
+					potentialArgs.add(itemName.getResourcePath());
+				} else {
+					potentialArgs.add(itemName.toString());
+				}
 				maxElementToCopy = i;
 				break;
 			case COMPONENT_STACK_SIZE:
@@ -262,7 +266,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	 */
 	public void checkValid() throws UIInvalidException {
 		if (item == null)
-			throw new UIInvalidException("gui.commandEditor.itemInvalid.noItem");
+			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_ITEMINVALID_NOITEM);
 		stackSizeField.checkValid();
 		for (ItemDamageHandler damageHandler : damageHandlers) {
 			damageHandler.checkValid();
@@ -277,7 +281,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		private HoverChecker hoverChecker;
 
 		public CmdItem() {
-			super(18 + Minecraft.getMinecraft().fontRendererObj.getStringWidth(I18n.format("gui.commandEditor.noItem")),
+			super(18 + Minecraft.getMinecraft().fontRendererObj.getStringWidth(Translate.GUI_COMMANDEDITOR_NOITEM),
 					Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT > 16
 							? Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT : 16);
 		}
@@ -330,7 +334,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 		public String getDisplayText() {
 			if (item == null)
-				return I18n.format("gui.commandEditor.noItem");
+				return Translate.GUI_COMMANDEDITOR_NOITEM;
 			else {
 				ItemStack stack = new ItemStack(item, stackSizeField == null ? 1 : stackSizeField.getIntValue(),
 						getDamage());

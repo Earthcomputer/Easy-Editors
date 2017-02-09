@@ -15,8 +15,9 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -174,14 +175,16 @@ public abstract class ItemDamageHandler {
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot(ItemStack item) {
 			this.item = item;
-			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
-					I18n.format("gui.commandEditor.item.damage.tool.durability"), Colors.itemLabel.color,
-					I18n.format("gui.commandEditor.item.damage.tool.durability.tooltip"),
-					durabilityField = new CommandSlotIntTextField(32, 32, 1, item.getMaxDamage() + 1)
-							.setNumberInvalidMessage("gui.commandEditor.item.damage.tool.durability.invalid")
-							.setOutOfBoundsMessage("gui.commandEditor.item.damage.tool.durability.outOfBounds"),
-					new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, "/ " + (item.getMaxDamage() + 1),
-							Colors.itemLabel.color)) };
+			return new IGuiCommandSlot[] {
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_DAMAGE_TOOL_DURABILITY,
+							Colors.itemLabel.color, Translate.GUI_COMMANDEDITOR_ITEM_DAMAGE_TOOL_DURABILITY_TOOLTIP,
+							durabilityField = new CommandSlotIntTextField(32, 32, 1, item.getMaxDamage() + 1)
+									.setNumberInvalidMessage(
+											TranslateKeys.GUI_COMMANDEDITOR_ITEM_DAMAGE_TOOL_DURABILITY_INVALID)
+									.setOutOfBoundsMessage(
+											TranslateKeys.GUI_COMMANDEDITOR_ITEM_DAMAGE_TOOL_DURABILITY_OUTOFBOUNDS),
+							new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+									"/ " + (item.getMaxDamage() + 1), Colors.itemLabel.color)) };
 		}
 
 		@Override

@@ -20,7 +20,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
-import net.minecraft.client.resources.I18n;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
@@ -283,15 +283,15 @@ public abstract class NBTTagHandler {
 				public CommandSlotTextField newInstance() {
 					return new CommandSlotTextField(100, 400);
 				}
-			}).setAppendHoverText(I18n.format("gui.commandEditor.item.nbt.lore.append"))
-					.setInsertHoverText(I18n.format("gui.commandEditor.item.nbt.lore.insert"))
-					.setRemoveHoverText(I18n.format("gui.commandEditor.item.nbt.lore.remove"));
+			}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_APPEND)
+					.setInsertHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_INSERT)
+					.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_REMOVE);
 			return new IGuiCommandSlot[] {
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.displayName"),
-							Colors.itemLabel.color, I18n.format("gui.commandEditor.item.nbt.displayName.tooltip"),
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_DISPLAYNAME,
+							Colors.itemLabel.color, Translate.GUI_COMMANDEDITOR_ITEM_NBT_DISPLAYNAME_TOOLTIP,
 							displayName),
-					CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.lore"), Colors.itemLabel.color,
-							I18n.format("gui.commandEditor.item.nbt.lore.tooltip"), lore) };
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE, Colors.itemLabel.color,
+							Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_TOOLTIP, lore) };
 		}
 
 		@Override
@@ -353,10 +353,10 @@ public abstract class NBTTagHandler {
 
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
-			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(
-					I18n.format("gui.commandEditor.item.nbt.leatherArmor.color"), Colors.itemLabel.color,
-					I18n.format("gui.commandEditor.item.nbt.leatherArmor.color.tooltip"),
-					color = new CommandSlotColor(false)) };
+			return new IGuiCommandSlot[] {
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LEATHERARMOR_COLOR,
+							Colors.itemLabel.color, Translate.GUI_COMMANDEDITOR_ITEM_NBT_LEATHERARMOR_COLOR_TOOLTIP,
+							color = new CommandSlotColor(false)) };
 		}
 
 		@Override
@@ -394,16 +394,16 @@ public abstract class NBTTagHandler {
 
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
-			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.item.nbt.ench"),
-					Colors.itemLabel.color, I18n.format("gui.commandEditor.item.nbt.ench.tooltip"),
+			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH,
+					Colors.itemLabel.color, Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH_TOOLTIP,
 					list = new CommandSlotList<CommandSlotEnchantment>(new Instantiator<CommandSlotEnchantment>() {
 						@Override
 						public CommandSlotEnchantment newInstance() {
 							return new CommandSlotEnchantment();
 						}
-					}).setAppendHoverText(I18n.format("gui.commandEditor.item.nbt.ench.append"))
-							.setInsertHoverText(I18n.format("gui.commandEditor.item.nbt.ench.insert"))
-							.setRemoveHoverText(I18n.format("gui.commandEditor.item.nbt.ench.remove"))) };
+					}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH_APPEND)
+							.setInsertHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH_INSERT)
+							.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH_REMOVE)) };
 		}
 
 		@Override

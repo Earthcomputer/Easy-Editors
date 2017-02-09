@@ -13,6 +13,7 @@ import net.earthcomputer.easyeditors.api.util.Colors.Color;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiNewCommandBlock;
 import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -146,13 +147,13 @@ public class EasyEditors {
 	public void readFromConfig() {
 		Property prop = config.get("general", "active", true, "Whether Easy Editors should replace GUIs");
 		EasyEditorsApi.isEasyEditorsActive = prop.getBoolean();
-		prop.setLanguageKey("gui.easyeditorsconfig.active");
+		prop.setLanguageKey(TranslateKeys.GUI_EASYEDITORSCONFIG_ACTIVE);
 
 		prop = config.get("general", "obtainDataFrom", "client",
 				"Where to obtain data on the server from. Set to server for servers that are likely to lie about their data (e.g. large public servers such as Hypixel)");
 		prop.setValidValues(new String[] { "client", "server" });
 		ChatBlocker.obtainDataFromServer = prop.getString().equals("server");
-		prop.setLanguageKey("gui.easyeditorsconfig.obtainDataFrom");
+		prop.setLanguageKey(TranslateKeys.GUI_EASYEDITORSCONFIG_OBTAINDATAFROM);
 		prop.setConfigEntryClass(GuiFactory.EasyEditorsConfigGui.TranslatedCycleValueEntry.class);
 
 		config.addCustomCategoryComment("colors",
@@ -183,7 +184,8 @@ public class EasyEditors {
 
 		@Override
 		public String translateToLocal(String language, Map<String, String> translations) {
-			return String.format(translations.get("smartTranslations.entity.thrown"), translations.get(thrownObject));
+			return String.format(translations.get(TranslateKeys.SMARTTRANSLATIONS_ENTITY_THROWN),
+					translations.get(thrownObject));
 		}
 	}
 

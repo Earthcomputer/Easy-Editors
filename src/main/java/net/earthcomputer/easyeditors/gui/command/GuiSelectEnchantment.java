@@ -9,6 +9,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -71,7 +72,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		list.drawScreen(mouseX, mouseY, partialTicks);
 
-		String str = I18n.format("gui.commandEditor.selectEnchantment.title");
+		String str = Translate.GUI_COMMANDEDITOR_SELECTENCHANTMENT_TITLE;
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				15 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 

@@ -7,6 +7,7 @@ import com.google.common.base.Predicate;
 import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.util.math.MathHelper;
 
 /**
@@ -92,13 +93,13 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		try {
 			intVal = Integer.parseInt(getText());
 		} catch (NumberFormatException e) {
-			throw new UIInvalidException(
-					numberInvalidMessage == null ? "gui.commandEditor.numberInvalid" : numberInvalidMessage);
+			throw new UIInvalidException(numberInvalidMessage == null ? TranslateKeys.GUI_COMMANDEDITOR_NUMBERINVALID
+					: numberInvalidMessage);
 		}
 		if (intVal < minValue || intVal > maxValue) {
 			throw new UIInvalidException(
-					outOfBoundsMessage == null ? "gui.commandEditor.numberOutOfBounds" : outOfBoundsMessage, minValue,
-					maxValue);
+					outOfBoundsMessage == null ? TranslateKeys.GUI_COMMANDEDITOR_NUMBEROUTOFBOUNDS : outOfBoundsMessage,
+					minValue, maxValue);
 		}
 	}
 

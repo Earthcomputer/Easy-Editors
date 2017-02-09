@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import com.google.common.base.Predicate;
 
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -144,7 +145,7 @@ public class GuiColorPicker extends GuiScreen {
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 
-		String str = I18n.format("gui.selectColor.title");
+		String str = Translate.GUI_SELECTCOLOR_TITLE;
 		drawString(fontRendererObj, str, width / 2 - fontRendererObj.getStringWidth(str) / 2, 12, 0xffffff);
 
 		GlStateManager.disableTexture2D();

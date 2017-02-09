@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.api.SmartTranslationRegistry;
 import net.earthcomputer.easyeditors.api.util.FakeWorld;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -94,7 +95,7 @@ public class GuiSelectEntity extends GuiScreen {
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		list.drawScreen(mouseX, mouseY, partialTicks);
 
-		String str = I18n.format("gui.commandEditor.selectEntity.title");
+		String str = Translate.GUI_COMMANDEDITOR_SELECTENTITY_TITLE;
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				15 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 

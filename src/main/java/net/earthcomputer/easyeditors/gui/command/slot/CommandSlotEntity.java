@@ -6,8 +6,9 @@ import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.IEntitySelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
@@ -35,7 +36,7 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 		this.includeLightning = includeLightning;
 		this.additionalOptions = additionalOptions;
 		addChild(entityLabel = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-				I18n.format("gui.commandEditor.noEntity"), 0xff0000));
+				Translate.GUI_COMMANDEDITOR_NOENTITY, 0xff0000));
 		addChild(new CommandSlotButton(20, 20, "...") {
 			@Override
 			public void onPress() {
@@ -80,7 +81,7 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 	 */
 	public void checkValid() throws UIInvalidException {
 		if (entity == null)
-			throw new UIInvalidException("gui.commandEditor.noEntitySelected");
+			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOENTITYSELECTED);
 	}
 
 }

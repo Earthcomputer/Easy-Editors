@@ -8,8 +8,9 @@ import net.earthcomputer.easyeditors.gui.command.GuiCommandSelector;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 
 /**
  * A command slot which represents a command
@@ -46,11 +47,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 
 	private IGuiCommandSlot buildHeader(String commandName) {
 		CommandSlotLabel label = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-				commandName.isEmpty() ? I18n.format("gui.commandEditor.noCommand") : commandName,
-				Colors.commandName.color);
+				commandName.isEmpty() ? Translate.GUI_COMMANDEDITOR_NOCOMMAND : commandName, Colors.commandName.color);
 		if (ICommandSyntax.forCommandName(commandName) == null)
 			label.setColor(Colors.invalidCommandName.color);
-		return CommandSlotLabel.createLabel(I18n.format("gui.commandEditor.commandLabel"), label,
+		return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_COMMANDLABEL, label,
 				new CommandSlotButton(20, 20, "...") {
 					@Override
 					public void onPress() {
@@ -63,7 +63,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		if (commandSyntax == null)
-			throw new UIInvalidException("gui.commandEditor.noCommandChosen");
+			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOCOMMANDCHOSEN);
 		commandSyntax.checkValid();
 		args.add(commandName);
 		super.addArgs(args);

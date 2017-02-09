@@ -18,6 +18,7 @@ import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -119,7 +120,7 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 		buttonList.add(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
-		searchLabel = I18n.format("gui.commandEditor.selectItem.search");
+		searchLabel = Translate.GUI_COMMANDEDITOR_SELECTITEM_SEARCH;
 		int labelWidth = fontRendererObj.getStringWidth(searchLabel);
 		searchText = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25, 200,
 				20);
@@ -180,7 +181,7 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 
 	@Override
 	public void drawForeground(int mouseX, int mouseY, float partialTicks) {
-		String str = I18n.format("gui.commandEditor.selectItem.title");
+		String str = Translate.GUI_COMMANDEDITOR_SELECTITEM_TITLE;
 		drawString(fontRendererObj, str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				15 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 		drawString(fontRendererObj, searchLabel, width / 2 - (fontRendererObj.getStringWidth(searchLabel) + 205) / 2,

@@ -3,6 +3,8 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectEnchantment;
 import net.earthcomputer.easyeditors.gui.command.IEnchantmentSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
@@ -23,7 +25,7 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 
 	public CommandSlotEnchantment() {
 		addChild(enchantmentNameLabel = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-				I18n.format("gui.commandEditor.noEnchantment"), 0xff0000));
+				Translate.GUI_COMMANDEDITOR_NOENCHANTMENT, 0xff0000));
 		addChild(new CommandSlotButton(20, 20, "...") {
 			@Override
 			public void onPress() {
@@ -33,8 +35,9 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		});
 		addChild(enchantmentLevel = new CommandSlotIntTextField(30, 30, 1, 100));
 		enchantmentLevel.setText("1");
-		enchantmentLevel.setNumberInvalidMessage("gui.commandEditor.playerSelector.enchantmentInvalid.levelInvalid")
-				.setOutOfBoundsMessage("gui.commandEditor.playerSelector.enchantmentInvalid.levelOutOfBounds");
+		enchantmentLevel
+				.setNumberInvalidMessage(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENCHANTMENTINVALID_LEVELINVALID)
+				.setOutOfBoundsMessage(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENCHANTMENTINVALID_LEVELOUTOFBOUNDS);
 	}
 
 	@Override
@@ -85,7 +88,7 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 	 */
 	public void checkValid() throws UIInvalidException {
 		if (!ForgeRegistries.ENCHANTMENTS.containsKey(enchantmentName))
-			throw new UIInvalidException("gui.commandEditor.enchantmentInvalid.noEnchantment");
+			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_ENCHANTMENTINVALID_NOENCHANTMENT);
 		enchantmentLevel.checkValid();
 	}
 

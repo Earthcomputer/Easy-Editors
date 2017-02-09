@@ -9,6 +9,8 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
+import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -68,7 +70,7 @@ public class GuiCommandSelector extends GuiScreen {
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		list.drawScreen(mouseX, mouseY, partialTicks);
 
-		String str = I18n.format("gui.commandEditor.selectCommand.title");
+		String str = Translate.GUI_COMMANDEDITOR_SELECTCOMMAND_TITLE;
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				15 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 
@@ -140,7 +142,7 @@ public class GuiCommandSelector extends GuiScreen {
 			String str = I18n.format("gui.commandEditor.selectCommand." + commandName + ".desc");
 			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2,
 					y + 4 + fontRenderer.FONT_HEIGHT, 0xc0c0c0);
-			str = I18n.format("gui.commandEditor.selectCommand.example",
+			str = I18n.format(TranslateKeys.GUI_COMMANDEDITOR_SELECTCOMMAND_EXAMPLE,
 					I18n.format("gui.commandEditor.selectCommand." + commandName + ".example"));
 			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2,
 					y + 6 + fontRenderer.FONT_HEIGHT * 2, 0xc0c0c0);

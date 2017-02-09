@@ -6,13 +6,13 @@ import org.lwjgl.opengl.GL11;
 
 import net.earthcomputer.easyeditors.gui.GuiColorPicker;
 import net.earthcomputer.easyeditors.gui.IColorPickerCallback;
+import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
 /**
@@ -83,7 +83,7 @@ public class CommandSlotColor extends GuiCommandSlotImpl implements IColorPicker
 		if (!getContext().isMouseInBounds(mouseX, mouseY))
 			hoverChecker.resetHoverTimer();
 		else if (hoverChecker.checkHover(mouseX, mouseY))
-			drawTooltip(mouseX, mouseY, I18n.format("gui.easyeditorsconfig.colortooltip"));
+			drawTooltip(mouseX, mouseY, Translate.GUI_EASYEDITORSCONFIG_COLORTOOLTIP);
 	}
 
 	@Override

@@ -7,9 +7,11 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 /**
  * Fired by {@link SmartTranslationRegistry} when the resource manager is
  * reloaded. Use this event to refresh the values in constants such as those in
- * {@link net.earthcomputer.easyeditors.util.Translate Translate}
+ * {@link net.earthcomputer.easyeditors.util.Translate Translate}.
  * 
- * @author Joseph
+ * <b>This class is a member of the Easy Editors API</b>
+ * 
+ * @author Earthcomputer
  *
  */
 public class LanguageLoadedEvent extends Event {
