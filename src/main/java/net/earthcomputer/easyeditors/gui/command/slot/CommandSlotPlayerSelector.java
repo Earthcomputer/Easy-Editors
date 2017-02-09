@@ -12,6 +12,7 @@ import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.api.util.Patterns;
+import net.earthcomputer.easyeditors.api.util.Predicates2;
 import net.earthcomputer.easyeditors.api.util.ReturnedValueListener;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
@@ -229,6 +230,15 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private List<ScoreObjective> objectivesList;
 		private String objectiveErrorMessage;
 		private CommandSlotList<CmdScoreTest> scoreTests;
+
+		private CommandSlotRadioList tag;
+		private CommandSlotCheckbox tagNameInverted;
+		private CommandSlotTextField tagName;
+
+		private static final int TAG_ANY = 0;
+		private static final int TAG_NONE = 1;
+		private static final int TAG_SOME = 2;
+		private static final int TAG_WITH_NAME = 3;
 
 		public CmdPlayerSelector() {
 			preSetup();
@@ -464,6 +474,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			specifics.addChild(setupPlayersOnlySlot());
 			specifics.addChild(modifiableTeam);
 			specifics.addChild(setupScoresSlotWithLabel());
+			specifics.addChild(setupTagSlot());
 
 			expand = new CommandSlotExpand(specifics);
 			addChild(expand);
@@ -490,14 +501,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 							Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENTITYNAME, Colors.playerSelectorLabel.color),
 					nameInverted, entityName);
 
-			entityName.setContentFilter(new Predicate<String>() {
-
-				@Override
-				public boolean apply(String input) {
-					return Patterns.partialPlayerName.matcher(input).matches();
-				}
-
-			});
+			entityName.setContentFilter(Predicates2.<String>matchingPattern(Patterns.partialPlayerName));
 
 			return r;
 		}
@@ -816,6 +820,35 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					Colors.playerSelectorLabel.color, scoreTests);
 		}
 
+		private IGuiCommandSlot setupTagSlot() {
+			CommandSlotVerticalArrangement tagSlots = new CommandSlotVerticalArrangement();
+			tagSlots.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG,
+					Colors.playerSelectorLabel.color));
+
+			tagName = new CommandSlotTextField(200, 200);
+			tagName.setContentFilter(Predicates2.<String>matchingPattern(Patterns.partialPlayerName));
+			tagNameInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_INVERTED);
+			IGuiCommandSlot tagNameWithLabel = CommandSlotLabel.createLabel(
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_NAME, Colors.playerSelectorLabel.color,
+					tagNameInverted, tagName);
+			tag = new CommandSlotRadioList(
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_ANY,
+							Colors.playerSelectorLabel.color),
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_NONE,
+							Colors.playerSelectorLabel.color),
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_SOME,
+							Colors.playerSelectorLabel.color),
+					tagNameWithLabel) {
+				@Override
+				protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
+					assert false;
+					return 0;
+				}
+			};
+			tagSlots.addChild(new CommandSlotRectangle(tag, Colors.playerSelectorLabel.color));
+			return tagSlots;
+		}
+
 		@Override
 		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 			if (index >= args.length)
@@ -1101,6 +1134,32 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				}
 			}
 
+			// By default, tag is set to TAG_ANY
+			this.tag.setSelectedIndex(TAG_ANY);
+			this.tagName.setText("");
+			this.tagNameInverted.setChecked(false);
+
+			if (specifiers.containsKey("tag")) {
+				String tagSpecifier = specifiers.get("tag");
+
+				boolean inverted = tagSpecifier.startsWith("!");
+				if (inverted) {
+					tagSpecifier = tagSpecifier.substring(1);
+				}
+
+				if (tagSpecifier.isEmpty()) {
+					if (inverted) {
+						this.tag.setSelectedIndex(TAG_SOME);
+					} else {
+						this.tag.setSelectedIndex(TAG_NONE);
+					}
+				} else {
+					this.tag.setSelectedIndex(TAG_WITH_NAME);
+					this.tagName.setText(tagSpecifier);
+					this.tagNameInverted.setChecked(inverted);
+				}
+			}
+
 			// After all this, only one argument has been read. Eek!!
 			return 1;
 		}
@@ -1370,6 +1429,28 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				if (scoreTest.minOrMax.getCurrentIndex() == CmdScoreTest.TEST_MIN)
 					key += "_min";
 				specifiers.put(key, String.valueOf(scoreTest.value.getIntValue()));
+			}
+
+			// tag
+			switch (this.tag.getSelectedIndex()) {
+			case TAG_WITH_NAME: {
+				String tag = this.tagName.getText();
+				if (this.tagNameInverted.isChecked()) {
+					tag = "!" + tag;
+				}
+				specifiers.put("tag", tag);
+				break;
+			}
+			case TAG_NONE:
+				specifiers.put("tag", "");
+				break;
+			case TAG_SOME:
+				specifiers.put("tag", "!");
+				break;
+			case TAG_ANY:
+				break;
+			default:
+				throw new IllegalStateException("tag had illegal selected index");
 			}
 
 			// Build final string
