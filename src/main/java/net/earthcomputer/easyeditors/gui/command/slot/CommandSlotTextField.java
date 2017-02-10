@@ -122,7 +122,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		if (x != this.x || y != this.y) {
 			this.x = x;
 			this.y = y;
-			privateOnTextChanged();
+			recreateInternalTextField();
 		}
 		wrappedTextField.drawTextBox();
 	}
@@ -143,7 +143,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	protected void onTextChanged() {
 	}
 
-	private void privateOnTextChanged() {
+	private void recreateInternalTextField() {
 		GuiTypeListenerTextField oldTextField = wrappedTextField;
 		GuiTypeListenerTextField newTextField = wrappedTextField = new GuiTypeListenerTextField(this, x + 1, y + 1,
 				MathHelper.clamp(Minecraft.getMinecraft().fontRendererObj.getStringWidth(oldTextField.getText()) + 8,
@@ -157,14 +157,17 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		newTextField.setValidator(oldTextField.contentFilter);
 		setWidth(newTextField.width + 2);
 
-		String strBefore = newTextField.getText().substring(newTextField.getLineScrollOffset(),
-				newTextField.getCursorPosition() - newTextField.getLineScrollOffset());
-		int x = newTextField.getEnableBackgroundDrawing() ? newTextField.xPosition + 4 : newTextField.xPosition;
+		onTextChanged();
+	}
+
+	private void ensureInView() {
+		String strBefore = wrappedTextField.getText().substring(wrappedTextField.getLineScrollOffset(),
+				wrappedTextField.getCursorPosition() - wrappedTextField.getLineScrollOffset());
+		int x = wrappedTextField.getEnableBackgroundDrawing() ? wrappedTextField.xPosition + 4
+				: wrappedTextField.xPosition;
 		x += Minecraft.getMinecraft().fontRendererObj.getStringWidth(strBefore);
 		if (getContext() != null)
 			getContext().ensureXInView(x);
-
-		onTextChanged();
 	}
 
 	@Override
@@ -208,8 +211,10 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 			String oldText = getText();
 			super.setText(text);
 			text = getText();
-			if (!oldText.equals(text))
-				listener.privateOnTextChanged();
+			if (!oldText.equals(text)) {
+				listener.recreateInternalTextField();
+				listener.ensureInView();
+			}
 		}
 
 		public void setTextDangerously(String text) {
@@ -221,8 +226,10 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 			String oldText = getText();
 			super.writeText(text);
 			text = getText();
-			if (!oldText.equals(text))
-				listener.privateOnTextChanged();
+			if (!oldText.equals(text)) {
+				listener.recreateInternalTextField();
+				listener.ensureInView();
+			}
 		}
 
 		@Override
@@ -239,7 +246,8 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 				setSelectionPos(oldSelectionEnd);
 				setLineScrollOffset(oldLineScrollOffset);
 			} else if (!oldText.equals(newText)) {
-				listener.privateOnTextChanged();
+				listener.recreateInternalTextField();
+				listener.ensureInView();
 			}
 		}
 
@@ -247,8 +255,10 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		public void setMaxStringLength(int maxStringLength) {
 			String oldText = getText();
 			super.setMaxStringLength(maxStringLength);
-			if (!oldText.equals(getText()))
-				listener.privateOnTextChanged();
+			if (!oldText.equals(getText())) {
+				listener.recreateInternalTextField();
+				listener.ensureInView();
+			}
 		}
 
 		public void setMaxStringLengthDangerously(int maxStringLength) {
