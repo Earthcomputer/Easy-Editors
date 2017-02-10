@@ -1061,6 +1061,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			if (specifiers.containsKey("m")) {
 				// Map the gamemode to the correct value
 				String gamemode = specifiers.get("m");
+				GameType gameType;
+				try {
+					gameType = GameType.parseGameTypeWithDefault(Integer.parseInt(gamemode), GameType.NOT_SET);
+				} catch (NumberFormatException e) {
+					gameType = GameType.parseGameTypeWithDefault(gamemode, GameType.NOT_SET);
+				}
+				gamemode = String.valueOf(gameType.getID());
 				for (int i = 0; i < this.gamemode.wordCount(); i++) {
 					if (this.gamemode.getValueAt(i).equals(gamemode)) {
 						this.gamemode.setCurrentIndex(i);

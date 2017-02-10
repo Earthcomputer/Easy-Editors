@@ -37,22 +37,7 @@ public class SyntaxGamemode extends CommandSyntax {
 	}
 
 	private CommandSlotMenu buildGamemodeSlot() {
-		GameType[] gameModes = GameType.values();
-		String[] displayNames = new String[gameModes.length - 1]; // -1 for
-																	// NOT_SET
-		String[] ids = new String[displayNames.length];
-
-		int i = 0;
-		for (GameType gameMode : gameModes) {
-			if (gameMode == GameType.NOT_SET) {
-				continue;
-			}
-			displayNames[i] = I18n.format("gameMode." + gameMode.getName());
-			ids[i] = String.valueOf(gameMode.getID());
-			i++;
-		}
-
-		return new CommandSlotMenu(displayNames, ids);
+		return new GameModeMenu();
 	}
 
 	private CommandSlotPlayerSelector buildPlayerSlot() {
@@ -93,6 +78,71 @@ public class SyntaxGamemode extends CommandSyntax {
 				}
 			}
 		};
+	}
+
+	public static class GameModeMenu extends CommandSlotMenu {
+		public GameModeMenu() {
+			super(getGameModeNames(), getGameModeIds());
+		}
+
+		private static String[] getGameModeNames() {
+			GameType[] gameTypes = GameType.values();
+			// -1 for NOT_SET
+			String[] names = new String[gameTypes.length - 1];
+			int i = 0;
+			for (GameType gameType : gameTypes) {
+				if (gameType == GameType.NOT_SET) {
+					continue;
+				}
+				names[i] = I18n.format("gameMode." + gameType.getName());
+				i++;
+			}
+			return names;
+		}
+
+		private static String[] getGameModeIds() {
+			GameType[] gameTypes = GameType.values();
+			// -1 for NOT_SET
+			String[] ids = new String[gameTypes.length - 1];
+			int i = 0;
+			for (GameType gameType : gameTypes) {
+				if (gameType == GameType.NOT_SET) {
+					continue;
+				}
+				ids[i] = String.valueOf(gameType.getID());
+				i++;
+			}
+			return ids;
+		}
+
+		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+			if (index == args.length) {
+				throw new CommandSyntaxException();
+			}
+			GameType gameMode;
+			try {
+				gameMode = GameType.parseGameTypeWithDefault(Integer.parseInt(args[index]), GameType.NOT_SET);
+			} catch (NumberFormatException e) {
+				gameMode = GameType.parseGameTypeWithDefault(args[index], GameType.NOT_SET);
+			}
+			if (gameMode == GameType.NOT_SET) {
+				throw new CommandSyntaxException();
+			}
+			String id = String.valueOf(gameMode.getID());
+			boolean found = false;
+			for (int i = 0; i < wordCount(); i++) {
+				if (getValueAt(i).equals(id)) {
+					this.setCurrentIndex(i);
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				throw new CommandSyntaxException();
+			}
+			return 1;
+		}
+
 	}
 
 }
