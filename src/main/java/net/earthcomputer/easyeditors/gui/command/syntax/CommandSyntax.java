@@ -116,6 +116,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("time", SyntaxTime.class);
 		registerCommandSyntax("gamemode", SyntaxGamemode.class);
 		registerCommandSyntax("difficulty", SyntaxDifficulty.class);
+		registerCommandSyntax("defaultgamemode", SyntaxDefaultGamemode.class);
 		registerCommandSyntax("give", SyntaxGive.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
