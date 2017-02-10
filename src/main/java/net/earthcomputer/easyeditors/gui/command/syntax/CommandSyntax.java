@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 
+import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.crash.CrashReport;
@@ -17,11 +18,13 @@ import net.minecraft.util.ReportedException;
  * @author Earthcomputer
  *
  */
-public abstract class ICommandSyntax {
+public abstract class CommandSyntax {
 
-	private static Map<String, Class<? extends ICommandSyntax>> commandSyntaxes = Maps.newHashMap();
+	private static Map<String, Class<? extends CommandSyntax>> commandSyntaxes = Maps.newHashMap();
 
 	protected static final Joiner spaceJoiner = Joiner.on(' ');
+
+	private ICommandSlotContext context;
 
 	/**
 	 * Builds the components of the command
@@ -39,6 +42,19 @@ public abstract class ICommandSyntax {
 	 *             slots themselves)
 	 */
 	public void checkValid() throws UIInvalidException {
+	}
+
+	private void setContext(ICommandSlotContext context) {
+		this.context = context;
+	}
+
+	/**
+	 * Gets the context to build this syntax
+	 * 
+	 * @return
+	 */
+	public ICommandSlotContext getContext() {
+		return context;
 	}
 
 	/**
@@ -64,7 +80,7 @@ public abstract class ICommandSyntax {
 	 * @param commandName
 	 * @param syntaxClass
 	 */
-	public static void registerCommandSyntax(String commandName, Class<? extends ICommandSyntax> syntaxClass) {
+	public static void registerCommandSyntax(String commandName, Class<? extends CommandSyntax> syntaxClass) {
 		commandSyntaxes.put(commandName, syntaxClass);
 	}
 
@@ -74,12 +90,14 @@ public abstract class ICommandSyntax {
 	 * @param commandName
 	 * @return
 	 */
-	public static ICommandSyntax forCommandName(String commandName) {
-		Class<? extends ICommandSyntax> syntax = commandSyntaxes.get(commandName);
+	public static CommandSyntax forCommandName(String commandName, ICommandSlotContext context) {
+		Class<? extends CommandSyntax> syntax = commandSyntaxes.get(commandName);
 		if (syntax == null)
 			return null;
 		try {
-			return syntax.getConstructor().newInstance();
+			CommandSyntax instance = syntax.getConstructor().newInstance();
+			instance.setContext(context);
+			return instance;
 		} catch (Exception e) {
 			throw new ReportedException(CrashReport.makeCrashReport(e, "Doing reflection"));
 		}
@@ -90,11 +108,12 @@ public abstract class ICommandSyntax {
 	 * @return A map of all registered command syntax types. The keys represent
 	 *         the command names, and values represent types of command syntax
 	 */
-	public static Map<String, Class<? extends ICommandSyntax>> getSyntaxList() {
+	public static Map<String, Class<? extends CommandSyntax>> getSyntaxList() {
 		return Collections.unmodifiableMap(commandSyntaxes);
 	}
 
 	static {
+		registerCommandSyntax("gamemode", SyntaxGamemode.class);
 		registerCommandSyntax("give", SyntaxGive.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}

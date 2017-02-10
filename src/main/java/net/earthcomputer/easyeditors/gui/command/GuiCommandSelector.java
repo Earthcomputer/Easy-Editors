@@ -8,7 +8,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
+import net.earthcomputer.easyeditors.gui.command.syntax.CommandSyntax;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.gui.FontRenderer;
@@ -29,7 +29,7 @@ public class GuiCommandSelector extends GuiScreen {
 	private GuiScreen previousScreen;
 	private ICommandEditorCallback callback;
 
-	private List<String> commands = Lists.newArrayList(ICommandSyntax.getSyntaxList().keySet());
+	private List<String> commands = Lists.newArrayList(CommandSyntax.getSyntaxList().keySet());
 	private int selectedIndex = 0;
 
 	private GuiButton cancelButton;

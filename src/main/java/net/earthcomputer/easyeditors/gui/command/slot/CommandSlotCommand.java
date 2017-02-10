@@ -7,7 +7,7 @@ import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiCommandSelector;
 import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
-import net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax;
+import net.earthcomputer.easyeditors.gui.command.syntax.CommandSyntax;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,7 @@ import net.minecraft.client.Minecraft;
 public class CommandSlotCommand extends CommandSlotVerticalArrangement implements ICommandEditorCallback {
 
 	private String commandName = "";
-	private ICommandSyntax commandSyntax;
+	private CommandSyntax commandSyntax;
 
 	@Override
 	public int readFromArgs(String[] args, int index) {
@@ -29,7 +29,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		IGuiCommandSlot header = buildHeader(commandName);
 		String[] newArgs = new String[args.length - index - 1];
 		System.arraycopy(args, index + 1, newArgs, 0, newArgs.length);
-		commandSyntax = ICommandSyntax.forCommandName(commandName);
+		commandSyntax = CommandSyntax.forCommandName(commandName, getContext());
 		clearChildren();
 		addChild(header);
 		if (commandSyntax != null) {
@@ -48,7 +48,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	private IGuiCommandSlot buildHeader(String commandName) {
 		CommandSlotLabel label = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				commandName.isEmpty() ? Translate.GUI_COMMANDEDITOR_NOCOMMAND : commandName, Colors.commandName.color);
-		if (ICommandSyntax.forCommandName(commandName) == null)
+		if (CommandSyntax.forCommandName(commandName, getContext()) == null)
 			label.setColor(Colors.invalidCommandName.color);
 		return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_COMMANDLABEL, label,
 				new CommandSlotButton(20, 20, "...") {
@@ -78,7 +78,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	public void setCommand(String rawCommand) {
 		if (!rawCommand.equals(commandName)) {
 			commandName = rawCommand;
-			commandSyntax = ICommandSyntax.forCommandName(rawCommand);
+			commandSyntax = CommandSyntax.forCommandName(rawCommand, getContext());
 			clearChildren();
 			addChild(buildHeader(rawCommand));
 			addChildren(commandSyntax.setupCommand());

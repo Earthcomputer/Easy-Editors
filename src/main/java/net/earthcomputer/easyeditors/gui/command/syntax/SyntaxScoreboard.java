@@ -5,7 +5,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotMenu;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Translate;
 
-public class SyntaxScoreboard extends ICommandSyntax {
+public class SyntaxScoreboard extends CommandSyntax {
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {

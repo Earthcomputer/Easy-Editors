@@ -8,7 +8,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Translate;
 
-public class SyntaxGive extends ICommandSyntax {
+public class SyntaxGive extends CommandSyntax {
 
 	private CommandSlotPlayerSelector playerSelector;
 	private CommandSlotItemStack item;
