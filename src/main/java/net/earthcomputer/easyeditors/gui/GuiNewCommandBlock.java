@@ -72,7 +72,6 @@ public class GuiNewCommandBlock extends GuiCommandBlock implements ICommandEdito
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
-		System.out.println(prevMode);
 
 		super.initGui();
 
