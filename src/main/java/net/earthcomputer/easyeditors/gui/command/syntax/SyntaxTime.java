@@ -11,6 +11,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotMenu;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotModifiable;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Translate;
+import net.earthcomputer.easyeditors.util.TranslateKeys;
 
 public class SyntaxTime extends CommandSyntax {
 
@@ -118,7 +119,8 @@ public class SyntaxTime extends CommandSyntax {
 					super.addArgs(args);
 				}
 			}
-		};
+		}.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_TIME_INVALID)
+				.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_TIME_OUTOFBOUNDS);
 	}
 
 	private CommandSlotMenu setupTimeToQuerySlot() {
