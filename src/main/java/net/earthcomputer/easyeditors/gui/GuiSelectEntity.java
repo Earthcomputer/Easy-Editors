@@ -6,9 +6,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
+import net.earthcomputer.easyeditors.EasyEditors;
 import net.earthcomputer.easyeditors.api.SmartTranslationRegistry;
 import net.earthcomputer.easyeditors.api.util.FakeWorld;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
@@ -18,6 +20,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -32,6 +37,11 @@ import net.minecraft.world.World;
  *
  */
 public class GuiSelectEntity extends GuiScreen {
+
+	private static final ResourceLocation LOCATION_ENTITY_BACKGROUND = new ResourceLocation(EasyEditors.ID,
+			"textures/gui/select_entity_entity_background.png");
+	private static final ResourceLocation LOCATION_ENTITY_FRAME = new ResourceLocation(EasyEditors.ID,
+			"textures/gui/select_entity_entity_frame.png");
 
 	public static final ResourceLocation PLAYER = new ResourceLocation("player");
 
@@ -101,7 +111,41 @@ public class GuiSelectEntity extends GuiScreen {
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		GeneralUtils.renderEntityAt(theEntity, width * 3 / 4, height / 2, width / 2 - 120, 150, mouseX, mouseY);
+		final int x = this.width * 3 / 4;
+		final int y = this.height / 2;
+		final int width = this.width / 2 - 120;
+		final int height = 150;
+		final int left = x - width / 2;
+		final int top = y - height / 2;
+		final int right = x + width / 2;
+		final int bottom = y + height / 2;
+		final int frameWidth = width * 8 / 200;
+		final int frameHeight = height * 8 / 275;
+
+		Tessellator tessellator = Tessellator.getInstance();
+		VertexBuffer buffer = tessellator.getBuffer();
+
+		mc.getTextureManager().bindTexture(LOCATION_ENTITY_BACKGROUND);
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		buffer.pos(left, top, 0).tex(0, 0).endVertex();
+		buffer.pos(left, bottom, 0).tex(0, 1).endVertex();
+		buffer.pos(right, bottom, 0).tex(1, 1).endVertex();
+		buffer.pos(right, top, 0).tex(1, 0).endVertex();
+		tessellator.draw();
+
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		GL11.glScissor(left * mc.displayWidth / this.width, top * mc.displayHeight / this.height,
+				width * mc.displayWidth / this.width, height * mc.displayHeight / this.height);
+		GeneralUtils.renderEntityAt(theEntity, x, y, width * 3 / 4, height * 3 / 4, mouseX, mouseY);
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+		mc.getTextureManager().bindTexture(LOCATION_ENTITY_FRAME);
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		buffer.pos(left - frameWidth, top - frameHeight, 0).tex(0, 0).endVertex();
+		buffer.pos(left - frameWidth, bottom + frameHeight, 0).tex(0, 1).endVertex();
+		buffer.pos(right + frameWidth, bottom + frameHeight, 0).tex(1, 1).endVertex();
+		buffer.pos(right + frameWidth, top - frameHeight, 0).tex(1, 0).endVertex();
+		tessellator.draw();
 	}
 
 	@Override
