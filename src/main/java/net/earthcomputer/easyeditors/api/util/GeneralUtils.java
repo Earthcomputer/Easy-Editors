@@ -429,7 +429,12 @@ public class GeneralUtils {
 		} else if (entity instanceof EntityLivingBase) {
 			EntityLivingBase eLiving = (EntityLivingBase) entity;
 			boolean isWidthRestricting = (float) eLiving.width / width > (float) eLiving.height / height;
-			float scale = isWidthRestricting ? (float) width / eLiving.width : (float) height / eLiving.height;
+			float scale;
+			if (isWidthRestricting) {
+				scale = eLiving.width > 1 ? width / eLiving.width : width;
+			} else {
+				scale = eLiving.height > 1 ? height / eLiving.height : height;
+			}
 			mouseX -= x;
 			mouseY -= y - 50;
 			GlStateManager.disableBlend();
