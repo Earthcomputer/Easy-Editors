@@ -1,7 +1,11 @@
+entity.AreaEffectCloud.name=Lingering Potion Effect Cloud
 entity.EnderCrystal.name=Ender Crystal
+entity.EvocationFangs.name=Evoker Fangs
 entity.LightningBolt.name=Bolt of Lightning
+entity.LlamaSpit.name=Llama Spit
 entity.MinecartSpawner.name=Minecart with Spawner
 entity.Player.name=Player
+entity.ShulkerBullet.name=Shulker Bullet
 smartTranslations.entity.thrown=Thrown %s
 
 gui.commandBlock.goToCommandEditor=Command Editor

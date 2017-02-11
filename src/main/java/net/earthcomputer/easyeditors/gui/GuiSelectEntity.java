@@ -141,6 +141,11 @@ public class GuiSelectEntity extends GuiScreen {
 	 * @return
 	 */
 	public static String getEntityName(ResourceLocation entity) {
+		if (PLAYER.equals(entity)) {
+			return Translate.ENTITY_PLAYER_NAME;
+		} else if (EntityList.LIGHTNING_BOLT.equals(entity)) {
+			return Translate.ENTITY_LIGHTNINGBOLT_NAME;
+		}
 		String unlocalized = "entity." + EntityList.getTranslationName(entity) + ".name";
 		if (SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(unlocalized))
 			return I18n.format(unlocalized);

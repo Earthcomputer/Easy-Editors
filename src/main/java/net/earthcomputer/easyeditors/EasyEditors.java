@@ -117,6 +117,8 @@ public class EasyEditors {
 		SmartTranslationRegistry.registerAlias("entity.FireworksRocketEntity.name", "item.fireworks.name");
 		SmartTranslationRegistry.registerAlias("entity.WitherSkull.name", "item.skull.wither.name");
 
+		SmartTranslationRegistry.registerAlias("entity.SpectralArrow.name", "item.spectral_arrow.name");
+
 		SmartTranslationRegistry.registerTranslation("entity.ThrownEnderpearl.name",
 				new ThrownTranslation("item.enderPearl.name"));
 		SmartTranslationRegistry.registerTranslation("entity.EyeOfEnderSignal.name",
