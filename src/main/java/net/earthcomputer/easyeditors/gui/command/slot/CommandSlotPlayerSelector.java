@@ -2,7 +2,10 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -24,6 +27,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.ResourceLocation;
@@ -121,6 +125,15 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		addChild(radioList);
 	}
 
+	/**
+	 * Gets the flags this player selector was constructed with
+	 * 
+	 * @return
+	 */
+	public int getFlags() {
+		return flags;
+	}
+
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
@@ -154,6 +167,91 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		if ((flags & DISALLOW_SELECTOR) == 0) {
 			if (selectedIndex == i)
 				playerSelector.checkValid();
+		}
+	}
+
+	public static class WithDefault extends CommandSlotPlayerSelector {
+		private boolean optionalPlayersOnly = true;
+
+		public WithDefault() {
+		}
+
+		public WithDefault(int flags) {
+			super(flags);
+		}
+
+		public WithDefault(int flags, boolean optionalPlayersOnly) {
+			super(flags);
+			this.optionalPlayersOnly = optionalPlayersOnly;
+		}
+
+		@Override
+		public void addArgs(List<String> args) throws UIInvalidException {
+			super.addArgs(args);
+			if (getContext().getSender() instanceof EntityPlayer) {
+				if ((getFlags() & NON_PLAYERS_ONLY) == 0) {
+					String lastArg = args.get(args.size() - 1);
+					boolean redundant = false;
+					if (lastArg.equals("@p")) {
+						redundant = true;
+					} else {
+						EntityPlayer player = (EntityPlayer) getContext().getSender();
+						if (lastArg.equals(player.getName())) {
+							redundant = true;
+						} else if (Patterns.UUID.matcher(lastArg).matches()
+								&& UUID.fromString(lastArg).equals(player.getUniqueID())) {
+							redundant = true;
+						}
+					}
+					if (redundant) {
+						args.remove(args.size() - 1);
+					}
+				}
+			} else if (getContext().getSender() instanceof Entity) {
+				if ((getFlags() & PLAYERS_ONLY) == 0 && !optionalPlayersOnly) {
+					String lastArg = args.get(args.size() - 1);
+					boolean redundant = false;
+					if (lastArg.equals("@e[c=1]")) {
+						redundant = true;
+					} else {
+						Entity entity = (Entity) getContext().getSender();
+						if (Patterns.UUID.matcher(lastArg).matches()
+								&& UUID.fromString(lastArg).equals(entity.getUniqueID())) {
+							redundant = true;
+						}
+					}
+					if (redundant) {
+						args.remove(args.size() - 1);
+					}
+				}
+			}
+		}
+
+		@Override
+		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+			if (isArgAbsent(args, index)) {
+				if (getContext().getSender() instanceof EntityPlayer) {
+					if ((getFlags() & NON_PLAYERS_ONLY) != 0) {
+						throw new CommandSyntaxException();
+					}
+					super.readFromArgs(ArrayUtils.add(args, "@p"), index);
+					return 0;
+				} else if (getContext().getSender() instanceof Entity) {
+					if ((getFlags() & PLAYERS_ONLY) != 0 || optionalPlayersOnly) {
+						throw new CommandSyntaxException();
+					}
+					super.readFromArgs(ArrayUtils.add(args, "@e[c=1]"), index);
+					return 0;
+				} else {
+					throw new CommandSyntaxException();
+				}
+			} else {
+				return super.readFromArgs(args, index);
+			}
+		}
+
+		protected boolean isArgAbsent(String[] args, int index) {
+			return args.length == index;
 		}
 	}
 
@@ -501,7 +599,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 							Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENTITYNAME, Colors.playerSelectorLabel.color),
 					nameInverted, entityName);
 
-			entityName.setContentFilter(Predicates2.<String>matchingPattern(Patterns.partialPlayerName));
+			entityName.setContentFilter(Predicates2.<String> matchingPattern(Patterns.partialPlayerName));
 
 			return r;
 		}
@@ -826,7 +924,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					Colors.playerSelectorLabel.color));
 
 			tagName = new CommandSlotTextField(200, 200);
-			tagName.setContentFilter(Predicates2.<String>matchingPattern(Patterns.partialPlayerName));
+			tagName.setContentFilter(Predicates2.<String> matchingPattern(Patterns.partialPlayerName));
 			tagNameInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_INVERTED);
 			IGuiCommandSlot tagNameWithLabel = CommandSlotLabel.createLabel(
 					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_NAME, Colors.playerSelectorLabel.color,
