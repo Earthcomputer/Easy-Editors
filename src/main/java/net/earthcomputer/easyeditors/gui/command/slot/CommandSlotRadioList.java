@@ -163,7 +163,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 
 	@Override
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-		if (index >= args.length)
+		if (shouldCheckIndexOutOfBounds() && index >= args.length)
 			throw new CommandSyntaxException();
 		selectedIndex = getSelectedIndexForString(args, index);
 		if (size() != 0) {
@@ -214,6 +214,16 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	 * @throws CommandSyntaxException
 	 */
 	protected abstract int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException;
+
+	/**
+	 * Whether to check whether <code>index >= args.length</code> before calling
+	 * {@link #getSelectedIndexForString(String[], int)}
+	 * 
+	 * @return
+	 */
+	protected boolean shouldCheckIndexOutOfBounds() {
+		return true;
+	}
 
 	@Override
 	public boolean onKeyTyped(char typedChar, int keyCode) {

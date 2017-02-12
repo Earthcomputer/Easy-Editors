@@ -119,6 +119,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("defaultgamemode", SyntaxDefaultGamemode.class);
 		registerCommandSyntax("kill", SyntaxKill.class);
 		registerCommandSyntax("toggledownfall", SyntaxNoArguments.class);
+		registerCommandSyntax("weather", SyntaxWeather.class);
 		registerCommandSyntax("give", SyntaxGive.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
