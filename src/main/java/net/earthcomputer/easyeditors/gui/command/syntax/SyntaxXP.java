@@ -2,12 +2,14 @@ package net.earthcomputer.easyeditors.gui.command.syntax;
 
 import java.util.List;
 
+import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRadioList;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
@@ -54,7 +56,8 @@ public class SyntaxXP extends CommandSyntax {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_XP_XP,
 						Translate.GUI_COMMANDEDITOR_XP_XP_TOOLTIP, xp),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_XP_PLAYER,
-						Translate.GUI_COMMANDEDITOR_XP_PLAYER_TOOLTIP, player) };
+						Translate.GUI_COMMANDEDITOR_XP_PLAYER_TOOLTIP,
+						new CommandSlotRectangle(player, Colors.playerSelectorBox.color)) };
 	}
 
 }
