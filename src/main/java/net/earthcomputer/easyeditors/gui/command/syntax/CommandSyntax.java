@@ -118,6 +118,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("difficulty", SyntaxDifficulty.class);
 		registerCommandSyntax("defaultgamemode", SyntaxDefaultGamemode.class);
 		registerCommandSyntax("kill", SyntaxKill.class);
+		registerCommandSyntax("toggledownfall", SyntaxNoArguments.class);
 		registerCommandSyntax("give", SyntaxGive.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
