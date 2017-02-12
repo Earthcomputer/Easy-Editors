@@ -105,6 +105,15 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	}
 
 	/**
+	 * Gets the current filter for the contents of this text field.
+	 * 
+	 * @return
+	 */
+	public Predicate<String> getContentFilter() {
+		return wrappedTextField.getContentFilter();
+	}
+
+	/**
 	 * Sets the filter for the contents of this text field. If the text field is
 	 * allowed to contain some text, the content filter should return true,
 	 * otherwise, it should return false
@@ -279,6 +288,10 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 			} catch (Exception e) {
 				throw new ReportedException(CrashReport.makeCrashReport(e, "Doing reflection"));
 			}
+		}
+
+		public Predicate<String> getContentFilter() {
+			return contentFilter;
 		}
 
 		@Override

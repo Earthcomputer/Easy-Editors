@@ -185,6 +185,20 @@ public class GeneralUtils {
 	}
 
 	/**
+	 * Converts a double to a String without any trailing <code>.0</code>
+	 * 
+	 * @param d
+	 * @return
+	 */
+	public static String doubleToString(double d) {
+		String strValue = String.valueOf(d);
+		if (strValue.endsWith(".0")) {
+			strValue = strValue.substring(0, strValue.length());
+		}
+		return strValue;
+	}
+
+	/**
 	 * Draws a rectangle with possibly different colors in different corners
 	 * 
 	 * @param left
@@ -530,7 +544,7 @@ public class GeneralUtils {
 						NBTBase entityNBT = JsonToNBT.getTagFromJson(event.getValue().getUnformattedText());
 
 						if (entityNBT instanceof NBTTagCompound) {
-							List<String> tooltipLines = Lists.<String>newArrayList();
+							List<String> tooltipLines = Lists.<String> newArrayList();
 							NBTTagCompound entityCompound = (NBTTagCompound) entityNBT;
 							tooltipLines.add(entityCompound.getString("name"));
 

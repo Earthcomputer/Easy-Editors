@@ -27,4 +27,13 @@ public class Patterns {
 
 	public static final Pattern integer = Pattern.compile("[+-]?[0-9]+");
 
+	public static final Pattern partialDouble = Pattern
+			.compile("[+-]?(?:0[Xx])?[0-9a-fA-F]*\\.?[0-9a-fA-F]*(?:[EePp][+-]?[0-9a-fA-F]*)?");
+
+	public static final Pattern _double = Pattern.compile(
+			// decimal
+			"(?:[+-]?(?:(?:[0-9]+\\.?[0-9]*)|(?:\\.[0-9]+))(?:[Ee][+-]?[0-9]+)?)|" +
+					// hexadecimal
+					"(?:[+-]?0[Xx](?:(?:[0-9a-fA-F]+\\.?[0-9a-fA-F]*)|(?:\\.[0-9a-fA-F]+))(?:[Pp][+-]?[0-9a-fA-F]+)?)");
+
 }
