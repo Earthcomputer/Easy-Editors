@@ -20,6 +20,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -125,6 +126,7 @@ public class GuiSelectEntity extends GuiScreen {
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer buffer = tessellator.getBuffer();
 
+		GlStateManager.color(1, 1, 1, 1);
 		mc.getTextureManager().bindTexture(LOCATION_ENTITY_BACKGROUND);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		buffer.pos(left, top, 0).tex(0, 0).endVertex();
@@ -139,6 +141,7 @@ public class GuiSelectEntity extends GuiScreen {
 		GeneralUtils.renderEntityAt(theEntity, x, y, width * 3 / 4, height * 3 / 4, mouseX, mouseY);
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
+		GlStateManager.disableDepth();
 		mc.getTextureManager().bindTexture(LOCATION_ENTITY_FRAME);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		buffer.pos(left - frameWidth, top - frameHeight, 0).tex(0, 0).endVertex();
