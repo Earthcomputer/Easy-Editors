@@ -58,14 +58,14 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 		this.callback = callback;
 		this.sender = sender;
 		commandSlotCommand = new CommandSlotCommand();
+		commandSlotRectangle = new CommandSlotRectangle(commandSlotCommand, Colors.commandBox.color);
+		commandSlotRectangle.addSizeChangeListener(this);
+		commandSlotRectangle.setContext(new Cxt());
 		String str = callback.getCommand();
 		if (str.startsWith("/"))
 			str = str.substring(1);
 		str = str.trim();
 		commandSlotCommand.readFromArgs(str.split(" "), 0);
-		commandSlotRectangle = new CommandSlotRectangle(commandSlotCommand, Colors.commandBox.color);
-		commandSlotRectangle.addSizeChangeListener(this);
-		commandSlotRectangle.setContext(new Cxt());
 		setVirtualWidth(commandSlotRectangle.getWidth() + 4);
 		setVirtualHeight(commandSlotRectangle.getHeight() + 4);
 	}
