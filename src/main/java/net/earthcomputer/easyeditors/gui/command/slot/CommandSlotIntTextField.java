@@ -89,7 +89,7 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		}
 		if (i < minValue || i > maxValue)
 			throw new CommandSyntaxException();
-		setText(args[index]);
+		setText(String.valueOf(i));
 		return 1;
 	}
 
@@ -97,7 +97,7 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
 
-		super.addArgs(args);
+		args.add(String.valueOf(getIntValue()));
 	}
 
 	/**
