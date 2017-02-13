@@ -56,6 +56,22 @@ public class CommandSlotNumberTextField extends CommandSlotTextField {
 		return this;
 	}
 
+	public double getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(double minValue) {
+		this.minValue = minValue;
+	}
+
+	public double getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(double maxValue) {
+		this.maxValue = maxValue;
+	}
+
 	@Override
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 		if (index >= args.length)

@@ -28,6 +28,8 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 	public CommandSlotRelativeCoordinate(int textColor) {
 		x = new CoordinateArg();
 		y = new CoordinateArg();
+		y.getTextField().setMinValue(-4096);
+		y.getTextField().setMaxValue(4096);
 		z = new CoordinateArg();
 		addChild(CommandSlotLabel.createLabel("X:", textColor, x));
 		addChild(CommandSlotLabel.createLabel("Y:", textColor, y));
