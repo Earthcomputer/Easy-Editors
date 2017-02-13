@@ -244,7 +244,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 					int height = getChildAt(i).getHeight();
 					if (height < 16)
 						height = 16;
-					if (mouseY >= top && mouseY < y + top + height) {
+					if (mouseY >= y + top && mouseY < y + top + height) {
 						if (selectedIndex != i) {
 							selectedIndex = i;
 							GeneralUtils.playButtonSound();
