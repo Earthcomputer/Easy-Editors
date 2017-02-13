@@ -193,7 +193,7 @@ public class GeneralUtils {
 	public static String doubleToString(double d) {
 		String strValue = String.valueOf(d);
 		if (strValue.endsWith(".0")) {
-			strValue = strValue.substring(0, strValue.length());
+			strValue = strValue.substring(0, strValue.length() - 2);
 		}
 		return strValue;
 	}
@@ -544,7 +544,7 @@ public class GeneralUtils {
 						NBTBase entityNBT = JsonToNBT.getTagFromJson(event.getValue().getUnformattedText());
 
 						if (entityNBT instanceof NBTTagCompound) {
-							List<String> tooltipLines = Lists.<String> newArrayList();
+							List<String> tooltipLines = Lists.<String>newArrayList();
 							NBTTagCompound entityCompound = (NBTTagCompound) entityNBT;
 							tooltipLines.add(entityCompound.getString("name"));
 

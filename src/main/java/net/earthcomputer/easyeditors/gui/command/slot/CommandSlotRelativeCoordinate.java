@@ -17,98 +17,99 @@ import net.earthcomputer.easyeditors.util.Translate;
  */
 public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangement {
 
-	private CommandSlotNumberTextField xCoord;
-	private CommandSlotNumberTextField yCoord;
-	private CommandSlotNumberTextField zCoord;
-	private CommandSlotCheckbox xRelative;
-	private CommandSlotCheckbox yRelative;
-	private CommandSlotCheckbox zRelative;
+	private CoordinateArg x;
+	private CoordinateArg y;
+	private CoordinateArg z;
 
 	public CommandSlotRelativeCoordinate() {
 		this(Colors.label.color);
 	}
 
 	public CommandSlotRelativeCoordinate(int textColor) {
-		xCoord = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
-		xCoord.setText("0");
-		yCoord = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
-		yCoord.setText("0");
-		zCoord = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
-		zCoord.setText("0");
-		xRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
-		xRelative.setChecked(true);
-		yRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
-		yRelative.setChecked(true);
-		zRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
-		zRelative.setChecked(true);
-		addChild(CommandSlotLabel.createLabel("X:", textColor, xCoord, xRelative));
-		addChild(CommandSlotLabel.createLabel("Y:", textColor, yCoord, yRelative));
-		addChild(CommandSlotLabel.createLabel("Z:", textColor, zCoord, zRelative));
+		x = new CoordinateArg();
+		y = new CoordinateArg();
+		z = new CoordinateArg();
+		addChild(CommandSlotLabel.createLabel("X:", textColor, x));
+		addChild(CommandSlotLabel.createLabel("Y:", textColor, y));
+		addChild(CommandSlotLabel.createLabel("Z:", textColor, z));
 	}
 
-	@Override
-	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-		if (index + 2 >= args.length) {
-			throw new CommandSyntaxException();
-		}
-		parseArg(args[index], xCoord, xRelative);
-		parseArg(args[index + 1], yCoord, yRelative);
-		parseArg(args[index + 2], zCoord, zRelative);
-		return 3;
-	}
+	public static class CoordinateArg extends CommandSlotHorizontalArrangement {
+		private CommandSlotNumberTextField textField;
+		private CommandSlotCheckbox relative;
 
-	private static void parseArg(String arg, CommandSlotNumberTextField coordField, CommandSlotCheckbox relative)
-			throws CommandSyntaxException {
-		boolean isRelative = arg.startsWith("~");
-		relative.setChecked(isRelative);
-		if (isRelative) {
-			arg = arg.substring(1);
+		public CoordinateArg() {
+			textField = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
+			textField.setText("0");
+			relative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
+			relative.setChecked(true);
+			addChild(textField);
+			addChild(relative);
 		}
-		if (arg.isEmpty()) {
-			coordField.setText("0");
-		} else {
-			double d;
-			try {
-				d = Double.parseDouble(arg);
-			} catch (NumberFormatException e) {
+
+		@Override
+		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+			if (args.length == index) {
 				throw new CommandSyntaxException();
 			}
-			coordField.setText(GeneralUtils.doubleToString(d));
-		}
-	}
-
-	@Override
-	public void addArgs(List<String> args) throws UIInvalidException {
-		checkValid();
-		writeArg(args, xCoord, xRelative);
-		writeArg(args, yCoord, yRelative);
-		writeArg(args, zCoord, zRelative);
-	}
-
-	private static void writeArg(List<String> args, CommandSlotNumberTextField coordField,
-			CommandSlotCheckbox relative) {
-		double dValue = coordField.getDoubleValue();
-		if (dValue == 0 && relative.isChecked()) {
-			args.add("~");
-		} else {
-			String arg = GeneralUtils.doubleToString(dValue);
-			if (relative.isChecked()) {
-				arg = "~" + arg;
+			String arg = args[index];
+			boolean relative = arg.startsWith("~");
+			if (relative) {
+				arg = arg.substring(1);
+				if (arg.isEmpty()) {
+					arg = "0";
+				}
 			}
-			args.add(arg);
+			textField.readFromArgs(new String[] { arg }, 0);
+			this.relative.setChecked(relative);
+			return 1;
 		}
-	}
 
-	/**
-	 * 
-	 * @throws UIInvalidException
-	 *             When any of the internal text fields do not hold a valid
-	 *             double
-	 */
-	public void checkValid() throws UIInvalidException {
-		xCoord.checkValid();
-		yCoord.checkValid();
-		zCoord.checkValid();
+		@Override
+		public void addArgs(List<String> args) throws UIInvalidException {
+			checkValid();
+			double textFieldValue = textField.getDoubleValue();
+			if (textFieldValue == 0) {
+				if (relative.isChecked()) {
+					args.add("~");
+				} else {
+					args.add("0");
+				}
+			} else {
+				String arg = GeneralUtils.doubleToString(textFieldValue);
+				if (relative.isChecked()) {
+					arg = "~" + arg;
+				}
+				args.add(arg);
+			}
+		}
+
+		/**
+		 * 
+		 * @throws UIInvalidException
+		 *             When this internal text field has an invalid number
+		 */
+		public void checkValid() throws UIInvalidException {
+			textField.checkValid();
+		}
+
+		/**
+		 * Gets the internal text field
+		 * 
+		 * @return
+		 */
+		public CommandSlotNumberTextField getTextField() {
+			return textField;
+		}
+
+		/**
+		 * Gets the internal checkbox
+		 * 
+		 * @return
+		 */
+		public CommandSlotCheckbox getRelative() {
+			return relative;
+		}
 	}
 
 }

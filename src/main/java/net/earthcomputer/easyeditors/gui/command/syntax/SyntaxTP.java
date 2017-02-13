@@ -5,9 +5,7 @@ import java.util.List;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCheckbox;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotNumberTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRadioList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
@@ -22,10 +20,8 @@ public class SyntaxTP extends CommandSyntax {
 	private CommandSlotRadioList target;
 	private CommandSlotPlayerSelector targetEntity;
 	private CommandSlotRelativeCoordinate targetCoordinate;
-	private CommandSlotNumberTextField yaw;
-	private CommandSlotNumberTextField pitch;
-	private CommandSlotCheckbox yawRelative;
-	private CommandSlotCheckbox pitchRelative;
+	private CommandSlotRelativeCoordinate.CoordinateArg yaw;
+	private CommandSlotRelativeCoordinate.CoordinateArg pitch;
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
@@ -38,107 +34,53 @@ public class SyntaxTP extends CommandSyntax {
 		};
 		targetEntity = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.ONE_ONLY);
 		targetCoordinate = new CommandSlotRelativeCoordinate(Colors.tpTargetLabel.color);
-		yaw = new CommandSlotNumberTextField(50, 100, -30000000, 30000000) {
+		yaw = new CommandSlotRelativeCoordinate.CoordinateArg() {
 			@Override
 			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 				if (args.length == index) {
-					setText("0");
-					yawRelative.setChecked(true);
+					getTextField().setText("0");
+					getRelative().setChecked(true);
 					return 0;
 				}
-				String arg = args[index];
-				boolean relative = arg.startsWith("~");
-				if (relative) {
-					arg = arg.substring(1);
-					if (arg.isEmpty()) {
-						arg = "0";
-					}
-				}
-				yawRelative.setChecked(relative);
-				return super.readFromArgs(new String[] { arg }, 0);
+				return super.readFromArgs(args, index);
 			}
 
 			@Override
 			public void addArgs(List<String> args) throws UIInvalidException {
-				super.addArgs(args);
-				if (yawRelative.isChecked()) {
-					String arg;
-					if (getDoubleValue() == 0) {
-						if (pitch.getDoubleValue() == 0 && pitchRelative.isChecked()) {
-							args.remove(args.size() - 1);
-							return;
-						}
-						arg = "~";
-					} else {
-						arg = args.get(args.size() - 1);
-					}
-					args.set(args.size() - 1, arg);
+				checkValid();
+				pitch.checkValid();
+				if (getTextField().getDoubleValue() != 0 || !getRelative().isChecked()
+						|| pitch.getTextField().getDoubleValue() != 0 || !pitch.getRelative().isChecked()) {
+					super.addArgs(args);
 				}
 			}
 		};
-		yaw.setText("0");
-		pitch = new CommandSlotNumberTextField(50, 100, -30000000, 30000000) {
+		pitch = new CommandSlotRelativeCoordinate.CoordinateArg() {
 			@Override
 			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 				if (args.length == index) {
-					setText("0");
-					pitchRelative.setChecked(true);
+					getTextField().setText("0");
+					getRelative().setChecked(true);
 					return 0;
 				}
-				String arg = args[index];
-				boolean relative = arg.startsWith("~");
-				if (relative) {
-					arg = arg.substring(1);
-					if (arg.isEmpty()) {
-						arg = "0";
-					}
-				}
-				pitchRelative.setChecked(relative);
-				return super.readFromArgs(new String[] { arg }, 0);
+				return super.readFromArgs(args, index);
 			}
 
 			@Override
 			public void addArgs(List<String> args) throws UIInvalidException {
-				super.addArgs(args);
-				if (pitchRelative.isChecked()) {
-					if (getDoubleValue() == 0) {
-						args.remove(args.size() - 1);
-						return;
-					}
-					args.set(args.size() - 1, "~" + args.get(args.size() - 1));
+				// no need to check validity, yaw has already done it
+				if (getTextField().getDoubleValue() != 0 || !getRelative().isChecked()) {
+					super.addArgs(args);
 				}
 			}
 		};
-		pitch.setText("0");
-		yawRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE) {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				return 0;
-			}
-
-			@Override
-			public void addArgs(List<String> args) {
-			}
-		};
-		yawRelative.setChecked(true);
-		pitchRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE) {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				return 0;
-			}
-
-			@Override
-			public void addArgs(List<String> args) {
-			}
-		};
-		pitchRelative.setChecked(true);
 		IGuiCommandSlot targetCoord = new CommandSlotVerticalArrangement(targetCoordinate,
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION, Colors.tpTargetLabel.color,
 						new CommandSlotVerticalArrangement(
 								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_YAW,
-										Colors.tpTargetLabel.color, yaw, yawRelative),
+										Colors.tpTargetLabel.color, yaw),
 								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_PITCH,
-										Colors.tpTargetLabel.color, pitch, pitchRelative))));
+										Colors.tpTargetLabel.color, pitch))));
 		target = new CommandSlotRadioList(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TARGET_ENTITY, Colors.tpTargetLabel.color,
 						new CommandSlotRectangle(targetEntity, Colors.playerSelectorBox.color)),
