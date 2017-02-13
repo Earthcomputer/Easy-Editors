@@ -34,9 +34,11 @@ public class EasyEditorsApi {
 	private static Class<?> cls_EasyEditors;
 	private static Class<?> cls_ICommandSyntax;
 	private static Class<?> cls_NBTTagHandler;
+	private static Class<?> cls_SlotHandler;
 
 	private static Method md_ICommandSyntax_registerCommandSyntax;
 	private static Method md_NBTTagHandler_registerHandler;
+	private static Method md_SlotHandler_registerHandler;
 
 	/**
 	 * The logger, mainly for internal use
@@ -48,11 +50,13 @@ public class EasyEditorsApi {
 			cls_EasyEditors = Class.forName("net.earthcomputer.easyeditors.EasyEditors");
 			cls_ICommandSyntax = Class.forName("net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax");
 			cls_NBTTagHandler = Class.forName("net.earthcomputer.easyeditors.gui.command.NBTTagHandler");
+			cls_SlotHandler = Class.forName("net.earthcomputer.easyeditors.gui.command.SlotHandler");
 
 			md_ICommandSyntax_registerCommandSyntax = cls_ICommandSyntax.getMethod("registerCommandSyntax",
 					String.class, Class.class);
 			md_NBTTagHandler_registerHandler = cls_NBTTagHandler.getMethod("registerHandler", String.class,
 					Predicate.class, Class.class);
+			md_SlotHandler_registerHandler = cls_SlotHandler.getMethod("registerHandler", cls_SlotHandler);
 		} catch (Exception e) {
 		}
 	}
@@ -166,6 +170,32 @@ public class EasyEditorsApi {
 			return;
 		try {
 			md_NBTTagHandler_registerHandler.invoke(null, handlerType, predicate, Class.forName(handlerClassName));
+		} catch (Exception e) {
+			GeneralUtils.logStackTrace(logger, e);
+		}
+	}
+
+	/**
+	 * A safe way of registering a SlotHandler without raising a
+	 * {@link NoClassDefFoundError} if the Easy Editors mod is not present.
+	 * Modders should ensure that the referred class in slotHandlerClassName is
+	 * not referenced directly in code where one cannot be sure whether Easy
+	 * Editors exists. Modders should also make sure that the referenced class
+	 * is a subclass of
+	 * {@link net.earthcomputer.easyeditors.gui.command.SlotHandler SlotHandler}
+	 * 
+	 * @param slotHandlerClassName
+	 */
+	public static void registerSlotHandler(String slotHandlerClassName) {
+		if (cls_EasyEditors == null) {
+			return;
+		}
+		try {
+			Class<?> slotHandlerClass = Class.forName(slotHandlerClassName);
+			if (!cls_SlotHandler.isAssignableFrom(slotHandlerClass)) {
+				throw new IllegalArgumentException("Not a SlotHandler");
+			}
+			md_SlotHandler_registerHandler.invoke(null, slotHandlerClass.newInstance());
 		} catch (Exception e) {
 			GeneralUtils.logStackTrace(logger, e);
 		}
