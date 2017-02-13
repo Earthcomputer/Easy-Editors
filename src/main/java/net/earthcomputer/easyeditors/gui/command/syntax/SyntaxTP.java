@@ -132,18 +132,18 @@ public class SyntaxTP extends CommandSyntax {
 			}
 		};
 		pitchRelative.setChecked(true);
+		IGuiCommandSlot targetCoord = new CommandSlotVerticalArrangement(targetCoordinate,
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION, Colors.tpTargetLabel.color,
+						new CommandSlotVerticalArrangement(
+								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_YAW,
+										Colors.tpTargetLabel.color, yaw, yawRelative),
+								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_PITCH,
+										Colors.tpTargetLabel.color, pitch, pitchRelative))));
 		target = new CommandSlotRadioList(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TARGET_ENTITY, Colors.tpTargetLabel.color,
 						new CommandSlotRectangle(targetEntity, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TARGET_COORDINATE,
-						Colors.tpTargetLabel.color,
-						new CommandSlotVerticalArrangement(targetCoordinate, CommandSlotLabel.createLabel(
-								Translate.GUI_COMMANDEDITOR_TP_ROTATION, Colors.tpTargetLabel.color,
-								new CommandSlotVerticalArrangement(
-										CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_YAW,
-												Colors.tpTargetLabel.color, yaw, yawRelative),
-										CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_PITCH,
-												Colors.tpTargetLabel.color, pitch, pitchRelative)))))) {
+						Colors.tpTargetLabel.color, targetCoord)) {
 			@Override
 			protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
 				int len = args.length - index;
