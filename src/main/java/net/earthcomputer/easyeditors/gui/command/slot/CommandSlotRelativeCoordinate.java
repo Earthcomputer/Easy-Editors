@@ -2,6 +2,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
@@ -24,15 +25,25 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 	private CommandSlotCheckbox zRelative;
 
 	public CommandSlotRelativeCoordinate() {
+		this(Colors.label.color);
+	}
+
+	public CommandSlotRelativeCoordinate(int textColor) {
 		xCoord = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
+		xCoord.setText("0");
 		yCoord = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
+		yCoord.setText("0");
 		zCoord = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
+		zCoord.setText("0");
 		xRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
+		xRelative.setChecked(true);
 		yRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
+		yRelative.setChecked(true);
 		zRelative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
-		addChild(CommandSlotLabel.createLabel("X:", xCoord, xRelative));
-		addChild(CommandSlotLabel.createLabel("Y:", yCoord, yRelative));
-		addChild(CommandSlotLabel.createLabel("Z:", zCoord, zRelative));
+		zRelative.setChecked(true);
+		addChild(CommandSlotLabel.createLabel("X:", textColor, xCoord, xRelative));
+		addChild(CommandSlotLabel.createLabel("Y:", textColor, yCoord, yRelative));
+		addChild(CommandSlotLabel.createLabel("Z:", textColor, zCoord, zRelative));
 	}
 
 	@Override

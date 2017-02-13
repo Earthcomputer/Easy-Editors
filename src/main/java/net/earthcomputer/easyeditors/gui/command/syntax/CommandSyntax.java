@@ -121,6 +121,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("toggledownfall", SyntaxNoArguments.class);
 		registerCommandSyntax("weather", SyntaxWeather.class);
 		registerCommandSyntax("xp", SyntaxXP.class);
+		registerCommandSyntax("tp", SyntaxTP.class);
 		registerCommandSyntax("give", SyntaxGive.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}

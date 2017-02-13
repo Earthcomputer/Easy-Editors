@@ -134,6 +134,20 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		return flags;
 	}
 
+	/**
+	 * Gets the internal radio list
+	 * 
+	 * @return
+	 */
+	public CommandSlotRadioList getRadioList() {
+		return radioList;
+	}
+
+	// Hacky method to get player selector because Java is stupid
+	private static CmdPlayerSelector getPlayerSelector(CommandSlotPlayerSelector selector) {
+		return selector.playerSelector;
+	}
+
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
@@ -183,6 +197,15 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		public WithDefault(int flags, boolean optionalPlayersOnly) {
 			super(flags);
 			this.optionalPlayersOnly = optionalPlayersOnly;
+			if ((flags & NON_PLAYERS_ONLY) == 0) {
+				getRadioList().setSelectedIndex(2);
+			} else {
+				getRadioList().setSelectedIndex(2);
+				getPlayerSelector(this).selectorType.setCurrentIndex(0);
+				if ((flags & ONE_ONLY) != 0) {
+					getPlayerSelector(this).countField.setText("1");
+				}
+			}
 		}
 
 		@Override
@@ -599,7 +622,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 							Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENTITYNAME, Colors.playerSelectorLabel.color),
 					nameInverted, entityName);
 
-			entityName.setContentFilter(Predicates2.<String> matchingPattern(Patterns.partialPlayerName));
+			entityName.setContentFilter(Predicates2.<String>matchingPattern(Patterns.partialPlayerName));
 
 			return r;
 		}
@@ -924,7 +947,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					Colors.playerSelectorLabel.color));
 
 			tagName = new CommandSlotTextField(200, 200);
-			tagName.setContentFilter(Predicates2.<String> matchingPattern(Patterns.partialPlayerName));
+			tagName.setContentFilter(Predicates2.<String>matchingPattern(Patterns.partialPlayerName));
 			tagNameInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_INVERTED);
 			IGuiCommandSlot tagNameWithLabel = CommandSlotLabel.createLabel(
 					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TAG_NAME, Colors.playerSelectorLabel.color,
