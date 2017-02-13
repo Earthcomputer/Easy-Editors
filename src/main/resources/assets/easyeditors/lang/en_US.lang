@@ -191,6 +191,8 @@ gui.commandEditor.selectCommand.kill.desc=Kills an entity
 gui.commandEditor.selectCommand.kill.example=/kill @e[type=slime]
 gui.commandEditor.selectCommand.scoreboard.desc=Various operations on the scoreboard
 gui.commandEditor.selectCommand.scoreboard.example=/scoreboard players set Earthcomputer randomVariable 0
+gui.commandEditor.selectCommand.teleport.desc=Teleports another entity relative to your position
+gui.commandEditor.selectCommand.teleport.example=/teleport @e[type=falling_block] ~ ~15 ~
 gui.commandEditor.selectCommand.test.desc=A test command
 gui.commandEditor.selectCommand.test.example=/test Sample text
 gui.commandEditor.selectCommand.time.desc=Sets/queries the world time
@@ -208,6 +210,7 @@ gui.commandEditor.selectEnchantment.title=Select Enchantment
 gui.commandEditor.selectEntity.title=Select Entity
 gui.commandEditor.selectItem.search=Search
 gui.commandEditor.selectItem.title=Select Item
+gui.commandEditor.teleport.targetCoordinate=Target Coordinate:
 gui.commandEditor.time.add=Add to the time
 gui.commandEditor.time.add.subcommand=Time to add
 gui.commandEditor.time.invalid=Invalid number in time

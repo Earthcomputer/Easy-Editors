@@ -122,6 +122,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("weather", SyntaxWeather.class);
 		registerCommandSyntax("xp", SyntaxXP.class);
 		registerCommandSyntax("tp", SyntaxTP.class);
+		registerCommandSyntax("teleport", SyntaxTeleport.class);
 		registerCommandSyntax("give", SyntaxGive.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
