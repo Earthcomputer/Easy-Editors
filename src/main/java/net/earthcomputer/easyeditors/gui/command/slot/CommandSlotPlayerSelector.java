@@ -55,7 +55,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	public static final int NON_PLAYERS_ONLY = 16;
 	public static final int ONE_ONLY = 32;
 
-	private static final ResourceLocation ENTITY_ANYTHING = new ResourceLocation("anything");
+	public static final ResourceLocation ENTITY_ANYTHING = new ResourceLocation("anything");
 
 	public CommandSlotPlayerSelector() {
 		this(0);
@@ -182,6 +182,14 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			if (selectedIndex == i)
 				playerSelector.checkValid();
 		}
+	}
+
+	/**
+	 * Called when the entity type is changed or first set
+	 * 
+	 * @param newEntityType
+	 */
+	protected void onSetEntityTo(ResourceLocation newEntityType) {
 	}
 
 	public static class WithDefault extends CommandSlotPlayerSelector {
@@ -565,6 +573,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						modifiableRotations.setChild(null);
 						modifiableTeam.setChild(null);
 					}
+
+					onSetEntityTo(entityName);
 				}
 
 			};

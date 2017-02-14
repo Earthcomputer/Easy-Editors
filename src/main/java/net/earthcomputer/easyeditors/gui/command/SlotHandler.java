@@ -1,5 +1,6 @@
 package net.earthcomputer.easyeditors.gui.command;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -30,6 +31,11 @@ import net.minecraft.util.ResourceLocation;
  */
 public abstract class SlotHandler {
 
+	/**
+	 * The SlotHandler used for container inventories
+	 */
+	public static final SlotHandler CONTAINER_HANDLER;
+
 	private static final List<SlotHandler> handlers = Lists.newArrayList();
 
 	/**
@@ -39,6 +45,32 @@ public abstract class SlotHandler {
 	 */
 	public static void registerHandler(SlotHandler handler) {
 		handlers.add(handler);
+	}
+
+	/**
+	 * Returns a list of all registered handlers
+	 * 
+	 * @return
+	 */
+	public static List<SlotHandler> getAllHandlers() {
+		return Collections.unmodifiableList(handlers);
+	}
+
+	/**
+	 * Returns a list of all registered handlers that can handle a specific
+	 * entity
+	 * 
+	 * @param entity
+	 * @return
+	 */
+	public static List<SlotHandler> getHandlersForEntity(ResourceLocation entity) {
+		List<SlotHandler> r = Lists.newArrayList();
+		for (SlotHandler handler : handlers) {
+			if (handler.handlesEntity(entity)) {
+				r.add(handler);
+			}
+		}
+		return r;
 	}
 
 	/**
@@ -240,13 +272,14 @@ public abstract class SlotHandler {
 	}
 
 	static {
-		registerHandler(new Inventory(TranslateKeys.GUI_COMMANDEDITOR_REPLACEITEM_SLOT_CONTAINER, "slot.container", 0,
-				53, null) {
+		CONTAINER_HANDLER = new Inventory(TranslateKeys.GUI_COMMANDEDITOR_REPLACEITEM_SLOT_CONTAINER, "slot.container",
+				0, 53, null) {
 			@Override
 			public boolean handlesEntity(ResourceLocation entity) {
 				return false;
 			}
-		});
+		};
+		registerHandler(CONTAINER_HANDLER);
 		registerHandler(new Inventory(TranslateKeys.GUI_COMMANDEDITOR_REPLACEITEM_SLOT_HOTBAR, "slot.hotbar", 0, 8,
 				EntityPlayer.class));
 		registerHandler(new Inventory(TranslateKeys.GUI_COMMANDEDITOR_REPLACEITEM_SLOT_INVENTORY, "slot.inventory", 0,

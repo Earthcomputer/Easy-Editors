@@ -175,6 +175,7 @@ gui.commandEditor.playerSelector.team.waiting=Waiting for team list from server.
 gui.commandEditor.playerSelector.username=Username
 gui.commandEditor.playerSelector.uuid=UUID
 gui.commandEditor.relativeCoordinate=Relative
+gui.commandEditor.replaceitem.noSlotHandler=No slot selected
 gui.commandEditor.replaceitem.slot.armor.chest=Item on Torso
 gui.commandEditor.replaceitem.slot.armor.feet=Item on Feet
 gui.commandEditor.replaceitem.slot.armor.head=Item on Head
