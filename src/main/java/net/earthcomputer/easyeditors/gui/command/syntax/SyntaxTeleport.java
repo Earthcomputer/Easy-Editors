@@ -23,7 +23,7 @@ public class SyntaxTeleport extends CommandSyntax {
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
 		teleportingEntity = new CommandSlotPlayerSelector();
-		targetCoordinates = new CommandSlotRelativeCoordinate(Colors.tpTargetLabel.color);
+		targetCoordinates = new CommandSlotRelativeCoordinate(Colors.miscBigBoxLabel.color);
 		yaw = new CommandSlotRelativeCoordinate.CoordinateArg() {
 			@Override
 			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
@@ -65,17 +65,17 @@ public class SyntaxTeleport extends CommandSyntax {
 			}
 		};
 		IGuiCommandSlot target = new CommandSlotVerticalArrangement(targetCoordinates,
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION, Colors.tpTargetLabel.color,
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION, Colors.miscBigBoxLabel.color,
 						new CommandSlotVerticalArrangement(
 								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_YAW,
-										Colors.tpTargetLabel.color, yaw),
+										Colors.miscBigBoxLabel.color, yaw),
 								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_PITCH,
-										Colors.tpTargetLabel.color, pitch))));
+										Colors.miscBigBoxLabel.color, pitch))));
 		return new IGuiCommandSlot[] {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TELEPORTINGENTITY,
 						new CommandSlotRectangle(teleportingEntity, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TELEPORT_TARGETCOORDINATE,
-						new CommandSlotRectangle(target, Colors.tpTargetBox.color)) };
+						new CommandSlotRectangle(target, Colors.miscBigBoxBox.color)) };
 	}
 
 }

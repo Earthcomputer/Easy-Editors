@@ -38,10 +38,10 @@ public class Colors {
 			"The color of an invalid item name");
 	public static final Color itemBox = new Color("box.item", 0xffffc923, true, "The color of the box of an item");
 	public static final Color itemLabel = new Color("label.item", 0x705d00, "The color of a label in a box of an item");
-	public static final Color tpTargetBox = new Color("box.tpTarget", 0xffb53e20, true,
-			"The color of the box around the target in the tp command");
-	public static final Color tpTargetLabel = new Color("label.tpTarget", 0x662312,
-			"The color of a label in the box around the target in the tp command");
+	public static final Color miscBigBoxBox = new Color("box.miscBigBox", 0xffb53e20, true,
+			"The color of miscellaneous big boxes");
+	public static final Color miscBigBoxLabel = new Color("label.miscBigBox", 0x662312,
+			"The color of labels in miscellaneous big boxes");
 
 	/**
 	 * 

@@ -33,7 +33,7 @@ public class SyntaxTP extends CommandSyntax {
 			}
 		};
 		targetEntity = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.ONE_ONLY);
-		targetCoordinate = new CommandSlotRelativeCoordinate(Colors.tpTargetLabel.color);
+		targetCoordinate = new CommandSlotRelativeCoordinate(Colors.miscBigBoxLabel.color);
 		yaw = new CommandSlotRelativeCoordinate.CoordinateArg() {
 			@Override
 			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
@@ -75,17 +75,17 @@ public class SyntaxTP extends CommandSyntax {
 			}
 		};
 		IGuiCommandSlot targetCoord = new CommandSlotVerticalArrangement(targetCoordinate,
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION, Colors.tpTargetLabel.color,
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION, Colors.miscBigBoxLabel.color,
 						new CommandSlotVerticalArrangement(
 								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_YAW,
-										Colors.tpTargetLabel.color, yaw),
+										Colors.miscBigBoxLabel.color, yaw),
 								CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_ROTATION_PITCH,
-										Colors.tpTargetLabel.color, pitch))));
+										Colors.miscBigBoxLabel.color, pitch))));
 		target = new CommandSlotRadioList(
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TARGET_ENTITY, Colors.tpTargetLabel.color,
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TARGET_ENTITY, Colors.miscBigBoxLabel.color,
 						new CommandSlotRectangle(targetEntity, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TARGET_COORDINATE,
-						Colors.tpTargetLabel.color, targetCoord)) {
+						Colors.miscBigBoxLabel.color, targetCoord)) {
 			@Override
 			protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
 				int len = args.length - index;
@@ -97,7 +97,7 @@ public class SyntaxTP extends CommandSyntax {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TELEPORTINGENTITY,
 						new CommandSlotRectangle(teleportingEntity, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TP_TARGET,
-						new CommandSlotRectangle(target, Colors.tpTargetBox.color)) };
+						new CommandSlotRectangle(target, Colors.miscBigBoxBox.color)) };
 	}
 
 }

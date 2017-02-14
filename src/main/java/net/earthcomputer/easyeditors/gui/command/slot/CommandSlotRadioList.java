@@ -121,26 +121,33 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	public void setChildAt(int index, IGuiCommandSlot child) {
 		super.setChildAt(index, child);
 		refreshButtonTops();
+		if (index == selectedIndex) {
+			onValueChanged();
+		}
 	}
 
 	@Override
 	public void removeChild(IGuiCommandSlot child) {
 		int index = getChildren().indexOf(child);
 		super.removeChild(child);
-		if (index == selectedIndex)
+		if (index == selectedIndex) {
 			selectedIndex = 0;
-		else if (index > selectedIndex)
+			onValueChanged();
+		} else if (index > selectedIndex) {
 			selectedIndex--;
+		}
 		refreshButtonTops();
 	}
 
 	@Override
 	public void removeChildAt(int index) {
 		super.removeChildAt(index);
-		if (index == selectedIndex)
+		if (index == selectedIndex) {
 			selectedIndex = 0;
-		else if (index > selectedIndex)
+			onValueChanged();
+		} else if (index > selectedIndex) {
 			selectedIndex--;
+		}
 		refreshButtonTops();
 	}
 
@@ -158,14 +165,17 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 	 * @param selectedIndex
 	 */
 	public void setSelectedIndex(int selectedIndex) {
-		this.selectedIndex = selectedIndex;
+		if (selectedIndex != this.selectedIndex) {
+			this.selectedIndex = selectedIndex;
+			onValueChanged();
+		}
 	}
 
 	@Override
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 		if (shouldCheckIndexOutOfBounds() && index >= args.length)
 			throw new CommandSyntaxException();
-		selectedIndex = getSelectedIndexForString(args, index);
+		setSelectedIndex(getSelectedIndexForString(args, index));
 		if (size() != 0) {
 			return getChildAt(selectedIndex).readFromArgs(args, index);
 		}
@@ -248,6 +258,7 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 						if (selectedIndex != i) {
 							selectedIndex = i;
 							GeneralUtils.playButtonSound();
+							onValueChanged();
 						}
 						break;
 					}
@@ -303,6 +314,12 @@ public abstract class CommandSlotRadioList extends CommandSlotCollection {
 			height += child.getHeight() > 16 ? child.getHeight() : 16;
 			height += 3;
 		}
+	}
+
+	/**
+	 * Called when the value (not the index) changes
+	 */
+	protected void onValueChanged() {
 	}
 
 }

@@ -124,6 +124,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("tp", SyntaxTP.class);
 		registerCommandSyntax("teleport", SyntaxTeleport.class);
 		registerCommandSyntax("give", SyntaxGive.class);
+		registerCommandSyntax("replaceitem", SyntaxReplaceItem.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 

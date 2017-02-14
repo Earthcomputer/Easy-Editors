@@ -236,7 +236,7 @@ public abstract class SlotHandler {
 				return false;
 			}
 			slotName = slotName.substring(slotPrefix.length());
-			if (slotName.startsWith("0") || slotName.startsWith("+")) {
+			if ((slotName.startsWith("0") && !"0".equals(slotName)) || slotName.startsWith("+")) {
 				return false;
 			}
 			int slotNumber;
