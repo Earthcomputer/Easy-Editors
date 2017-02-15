@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui.command;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.util.ResourceLocation;
@@ -30,27 +32,32 @@ public class GuiSelectEnchantment extends GuiScreen {
 	private GuiScreen previousScreen;
 	private IEnchantmentSelectorCallback callback;
 
-	private List<ResourceLocation> enchantments;
-	private int selectedIndex = 0;
+	private List<ResourceLocation> allEnchantments;
+	private List<ResourceLocation> displayedEnchantments;
+	private ResourceLocation selectedEnchantment = null;
 
+	private GuiTextField searchTextField;
 	private GuiButton cancelButton;
 	private EnchantmentList list;
 
 	public GuiSelectEnchantment(GuiScreen previousScreen, IEnchantmentSelectorCallback callback) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
-		enchantments = Lists.newArrayList();
+		allEnchantments = Lists.newArrayList();
 		for (ResourceLocation rl : Enchantment.REGISTRY.getKeys()) {
-			enchantments.add(rl);
+			allEnchantments.add(rl);
 		}
-		Collections.sort(enchantments, new Comparator<ResourceLocation>() {
+		Collections.sort(allEnchantments, new Comparator<ResourceLocation>() {
 			@Override
 			public int compare(ResourceLocation first, ResourceLocation second) {
 				return String.CASE_INSENSITIVE_ORDER.compare(first.toString(), second.toString());
 			}
 		});
-		if (callback.getEnchantment() != null) {
-			selectedIndex = enchantments.indexOf(callback.getEnchantment());
+		displayedEnchantments = Lists.newArrayList(allEnchantments);
+
+		selectedEnchantment = callback.getEnchantment();
+		if (selectedEnchantment == null) {
+			selectedEnchantment = displayedEnchantments.get(0);
 		}
 	}
 
@@ -61,6 +68,10 @@ public class GuiSelectEnchantment extends GuiScreen {
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
 		list = new EnchantmentList();
+		String searchLabel = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		int labelWidth = fontRendererObj.getStringWidth(searchLabel);
+		searchTextField = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25,
+				200, 20);
 	}
 
 	@Override
@@ -76,6 +87,10 @@ public class GuiSelectEnchantment extends GuiScreen {
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				15 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 
+		str = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		drawString(fontRendererObj, str, width / 2 - (fontRendererObj.getStringWidth(str) + 205) / 2, 30, 0xffffff);
+		searchTextField.drawTextBox();
+
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
 
@@ -83,7 +98,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 	public void actionPerformed(GuiButton button) {
 		switch (button.id) {
 		case 0:
-			callback.setEnchantment(enchantments.get(selectedIndex));
+			callback.setEnchantment(selectedEnchantment);
 			mc.displayGuiScreen(previousScreen);
 			break;
 		case 1:
@@ -100,6 +115,9 @@ public class GuiSelectEnchantment extends GuiScreen {
 			actionPerformed(cancelButton);
 		} else {
 			super.keyTyped(typedChar, keyCode);
+			if (searchTextField.textboxKeyTyped(typedChar, keyCode)) {
+				filterSearch();
+			}
 		}
 	}
 
@@ -109,27 +127,56 @@ public class GuiSelectEnchantment extends GuiScreen {
 		list.handleMouseInput();
 	}
 
+	@Override
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+		searchTextField.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	private void filterSearch() {
+		displayedEnchantments.clear();
+		displayedEnchantments.addAll(allEnchantments);
+
+		String searchText = searchTextField.getText();
+		searchText = searchText.trim().toLowerCase();
+
+		Iterator<ResourceLocation> enchantmentItr = displayedEnchantments.iterator();
+		while (enchantmentItr.hasNext()) {
+			ResourceLocation enchantment = enchantmentItr.next();
+
+			String localizedName = I18n.format(ForgeRegistries.ENCHANTMENTS.getValue(enchantment).getName());
+			if (localizedName.toLowerCase().contains(searchText)) {
+				continue;
+			}
+			if (String.valueOf(enchantment).toLowerCase().contains(searchText)) {
+				continue;
+			}
+
+			enchantmentItr.remove();
+		}
+	}
+
 	private class EnchantmentList extends GuiSlot {
 
 		public EnchantmentList() {
-			super(GuiSelectEnchantment.this.mc, GuiSelectEnchantment.this.width, GuiSelectEnchantment.this.height, 30,
+			super(GuiSelectEnchantment.this.mc, GuiSelectEnchantment.this.width, GuiSelectEnchantment.this.height, 55,
 					GuiSelectEnchantment.this.height - 30,
 					GuiSelectEnchantment.this.fontRendererObj.FONT_HEIGHT * 2 + 8);
 		}
 
 		@Override
 		protected int getSize() {
-			return enchantments.size();
+			return displayedEnchantments.size();
 		}
 
 		@Override
 		protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {
-			selectedIndex = slotIndex;
+			selectedEnchantment = displayedEnchantments.get(slotIndex);
 		}
 
 		@Override
 		protected boolean isSelected(int slotIndex) {
-			return slotIndex == selectedIndex;
+			return displayedEnchantments.get(slotIndex).equals(selectedEnchantment);
 		}
 
 		@Override
@@ -140,7 +187,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 		@Override
 		protected void drawSlot(int entryID, int x, int y, int height, int mouseX, int mouseY) {
 			FontRenderer fontRenderer = GuiSelectEnchantment.this.fontRendererObj;
-			ResourceLocation enchantmentName = enchantments.get(entryID);
+			ResourceLocation enchantmentName = displayedEnchantments.get(entryID);
 
 			String str = I18n.format(ForgeRegistries.ENCHANTMENTS.getValue(enchantmentName).getName());
 			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2, y + 2,
