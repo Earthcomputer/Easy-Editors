@@ -16,8 +16,11 @@ import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.util.Translate;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiYesNo;
+import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
@@ -57,21 +60,26 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 		this.previousGui = previousGui;
 		this.callback = callback;
 		this.sender = sender;
-		commandSlotCommand = new CommandSlotCommand();
-		commandSlotRectangle = new CommandSlotRectangle(commandSlotCommand, Colors.commandBox.color);
-		commandSlotRectangle.addSizeChangeListener(this);
-		commandSlotRectangle.setContext(new Cxt());
-		String str = callback.getCommand();
-		if (str.startsWith("/"))
-			str = str.substring(1);
-		str = str.trim();
-		commandSlotCommand.readFromArgs(str.split(" "), 0);
-		setVirtualWidth(commandSlotRectangle.getWidth() + 4);
-		setVirtualHeight(commandSlotRectangle.getHeight() + 4);
 	}
+
+	private boolean hasInitGui = false;
 
 	@Override
 	public void initGui() {
+		if (!hasInitGui) {
+			hasInitGui = true;
+			commandSlotCommand = new CommandSlotCommand();
+			commandSlotRectangle = new CommandSlotRectangle(commandSlotCommand, Colors.commandBox.color);
+			commandSlotRectangle.addSizeChangeListener(this);
+			commandSlotRectangle.setContext(new Cxt());
+			String str = callback.getCommand();
+			if (str.startsWith("/"))
+				str = str.substring(1);
+			str = str.trim();
+			commandSlotCommand.readFromArgs(str.split(" "), 0);
+			setVirtualWidth(commandSlotRectangle.getWidth() + 4);
+			setVirtualHeight(commandSlotRectangle.getHeight() + 4);
+		}
 		super.initGui();
 		buttonList.add(doneButton = new GuiButton(0, width / 2 - 160, height - getFooterHeight() / 2 - 10, 150, 20,
 				I18n.format("gui.done")));
@@ -204,7 +212,7 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 			setScrollY(newVirtualHeight - getShownHeight());
 	}
 
-	private class Cxt implements ICommandSlotContext {
+	private class Cxt implements ICommandSlotContext, GuiYesNoCallback {
 
 		@Override
 		public World getWorld() {
@@ -241,6 +249,24 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 				addScrollY(y - getHeaderHeight());
 			else if (y > getHeaderHeight() + getShownHeight())
 				addScrollY(y - (getHeaderHeight() + getShownHeight()));
+		}
+
+		@Override
+		public void commandSyntaxError() {
+			Minecraft.getMinecraft()
+					.displayGuiScreen(new GuiYesNo(this, Translate.GUI_COMMANDEDITOR_INVALIDCOMMAND_LINE1,
+							Translate.GUI_COMMANDEDITOR_INVALIDCOMMAND_LINE2, 0));
+		}
+
+		@Override
+		public void confirmClicked(boolean result, int id) {
+			if (id == 0) {
+				if (result) {
+					Minecraft.getMinecraft().displayGuiScreen(GuiCommandEditor.this);
+				} else {
+					Minecraft.getMinecraft().displayGuiScreen(previousGui);
+				}
+			}
 		}
 
 	}

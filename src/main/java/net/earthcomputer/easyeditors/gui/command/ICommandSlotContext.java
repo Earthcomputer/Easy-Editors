@@ -63,4 +63,12 @@ public interface ICommandSlotContext {
 	 */
 	void ensureYInView(int y);
 
+	/**
+	 * Called by
+	 * {@link net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCommand
+	 * CommandSlotCommand} when the command it is reading from has a syntax
+	 * error. Normally used to display a GUI notifying the user
+	 */
+	void commandSyntaxError();
+
 }

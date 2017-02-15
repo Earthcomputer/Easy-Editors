@@ -38,6 +38,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		try {
 			return super.readFromArgs(args, index + 1) + 1;
 		} catch (CommandSyntaxException e) {
+			getContext().commandSyntaxError();
 			clearChildren();
 			addChild(header);
 			addChildren(commandSyntax.setupCommand());
@@ -48,8 +49,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	private IGuiCommandSlot buildHeader(String commandName) {
 		CommandSlotLabel label = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				commandName.isEmpty() ? Translate.GUI_COMMANDEDITOR_NOCOMMAND : commandName, Colors.commandName.color);
-		if (CommandSyntax.forCommandName(commandName, getContext()) == null)
+		if (CommandSyntax.forCommandName(commandName, getContext()) == null) {
 			label.setColor(Colors.invalidCommandName.color);
+			getContext().commandSyntaxError();
+		}
 		return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_COMMANDLABEL, label,
 				new CommandSlotButton(20, 20, "...") {
 					@Override
