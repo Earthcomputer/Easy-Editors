@@ -13,6 +13,7 @@ import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.api.util.Predicates2;
@@ -1471,8 +1472,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						&& !this.targetInverted.isChecked();
 				if (!targetImplied) {
 					ResourceLocation targetTypeLocation = targetEntity.getEntity();
-					String targetType = targetTypeLocation.getResourceDomain().equals("minecraft")
-							? targetTypeLocation.getResourcePath() : targetTypeLocation.toString();
+					String targetType = GeneralUtils.resourceLocationToString(targetTypeLocation);
 					if (targetTypeLocation.equals(ENTITY_ANYTHING)) {
 						// Anything is still sometimes specified as an empty
 						// string

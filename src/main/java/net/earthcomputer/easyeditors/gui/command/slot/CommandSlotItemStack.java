@@ -6,6 +6,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.api.util.NBTToJson;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
@@ -175,11 +176,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			switch (argOrder[i]) {
 			case COMPONENT_ITEM:
 				ResourceLocation itemName = item.delegate.name();
-				if (itemName.getResourceDomain().equals("minecraft")) {
-					potentialArgs.add(itemName.getResourcePath());
-				} else {
-					potentialArgs.add(itemName.toString());
-				}
+				potentialArgs.add(GeneralUtils.resourceLocationToString(itemName));
 				maxElementToCopy = i;
 				break;
 			case COMPONENT_STACK_SIZE:

@@ -2,6 +2,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.IEntitySelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
@@ -59,7 +60,7 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
-		args.add(entity.getResourceDomain().equals("minecraft") ? entity.getResourcePath() : entity.toString());
+		args.add(GeneralUtils.resourceLocationToString(entity));
 	}
 
 	@Override

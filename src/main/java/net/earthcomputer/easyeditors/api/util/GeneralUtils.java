@@ -199,6 +199,17 @@ public class GeneralUtils {
 	}
 
 	/**
+	 * Converts a resource location to a String, dropping the
+	 * <code>minecraft:</code> prefix if present in order to shorten the output
+	 * 
+	 * @param location
+	 * @return
+	 */
+	public static String resourceLocationToString(ResourceLocation location) {
+		return location.getResourceDomain().equals("minecraft") ? location.getResourcePath() : location.toString();
+	}
+
+	/**
 	 * Draws a rectangle with possibly different colors in different corners
 	 * 
 	 * @param left

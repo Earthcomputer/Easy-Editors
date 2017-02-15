@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectEffect;
 import net.earthcomputer.easyeditors.gui.command.IEffectSelectorCallback;
@@ -51,7 +52,7 @@ public class CommandSlotMobEffect extends CommandSlotHorizontalArrangement imple
 		if (effect == null) {
 			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOEFFECTSELECTED);
 		}
-		args.add(effect.getResourceDomain().equals("minecraft") ? effect.getResourcePath() : effect.toString());
+		args.add(GeneralUtils.resourceLocationToString(effect));
 	}
 
 	@Override
