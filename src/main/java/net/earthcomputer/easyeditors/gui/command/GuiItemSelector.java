@@ -32,9 +32,11 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.HoverChecker;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 /**
  * A GUI which displays a list of all the items in the game for the user to
@@ -45,17 +47,15 @@ import net.minecraftforge.fml.client.config.HoverChecker;
  */
 public class GuiItemSelector extends GuiTwoWayScroll {
 
-	private static Map<String, ItemStack> allItems = Maps.newLinkedHashMap();
-	private static LinkedHashMultimap<String, ItemStack> allItemsAndSubitems = LinkedHashMultimap.create();
+	private static Map<ResourceLocation, ItemStack> allItems = Maps.newLinkedHashMap();
+	private static LinkedHashMultimap<ResourceLocation, ItemStack> allItemsAndSubitems = LinkedHashMultimap.create();
 	private static boolean hasInitializedItems = false;
 
 	private List<ItemStack> shownItems = Lists.newArrayList();
 
 	private static void initializeItems() {
-		// TODO: switch to ForgeRegisties.ITEM
-		for (Object obj : Item.REGISTRY.getKeys()) {
-			String name = String.valueOf(obj);
-			Item item = Item.getByNameOrId(name);
+		for (Item item : ForgeRegistries.ITEMS) {
+			ResourceLocation name = item.delegate.name();
 			allItems.put(name, new ItemStack(item));
 			NonNullList<ItemStack> subItems = NonNullList.create();
 			item.getSubItems(item, null, subItems);
@@ -273,19 +273,17 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 		filterText = filterText.toLowerCase();
 		shownItems.clear();
 		if (allowSubItems) {
-			for (Map.Entry<String, Collection<ItemStack>> entry : allItemsAndSubitems.asMap().entrySet()) {
-				String internalName = entry.getKey();
+			for (Map.Entry<ResourceLocation, Collection<ItemStack>> entry : allItemsAndSubitems.asMap().entrySet()) {
 				for (ItemStack stack : entry.getValue()) {
-					if (doesFilterTextMatch(filterText, stack, internalName)) {
+					if (doesFilterTextMatch(filterText, stack)) {
 						shownItems.add(stack);
 					}
 				}
 			}
 		} else {
-			for (Map.Entry<String, ItemStack> entry : allItems.entrySet()) {
-				String internalName = entry.getKey();
+			for (Map.Entry<ResourceLocation, ItemStack> entry : allItems.entrySet()) {
 				ItemStack stack = entry.getValue();
-				if (doesFilterTextMatch(filterText, stack, internalName))
+				if (doesFilterTextMatch(filterText, stack))
 					shownItems.add(stack);
 			}
 		}
@@ -299,7 +297,7 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 		setScrollY(0);
 	}
 
-	private boolean doesFilterTextMatch(final String filterText, ItemStack stack, String internalName) {
+	private boolean doesFilterTextMatch(final String filterText, ItemStack stack) {
 		return Iterables.any(stack.getTooltip(mc.player, true), new Predicate<String>() {
 			@Override
 			public boolean apply(String line) {

@@ -36,9 +36,11 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.HoverChecker;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 /**
  * A GUI which displays a list of all the blocks in the game for the user to
@@ -49,17 +51,16 @@ import net.minecraftforge.fml.client.config.HoverChecker;
  */
 public class GuiBlockSelector extends GuiTwoWayScroll {
 
-	private static Map<String, IBlockState> allBlocks = Maps.newLinkedHashMap();
-	private static LinkedHashMultimap<String, IBlockState> allBlocksAndSubBlocks = LinkedHashMultimap.create();
+	private static Map<ResourceLocation, IBlockState> allBlocks = Maps.newLinkedHashMap();
+	private static LinkedHashMultimap<ResourceLocation, IBlockState> allBlocksAndSubBlocks = LinkedHashMultimap
+			.create();
 	private static boolean hasInitializedBlocks = false;
 
 	private List<IBlockState> shownBlocks = Lists.newArrayList();
 
 	private static void initializeBlocks() {
-		// TODO: switch to ForgeRegistries.BLOCK
-		for (Object obj : Block.REGISTRY) {
-			String name = String.valueOf(obj);
-			Block block = Block.getBlockFromName(name);
+		for (Block block : ForgeRegistries.BLOCKS) {
+			ResourceLocation name = block.delegate.name();
 			allBlocks.put(name, block.getDefaultState());
 			allBlocksAndSubBlocks.putAll(name, getVariantStates(block.getDefaultState(),
 					Arrays.asList(BlockPropertyRegistry.getVariantProperties(block))));
@@ -288,19 +289,18 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		filterText = filterText.toLowerCase();
 		shownBlocks.clear();
 		if (allowSubBlocks) {
-			for (Map.Entry<String, Collection<IBlockState>> entry : allBlocksAndSubBlocks.asMap().entrySet()) {
-				String internalName = entry.getKey();
+			for (Map.Entry<ResourceLocation, Collection<IBlockState>> entry : allBlocksAndSubBlocks.asMap()
+					.entrySet()) {
 				for (IBlockState block : entry.getValue()) {
-					if (doesFilterTextMatch(filterText, block, internalName)) {
+					if (doesFilterTextMatch(filterText, block)) {
 						shownBlocks.add(block);
 					}
 				}
 			}
 		} else {
-			for (Map.Entry<String, IBlockState> entry : allBlocks.entrySet()) {
-				String internalName = entry.getKey();
+			for (Map.Entry<ResourceLocation, IBlockState> entry : allBlocks.entrySet()) {
 				IBlockState block = entry.getValue();
-				if (doesFilterTextMatch(filterText, block, internalName))
+				if (doesFilterTextMatch(filterText, block))
 					shownBlocks.add(block);
 			}
 		}
@@ -425,7 +425,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		return tooltip;
 	}
 
-	private boolean doesFilterTextMatch(final String filterText, IBlockState block, String internalName) {
+	private boolean doesFilterTextMatch(final String filterText, IBlockState block) {
 		return Iterables.any(getTooltip(block), new Predicate<String>() {
 			@Override
 			public boolean apply(String line) {
