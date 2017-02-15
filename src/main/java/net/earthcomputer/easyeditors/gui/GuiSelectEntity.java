@@ -96,7 +96,7 @@ public class GuiSelectEntity extends GuiScreen {
 	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
-		String searchLabel = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		String searchLabel = Translate.GUI_COMMANDEDITOR_SEARCH;
 		int labelWidth = fontRendererObj.getStringWidth(searchLabel);
 		searchTextField = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25,
 				200, 20);
@@ -121,7 +121,7 @@ public class GuiSelectEntity extends GuiScreen {
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		str = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		str = Translate.GUI_COMMANDEDITOR_SEARCH;
 		drawString(fontRendererObj, str, width / 2 - (fontRendererObj.getStringWidth(str) + 205) / 2, 30, 0xffffff);
 		searchTextField.drawTextBox();
 

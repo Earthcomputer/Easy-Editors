@@ -68,7 +68,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
 		list = new EnchantmentList();
-		String searchLabel = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		String searchLabel = Translate.GUI_COMMANDEDITOR_SEARCH;
 		int labelWidth = fontRendererObj.getStringWidth(searchLabel);
 		searchTextField = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25,
 				200, 20);
@@ -87,7 +87,7 @@ public class GuiSelectEnchantment extends GuiScreen {
 		fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
 				15 - fontRendererObj.FONT_HEIGHT / 2, 0xffffff);
 
-		str = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		str = Translate.GUI_COMMANDEDITOR_SEARCH;
 		drawString(fontRendererObj, str, width / 2 - (fontRendererObj.getStringWidth(str) + 205) / 2, 30, 0xffffff);
 		searchTextField.drawTextBox();
 

@@ -120,7 +120,7 @@ public class GuiItemSelector extends GuiTwoWayScroll {
 		buttonList.add(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
-		searchLabel = Translate.GUI_COMMANDEDITOR_SELECTITEM_SEARCH;
+		searchLabel = Translate.GUI_COMMANDEDITOR_SEARCH;
 		int labelWidth = fontRendererObj.getStringWidth(searchLabel);
 		searchText = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25, 200,
 				20);
