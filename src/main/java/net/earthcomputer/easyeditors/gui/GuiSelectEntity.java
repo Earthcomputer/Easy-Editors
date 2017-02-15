@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -20,6 +21,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -49,12 +51,14 @@ public class GuiSelectEntity extends GuiScreen {
 	private GuiScreen previousScreen;
 	private IEntitySelectorCallback callback;
 
-	private List<ResourceLocation> entities;
-	private int selectedIndex;
+	private List<ResourceLocation> allEntities;
+	private List<ResourceLocation> displayedEntities;
+	private ResourceLocation selectedEntity;
 
 	private World theWorld;
 	private Entity theEntity;
 
+	private GuiTextField searchTextField;
 	private GuiButton cancelButton;
 	private EList list;
 
@@ -67,30 +71,35 @@ public class GuiSelectEntity extends GuiScreen {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 
-		entities = Lists.newArrayList(EntityList.getEntityNameList());
+		allEntities = Lists.newArrayList(EntityList.getEntityNameList());
 		if (includePlayer)
-			entities.add(PLAYER);
+			allEntities.add(PLAYER);
 		if (includeLightning)
-			entities.remove(EntityList.LIGHTNING_BOLT);
+			allEntities.remove(EntityList.LIGHTNING_BOLT);
 		for (ResourceLocation additionalOption : additionalOptions)
-			entities.add(additionalOption);
-		Collections.sort(entities, new Comparator<ResourceLocation>() {
+			allEntities.add(additionalOption);
+		Collections.sort(allEntities, new Comparator<ResourceLocation>() {
 			@Override
 			public int compare(ResourceLocation s1, ResourceLocation s2) {
 				return String.CASE_INSENSITIVE_ORDER.compare(getEntityName(s1), getEntityName(s2));
 			}
 		});
+		displayedEntities = Lists.newArrayList(allEntities);
 
-		if (entities.contains(callback.getEntity()))
-			selectedIndex = entities.indexOf(callback.getEntity());
+		if (displayedEntities.contains(callback.getEntity()))
+			selectedEntity = callback.getEntity();
 
 		theWorld = new FakeWorld();
-		theEntity = createEntity(selectedIndex);
+		theEntity = createEntity(selectedEntity);
 	}
 
 	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
+		String searchLabel = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		int labelWidth = fontRendererObj.getStringWidth(searchLabel);
+		searchTextField = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25,
+				200, 20);
 		buttonList.add(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		buttonList.add(
 				cancelButton = new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
@@ -112,8 +121,12 @@ public class GuiSelectEntity extends GuiScreen {
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
+		str = Translate.GUI_COMMANDEDITOR_SELECTBLOCK_SEARCH;
+		drawString(fontRendererObj, str, width / 2 - (fontRendererObj.getStringWidth(str) + 205) / 2, 30, 0xffffff);
+		searchTextField.drawTextBox();
+
 		final int x = this.width * 3 / 4;
-		final int y = this.height / 2;
+		final int y = this.height / 2 + 10;
 		final int width = this.width / 2 - 120;
 		final int height = 150;
 		final int left = x - width / 2;
@@ -136,7 +149,7 @@ public class GuiSelectEntity extends GuiScreen {
 		tessellator.draw();
 
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
-		GL11.glScissor(left * mc.displayWidth / this.width, top * mc.displayHeight / this.height,
+		GL11.glScissor(left * mc.displayWidth / this.width, (this.height - bottom) * mc.displayHeight / this.height,
 				width * mc.displayWidth / this.width, height * mc.displayHeight / this.height);
 		GeneralUtils.renderEntityAt(theEntity, x, y, width * 3 / 4, height * 3 / 4, mouseX, mouseY);
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -155,7 +168,7 @@ public class GuiSelectEntity extends GuiScreen {
 	public void actionPerformed(GuiButton button) {
 		switch (button.id) {
 		case 0:
-			callback.setEntity(entities.get(selectedIndex));
+			callback.setEntity(selectedEntity);
 			mc.displayGuiScreen(previousScreen);
 			break;
 		case 1:
@@ -172,6 +185,9 @@ public class GuiSelectEntity extends GuiScreen {
 			actionPerformed(cancelButton);
 		} else {
 			super.keyTyped(typedChar, keyCode);
+			if (searchTextField.textboxKeyTyped(typedChar, keyCode)) {
+				filterSearch();
+			}
 		}
 	}
 
@@ -179,6 +195,12 @@ public class GuiSelectEntity extends GuiScreen {
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		list.handleMouseInput();
+	}
+
+	@Override
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+		searchTextField.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	/**
@@ -199,8 +221,7 @@ public class GuiSelectEntity extends GuiScreen {
 		return entity.getResourcePath();
 	}
 
-	private Entity createEntity(int slotIndex) {
-		ResourceLocation entityName = entities.get(slotIndex);
+	private Entity createEntity(ResourceLocation entityName) {
 		if (PLAYER.equals(entityName)) {
 			return Minecraft.getMinecraft().player;
 		} else if (EntityList.LIGHTNING_BOLT.equals(entityName)) {
@@ -210,26 +231,46 @@ public class GuiSelectEntity extends GuiScreen {
 		}
 	}
 
+	private void filterSearch() {
+		displayedEntities.clear();
+		displayedEntities.addAll(allEntities);
+
+		String searchText = searchTextField.getText();
+		searchText = searchText.trim().toLowerCase();
+
+		Iterator<ResourceLocation> entityItr = displayedEntities.iterator();
+		while (entityItr.hasNext()) {
+			ResourceLocation entity = entityItr.next();
+			if (getEntityName(entity).toLowerCase().contains(searchText)) {
+				continue;
+			}
+			if (String.valueOf(entity).toLowerCase().contains(searchText)) {
+				continue;
+			}
+			entityItr.remove();
+		}
+	}
+
 	private class EList extends GuiSlot {
 		public EList() {
-			super(GuiSelectEntity.this.mc, GuiSelectEntity.this.width / 2, GuiSelectEntity.this.height, 30,
+			super(GuiSelectEntity.this.mc, GuiSelectEntity.this.width / 2, GuiSelectEntity.this.height, 55,
 					GuiSelectEntity.this.height - 30, GuiSelectEntity.this.fontRendererObj.FONT_HEIGHT * 2 + 8);
 		}
 
 		@Override
 		protected int getSize() {
-			return entities.size();
+			return displayedEntities.size();
 		}
 
 		@Override
 		protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {
-			selectedIndex = slotIndex;
-			theEntity = createEntity(slotIndex);
+			selectedEntity = displayedEntities.get(slotIndex);
+			theEntity = createEntity(selectedEntity);
 		}
 
 		@Override
 		protected boolean isSelected(int slotIndex) {
-			return slotIndex == selectedIndex;
+			return displayedEntities.get(slotIndex).equals(selectedEntity);
 		}
 
 		@Override
@@ -240,7 +281,7 @@ public class GuiSelectEntity extends GuiScreen {
 		@Override
 		protected void drawSlot(int entryID, int x, int y, int height, int mouseX, int mouseY) {
 			FontRenderer fontRenderer = GuiSelectEntity.this.fontRendererObj;
-			ResourceLocation entityName = entities.get(entryID);
+			ResourceLocation entityName = displayedEntities.get(entryID);
 
 			String str = getEntityName(entityName);
 			fontRenderer.drawString(str, x + getListWidth() / 2 - fontRenderer.getStringWidth(str) / 2, y + 2,
