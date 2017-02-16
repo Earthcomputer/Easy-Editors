@@ -3,6 +3,8 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -61,12 +63,12 @@ public class CommandSlotLabel extends GuiCommandSlotImpl {
 	}
 
 	@Override
-	public int readFromArgs(String[] args, int index) {
+	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 		return 0;
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
 	}
 
 	/**

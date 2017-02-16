@@ -64,7 +64,7 @@ public class CommandSlotMobEffect extends CommandSlotHorizontalArrangement imple
 	public void setEffect(ResourceLocation effect) {
 		this.effect = effect;
 		label.setChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-				I18n.format(ForgeRegistries.POTIONS.getValue(effect).getName())));
+				I18n.format(ForgeRegistries.POTIONS.getValue(effect).getName()), Colors.itemName.color));
 	}
 
 }
