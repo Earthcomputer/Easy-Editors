@@ -18,8 +18,7 @@ public class SyntaxGive extends CommandSyntax {
 		item = new CommandSlotItemStack(1, CommandSlotItemStack.COMPONENT_ITEM,
 				CommandSlotItemStack.COMPONENT_STACK_SIZE, CommandSlotItemStack.COMPONENT_DAMAGE,
 				CommandSlotItemStack.COMPONENT_NBT);
-		playerSelector = new CommandSlotPlayerSelector(
-				CommandSlotPlayerSelector.PLAYERS_ONLY | CommandSlotPlayerSelector.ONE_ONLY);
+		playerSelector = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.PLAYERS_ONLY);
 
 		return new IGuiCommandSlot[] {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_GIVE_PLAYER,

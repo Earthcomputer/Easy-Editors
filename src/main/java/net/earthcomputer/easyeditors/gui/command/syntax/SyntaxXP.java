@@ -51,7 +51,7 @@ public class SyntaxXP extends CommandSyntax {
 			}
 		};
 		CommandSlotPlayerSelector player = new CommandSlotPlayerSelector.WithDefault(
-				CommandSlotPlayerSelector.PLAYERS_ONLY | CommandSlotPlayerSelector.ONE_ONLY);
+				CommandSlotPlayerSelector.PLAYERS_ONLY);
 		return new IGuiCommandSlot[] {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_XP_XP,
 						Translate.GUI_COMMANDEDITOR_XP_XP_TOOLTIP, xp),

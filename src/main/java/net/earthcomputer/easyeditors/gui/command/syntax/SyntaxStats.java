@@ -62,7 +62,7 @@ public class SyntaxStats extends CommandSyntax {
 		});
 
 		sourceBlock = new CommandSlotRelativeCoordinate(Colors.miscBigBoxLabel.color);
-		sourceEntity = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.ONE_ONLY);
+		sourceEntity = new CommandSlotPlayerSelector();
 		source = new CommandSlotRadioList(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_REPLACEITEM_TARGET_BLOCK,
 						Colors.miscBigBoxLabel.color, sourceBlock),

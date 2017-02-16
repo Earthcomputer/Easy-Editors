@@ -29,7 +29,7 @@ public class SyntaxReplaceItem extends CommandSyntax {
 	public IGuiCommandSlot[] setupCommand() {
 		slot = new CommandSlotInventorySlot();
 		targetBlock = new CommandSlotRelativeCoordinate(Colors.miscBigBoxLabel.color);
-		targetEntity = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.ONE_ONLY) {
+		targetEntity = new CommandSlotPlayerSelector() {
 			@Override
 			protected void onSetEntityTo(ResourceLocation newEntityType) {
 				slot.setEntityType(newEntityType);
