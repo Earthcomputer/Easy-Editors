@@ -81,3 +81,25 @@ default behaviour:
 -damageIndicator- same as crit, except the input ySpeed has 1 added to it
 -sweepAttack- same as largeexplode
 -totem- same as fireworksSpark
+
+======== COMMAND SYNTAX =========
+/particle <particle-type> <x> <y> <z> <paramX> <paramY> <paramZ> <paramSpeed> [count] [force] [players] [args...]
+
+-particle type: self-explanatory
+-x, y, z: the x-, y- and z-position to spawn the particle (can be relative to the sender's position). If count is not 0,
+          for each dimension x, y and z, the coordinate will be a random number with mean x, y, z and standard deviation
+          paramX, paramY, paramZ
+-paramX, paramY, paramZ: if count not 0, these are used to offset x, y and z as explained above. Otherwise, they are
+                         multiplied by paramSpeed and used as the xSpeed, ySpeed and zSpeed inputs in the different particle
+                         factories explained above
+-paramSpeed: if count is not 0, paramSpeed is used as the standard deviation of the random xSpeed, ySpeed and zSpeed inputs
+             of each particle in the different particle factories explained above (the mean is 0). Otherwise, paramSpeed is
+             used as a multiplier for each of paramX, paramY and paramZ, as explained in their entry
+-count: the number of particles to be summoned. If 0 (the default), one particle is summoned in what I like to call 'exact
+        mode', where the parameters passed to the particle factory aren't randomized (though the factories themselves may
+        still do some randomizing). If nonzero, the specified number of particles are summoned
+-force: whether clients should still spawn the particle if it is more than 16 blocks from the player. Default is false.
+        This is not a boolean flag, but a string. It will only be true if the string is equal to "force". Any other string,
+        including "true", "FORCE" and "", will result in a false flag.
+-players: the players which should be able to see the particle spawned. Defaults to all players within a certain distance.
+-args: extra parameters which some particles require. Additional arguments after those used by the particle are ignored
