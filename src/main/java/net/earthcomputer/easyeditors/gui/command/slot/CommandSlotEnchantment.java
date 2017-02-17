@@ -26,8 +26,13 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 	private ResourceLocation enchantmentName = null;
 	private CommandSlotLabel enchantmentNameLabel;
 	private CommandSlotIntTextField enchantmentLevel;
+	private boolean levelOptional;
 
 	public CommandSlotEnchantment() {
+		this(false);
+	}
+
+	public CommandSlotEnchantment(boolean levelOptional) {
 		addChild(enchantmentNameLabel = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				Translate.GUI_COMMANDEDITOR_NOENCHANTMENT, 0xff0000));
 		addChild(new CommandSlotButton(20, 20, "...") {
@@ -42,6 +47,7 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		enchantmentLevel
 				.setNumberInvalidMessage(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENCHANTMENTINVALID_LEVELINVALID)
 				.setOutOfBoundsMessage(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENCHANTMENTINVALID_LEVELOUTOFBOUNDS);
+		this.levelOptional = levelOptional;
 	}
 
 	@Override
@@ -65,13 +71,32 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 			throw new CommandSyntaxException();
 		}
 		setEnchantment(enchantment);
-		return 1;
+
+		index++;
+		if (args.length == index) {
+			if (!levelOptional) {
+				throw new CommandSyntaxException();
+			}
+			setLevel(1);
+			return 1;
+		}
+
+		try {
+			setLevel(Integer.parseInt(args[index]));
+		} catch (NumberFormatException e) {
+			throw new CommandSyntaxException();
+		}
+
+		return 2;
 	}
 
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
 		args.add(GeneralUtils.resourceLocationToString(enchantmentName));
+		if (!levelOptional || getLevel() != 1) {
+			args.add(String.valueOf(getLevel()));
+		}
 	}
 
 	@Override

@@ -127,6 +127,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("replaceitem", SyntaxReplaceItem.class);
 		registerCommandSyntax("stats", SyntaxStats.class);
 		registerCommandSyntax("effect", SyntaxEffect.class);
+		registerCommandSyntax("enchant", SyntaxEnchant.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 
