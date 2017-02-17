@@ -1,5 +1,9 @@
 package net.earthcomputer.easyeditors.gui.command.slot;
 
+import java.util.List;
+
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectEnchantment;
 import net.earthcomputer.easyeditors.gui.command.IEnchantmentSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
@@ -38,6 +42,36 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		enchantmentLevel
 				.setNumberInvalidMessage(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENCHANTMENTINVALID_LEVELINVALID)
 				.setOutOfBoundsMessage(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_ENCHANTMENTINVALID_LEVELOUTOFBOUNDS);
+	}
+
+	@Override
+	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+		if (args.length == index) {
+			throw new CommandSyntaxException();
+		}
+		ResourceLocation enchantment = null;
+		try {
+			Enchantment ench = Enchantment.getEnchantmentByID(Integer.parseInt(args[index]));
+			if (ench != null) {
+				enchantment = ench.delegate.name();
+			}
+		} catch (NumberFormatException e) {
+			// ignore
+		}
+		if (enchantment == null) {
+			enchantment = new ResourceLocation(args[index]);
+		}
+		if (!ForgeRegistries.ENCHANTMENTS.containsKey(enchantment)) {
+			throw new CommandSyntaxException();
+		}
+		setEnchantment(enchantment);
+		return 1;
+	}
+
+	@Override
+	public void addArgs(List<String> args) throws UIInvalidException {
+		checkValid();
+		args.add(GeneralUtils.resourceLocationToString(enchantmentName));
 	}
 
 	@Override
