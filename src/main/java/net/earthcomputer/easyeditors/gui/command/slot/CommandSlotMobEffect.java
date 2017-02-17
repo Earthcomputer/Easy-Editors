@@ -12,6 +12,7 @@ import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
@@ -39,7 +40,18 @@ public class CommandSlotMobEffect extends CommandSlotHorizontalArrangement imple
 		if (args.length == index) {
 			throw new CommandSyntaxException();
 		}
-		ResourceLocation effect = new ResourceLocation(args[index]);
+		ResourceLocation effect = null;
+		try {
+			Potion potion = Potion.getPotionById(Integer.parseInt(args[index]));
+			if (potion != null) {
+				effect = potion.delegate.name();
+			}
+		} catch (NumberFormatException e) {
+			// ignore
+		}
+		if (effect == null) {
+			effect = new ResourceLocation(args[index]);
+		}
 		if (!ForgeRegistries.POTIONS.containsKey(effect)) {
 			throw new CommandSyntaxException();
 		}
