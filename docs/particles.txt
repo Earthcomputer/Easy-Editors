@@ -1,0 +1,83 @@
+This is a list of all particle types and how built-in factors affect the values originally entered in the /particle command.
+This list needs to be here because the vanilla behaviour concerning particles is so inconsistent.
+
+default behaviour:
+- xSpeed, ySpeed, zSpeed +/-0.4, evenly distributed
+- speed normalized, it is really only a vector representing direction
+- actual total speed is normally distributed between 0.06 and 0.18
+- 0.1 added to ySpeed
+
+-explode- xSpeed, ySpeed, zSpeed +/-0.05, evenly distributed
+-spit- default behaviour
+-bubble- xSpeed, ySpeed, zSpeed multiplied by 0.2, then +/-0.01, evenly distributed
+-splash- if ySpeed is 0, but the particle is still moving, xSpeed, ySpeed, zSpeed are exactly as specified in the command,
+         then 0.1 is added to ySpeed
+-wake- xSpeed, ySpeed and zSpeed are exactly as specified in the command
+-droplet- default behaviour, then xSpeed and zSpeed are multiplied by 0.3, and ySpeed is set between 0.1 and 0.3, evenly
+          distributed
+-suspended- yPos moved down by 0.125, xSpeed, ySpeed, zSpeed set to 0
+-depthsuspend- default behaviour, then xSpeed, ySpeed, zSpeed multiplied by 0.02
+-crit- default behaviour, then xSpeed, ySpeed, zSpeed multiplied by 0.1, then added to the original xSpeed, ySpeed, zSpeed
+       multiplied by 0.4
+-magicCrit- same as crit
+-smoke- default behaviour, then xSpeed, ySpeed, zSpeed multiplied by 0.1, then added to the original xSpeed, ySpeed, zSpeed
+-largesmoke- same as smoke
+-spell- default behaviour but with initial xSpeed and zSpeed set to random numbers between -0.5 and 0.5, evenly distributed.
+        Then, ySpeed is multiplied by 0.2, and if the original xSpeed and zSpeed were both 0, xSpeed and zSpeed are
+        multiplied by 0.1
+-instantSpell- same as spell
+-mobSpell- same as spell, then red, green and blue are set to xSpeed, ySpeed and zSpeed
+-mobSpellAmbient- same as mobSpell, then the alpha is set to 0.15
+-witchMagic- same as spell, then green set to 0, and red and blue set to the same number between 0.35 and 0.85, evenly
+             distributed
+-dripWater- xSpeed, ySpeed, zSpeed set to 0. Red, green, blue set to 0, 0, 1
+-dripLava- same as dripWater, but red, green, blue set to 1, 0, 0
+-angryVillager- same as heart
+-happyVillager- same as depthsuspend
+-townaura- same as depthsuspend
+-note- default behaviour but with initial xSpeed, ySpeed and zSpeed as 0, then xSpeed, ySpeed, zSpeed multiplied by 0.01,
+       then add 0.2 to ySpeed. Set red to 0.65sin(xSpeed * 360) + 0.35, green to 0.65sin(360(xSpeed + 1/3)) + 0.35, and
+       blue to 0.65sin(360(xSpeed + 2/3)) + 0.35
+-portal- xSpeed, ySpeed, zSpeed are exactly as specified in the command
+-enchantmenttable- same as portal, then blue is a random number between 0.6 and 1, evenly distributed, and red and green are
+                   0.9 times that number
+-flame- same as smoke, then xPos, yPos, zPos added to evenly distributed numbers between 0 and 0.05. Red, green, blue set to
+        1, 1, 1
+-lava- default behaviour but with initial xSpeed, ySpeed and zSpeed set to 0. Then, xSpeed and zSpeed multiplied by 0.8 and
+       ySpeed set to a random number between 0.05 and 0.45, evenly distributed. Red, green, blue set to 1, 1, 1
+-footstep- xSpeed, ySpeed, zSpeed set to 0
+-cloud- default behaviour but with initial xSpeed, ySpeed, zSpeed set to 0, 0, 0, then xSpeed, ySpeed, zSpeed multiplied by
+        0.1, then added to the specified xSpeed, ySpeed, zSpeed. Red, green, blue set to the same random number between 0.7
+        and 1, evenly distributed
+-reddust- default behaviour but with initial xSpeed, ySpeed, zSpeed set to 0, 0, 0, then xSpeed, ySpeed, zSpeed multiplied by
+          0.1. Then, if input xSpeed = 0, set input xSpeed to 1. Then red, green, blue set to input xSpeed, ySpeed, zSpeed,
+          multiplied by separate random numbers between 0.8 and 1, evenly distributed, and by a single random number between
+          0.6 and 1, evenly distributed
+-fallingdust- xSpeed, ySpeed, zSpeed set to 0, 0, 0. The fisrt parameter is a block state ID, and the particle colour is
+              set as the block colour (as defined by BlockColors) of that block state. If the block is a BlockFalling, then
+              the particle colour is instead set to block.getDustColor(state). If the block state is air or is rendered
+              invisible, then no particle is created
+-snowballpoof- default behaviour but with initial xSpeed, ySpeed, zSpeed set to 0, 0, 0. Red, green, blue set to 1, 1, 1
+-snowshovel- default behaviour, then, xSpeed, ySpeed, zSpeed multiplied by 0.1, and the input xSpeed, ySpeed, zSpeed is added
+             then red, green, blue is set to the same random number between 0.7 and 1, evenly distributed
+-slime- same as snowballpoof
+-heart- default behaviour but with initial xSpeed, ySpeed, zSpeed set to 0, 0, 0, then xSpeed, ySpeed, zSpeed multiplied by
+        0.01 and 0.1 is added to ySpeed
+-barrier- xSpeed, ySpeed, zSpeed set to 0, red, green, blue set to 1
+-iconcrack- same as snowballpoof, then xSpeed, ySpeed, zSpeed multiplied by 0.1 and added to input xSpeed, ySpeed, zSpeed.
+            Input parameters are an item ID for the first parameter and an optional item metadata for the second parameter
+            (if absent, metadata is 0)
+-blockcrack- default behaviour, then red, green, blue set to 0.6, then multiplied by the colour multiplier, as defined by
+             BlockColors. Parameter is a block state ID representing the block being dug
+-blockdust- same as blockcrack, except xSpeed, ySpeed and zSpeed are set to the exact input
+-hugeexplosion- default behaviour but with initial xSpeed, ySpeed, zSpeed set to 0, 0, 0
+-largeexplode- default behaviour but with initial xSpeed, ySpeed, zSpeed set to 0, 0, 0, then red, green, blue set to the
+               same random number between 0.6 and 1, evenly distributed
+-fireworksSpark- default behaviour, then xSpeed, ySpeed, zSpeed set to the exact inputs
+-mobappearance- same as barrier
+-dragonbreath- same as fireworksSpark, then red is set to a random number between 183/255 and 223/255, green is set to 0 and
+               blue is set to a random number between 210/255 and 249/255, both evenly distributed
+-endRod- xSpeed, ySpeed, zSpeed are set to exactly the input values
+-damageIndicator- same as crit, except the input ySpeed has 1 added to it
+-sweepAttack- same as largeexplode
+-totem- same as fireworksSpark

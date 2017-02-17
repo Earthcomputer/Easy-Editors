@@ -1,6 +1,7 @@
 /*
 /*/
 !/src/
+!/docs/
 !.gitignore
 !gradlew
 !*.bat
