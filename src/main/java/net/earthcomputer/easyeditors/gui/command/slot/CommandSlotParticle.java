@@ -1,8 +1,7 @@
 package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.MathContext;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +42,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 
 	private static final World FAKE_WORLD = new FakeWorld();
 	private static final Random RANDOM = new Random();
+	private static final int MAX_SIMULATIONS = 100000;
 
 	private ParticleType type;
 	private CommandSlotRelativeCoordinate spawnCoord;
@@ -60,6 +60,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 	private CommandSlotModifiable<IGuiCommandSlot> args;
 	private CommandSlotVerticalArrangement EMPTY_ARGS;
 
+	private CommandSlotLabel graphsTitles;
 	private Graph xGraph;
 	private Graph yGraph;
 	private Graph zGraph;
@@ -205,10 +206,13 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE,
 				Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE_TOOLTIP, force));
 		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_PLAYERS,
-				Translate.GUI_COMMANDEDITOR_PARTICLE_PLAYERS_TOOLTIP, players));
+				Translate.GUI_COMMANDEDITOR_PARTICLE_PLAYERS_TOOLTIP,
+				new CommandSlotRectangle(players, Colors.playerSelectorBox.color)));
 		addChild(args);
 
-		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_GRAPH));
+		graphsTitles = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+				I18n.format(TranslateKeys.GUI_COMMANDEDITOR_PARTICLE_GRAPH, 0));
+		addChild(graphsTitles);
 		CommandSlotVerticalArrangement posGraphs = new CommandSlotVerticalArrangement();
 		posGraphs.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_GRAPHX, xGraph));
 		posGraphs.addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_GRAPHY, yGraph));
@@ -229,7 +233,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 
 	@Override
 	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
-		if (simulations.size() < 10000) {
+		if (simulations.size() < MAX_SIMULATIONS) {
 			try {
 				checkValid();
 				double posX = spawnCoord.getXArg().getTextField().getDoubleValue();
@@ -272,6 +276,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 					}
 					simulations.add(new ParticleSpawnInfo(particle));
 				}
+				graphsTitles.setText(I18n.format(TranslateKeys.GUI_COMMANDEDITOR_PARTICLE_GRAPH, simulations.size()));
 			} catch (UIInvalidException e) {
 				// ignore
 			}
@@ -413,10 +418,10 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 			GlStateManager.translate(x + 100 / 2, y + 101, 0);
 			GlStateManager.rotate(90, 0, 0, 1);
 			FontRenderer font = Minecraft.getMinecraft().fontRendererObj;
-			MathContext mthCtx = new MathContext(3);
-			font.drawString(BigDecimal.valueOf(max).round(mthCtx).toString(), 0, -(100 / 2 + 4), 0x000000);
-			font.drawString(BigDecimal.valueOf(middle).round(mthCtx).toString(), 0, -4, 0x000000);
-			font.drawString(BigDecimal.valueOf(min).round(mthCtx).toString(), 0, 100 / 2 - 4, 0x000000);
+			DecimalFormat format = new DecimalFormat("0.###");
+			font.drawString(format.format(max), 0, -(100 / 2 + 4), 0x000000);
+			font.drawString(format.format(middle), 0, -4, 0x000000);
+			font.drawString(format.format(min), 0, 100 / 2 - 4, 0x000000);
 			GlStateManager.popMatrix();
 
 			// divide the numbers into groups and count the numbers in each
