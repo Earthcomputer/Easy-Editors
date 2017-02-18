@@ -132,7 +132,7 @@ public class SyntaxEffect extends CommandSyntax {
 			}
 
 			@Override
-			public void addArgs(List<String> args) {
+			public void addArgs(List<String> args) throws UIInvalidException {
 				if (!isChecked()) {
 					return;
 				}

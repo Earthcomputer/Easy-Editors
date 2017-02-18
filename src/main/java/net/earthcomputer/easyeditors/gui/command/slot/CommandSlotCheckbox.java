@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.client.config.HoverChecker;
@@ -61,7 +62,7 @@ public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
 		args.add(String.valueOf(checkbox.isChecked()));
 	}
 

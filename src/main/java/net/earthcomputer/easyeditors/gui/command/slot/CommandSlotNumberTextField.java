@@ -20,7 +20,7 @@ public class CommandSlotNumberTextField extends CommandSlotTextField {
 	private String outOfBoundsMessage;
 
 	public CommandSlotNumberTextField(int minWidth, int maxWidth) {
-		this(minWidth, maxWidth, Double.MIN_VALUE);
+		this(minWidth, maxWidth, -Double.MAX_VALUE);
 	}
 
 	public CommandSlotNumberTextField(int minWidth, int maxWidth, double minValue) {

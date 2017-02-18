@@ -26,14 +26,35 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 	}
 
 	public CommandSlotRelativeCoordinate(int textColor) {
-		x = new CoordinateArg();
-		y = new CoordinateArg();
+		class ChangeListeningCoordArg extends CoordinateArg {
+			@Override
+			protected void onChanged() {
+				CommandSlotRelativeCoordinate.this.onChanged();
+			}
+		}
+		x = new ChangeListeningCoordArg();
+		y = new ChangeListeningCoordArg();
 		y.getTextField().setMinValue(-4096);
 		y.getTextField().setMaxValue(4096);
-		z = new CoordinateArg();
+		z = new ChangeListeningCoordArg();
 		addChild(CommandSlotLabel.createLabel("X:", textColor, x));
 		addChild(CommandSlotLabel.createLabel("Y:", textColor, y));
 		addChild(CommandSlotLabel.createLabel("Z:", textColor, z));
+	}
+
+	public CoordinateArg getXArg() {
+		return x;
+	}
+
+	public CoordinateArg getYArg() {
+		return y;
+	}
+
+	public CoordinateArg getZArg() {
+		return z;
+	}
+
+	protected void onChanged() {
 	}
 
 	public static class CoordinateArg extends CommandSlotHorizontalArrangement {
@@ -41,9 +62,19 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 		private CommandSlotCheckbox relative;
 
 		public CoordinateArg() {
-			textField = new CommandSlotNumberTextField(50, 100, -30000000, 30000000);
+			textField = new CommandSlotNumberTextField(50, 100, -30000000, 30000000) {
+				@Override
+				protected void onTextChanged() {
+					onChanged();
+				}
+			};
 			textField.setText("0");
-			relative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE);
+			relative = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_RELATIVECOORDINATE) {
+				@Override
+				protected void onChecked(boolean checked) {
+					onChanged();
+				}
+			};
 			relative.setChecked(true);
 			addChild(textField);
 			addChild(relative);
@@ -111,6 +142,9 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 		 */
 		public CommandSlotCheckbox getRelative() {
 			return relative;
+		}
+
+		protected void onChanged() {
 		}
 	}
 

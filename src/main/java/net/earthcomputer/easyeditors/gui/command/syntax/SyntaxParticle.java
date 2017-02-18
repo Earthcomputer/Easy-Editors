@@ -1,5 +1,6 @@
 package net.earthcomputer.easyeditors.gui.command.syntax;
 
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotParticle;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 
 /*
@@ -42,8 +43,7 @@ public class SyntaxParticle extends CommandSyntax {
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
-		// TODO Auto-generated method stub
-		return null;
+		return new IGuiCommandSlot[] { new CommandSlotParticle() };
 	}
 
 }
