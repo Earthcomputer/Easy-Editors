@@ -165,11 +165,11 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		newTextField.setFocused(oldTextField.isFocused());
 		newTextField.setValidator(oldTextField.contentFilter);
 		setWidth(newTextField.width + 2);
-
-		onTextChanged();
 	}
 
 	private void ensureInView() {
+		onTextChanged();
+		
 		String strBefore = wrappedTextField.getText().substring(wrappedTextField.getLineScrollOffset(),
 				wrappedTextField.getCursorPosition() - wrappedTextField.getLineScrollOffset());
 		int x = wrappedTextField.getEnableBackgroundDrawing() ? wrappedTextField.xPosition + 4
