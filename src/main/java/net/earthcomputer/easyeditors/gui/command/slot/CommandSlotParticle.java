@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -380,40 +379,54 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 
 		@Override
 		public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
+			// draw the axes
 			Gui.drawRect(x, y, x + 1, y + 100, 0xff000000);
 			Gui.drawRect(x, y + 99, x + 100, y + 100, 0xff000000);
+
+			// exit if there have been no simulations (the axes are all we need
+			// to draw)
 			if (simulations.isEmpty()) {
 				return;
 			}
 
+			// get all the field values from the simulations
 			ArrayList<Double> fieldValues = Lists.newArrayListWithCapacity(simulations.size());
 			for (ParticleSpawnInfo sim : simulations) {
 				fieldValues.add(sim.getField(fieldNumber));
 			}
-			// TODO: not use the median and therefore not have to sort the
-			// numbers?
-			Collections.sort(fieldValues);
-			double min = fieldValues.get(0);
-			double max = fieldValues.get(fieldValues.size() - 1);
-			double median = fieldValues.get(fieldValues.size() / 2);
 
+			// get the minimum, maximum and halfway between values
+			double min = Double.POSITIVE_INFINITY;
+			double max = Double.NEGATIVE_INFINITY;
+			for (double field : fieldValues) {
+				if (field < min) {
+					min = field;
+				}
+				if (field > max) {
+					max = field;
+				}
+			}
+			double middle = min + (max - min) / 2;
+
+			// draw the numbers on the x-axis
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x + 100 / 2, y + 101, 0);
 			GlStateManager.rotate(90, 0, 0, 1);
 			FontRenderer font = Minecraft.getMinecraft().fontRendererObj;
 			MathContext mthCtx = new MathContext(3);
 			font.drawString(BigDecimal.valueOf(max).round(mthCtx).toString(), 0, -(100 / 2 + 4), 0x000000);
-			font.drawString(BigDecimal.valueOf(median).round(mthCtx).toString(), 0, -4, 0x000000);
+			font.drawString(BigDecimal.valueOf(middle).round(mthCtx).toString(), 0, -4, 0x000000);
 			font.drawString(BigDecimal.valueOf(min).round(mthCtx).toString(), 0, 100 / 2 - 4, 0x000000);
 			GlStateManager.popMatrix();
 
-			final int GROUP_SIZE = 20;
-			int groupCount = fieldValues.size() / GROUP_SIZE;
-			double groupWidth = (max - min) / groupCount;
-			int[] numberInEachGroup = new int[groupCount];
+			// divide the numbers into groups and count the numbers in each
+			// group so they can be drawn as a frequency polygon
+			final int GROUP_COUNT = 20;
+			double groupWidth = (max - min) / GROUP_COUNT;
+			int[] numberInEachGroup = new int[GROUP_COUNT];
 			for (double field : fieldValues) {
 				int groupNumber = (int) ((field - min) / groupWidth);
-				if (groupNumber == groupCount) {
+				if (groupNumber == GROUP_COUNT) {
 					groupNumber--;
 				}
 				numberInEachGroup[groupNumber]++;
@@ -424,16 +437,17 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 					maxNumberInGroup = numInGroup;
 				}
 			}
-			int[] heights = new int[groupCount];
-			for (int i = 0; i < groupCount; i++) {
+			int[] heights = new int[GROUP_COUNT];
+			for (int i = 0; i < GROUP_COUNT; i++) {
 				heights[i] = numberInEachGroup[i] * 100 / maxNumberInGroup;
 			}
 
-			double groupWidthPixels = 100.0 / (groupCount + 1);
+			// draw the polygon
+			double groupWidthPixels = 100.0 / (GROUP_COUNT + 1);
 			Tessellator tessellator = Tessellator.getInstance();
 			VertexBuffer buffer = tessellator.getBuffer();
 			buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-			for (int i = 0; i < groupCount; i++) {
+			for (int i = 0; i < GROUP_COUNT; i++) {
 				buffer.pos(x + groupWidthPixels / 2 + groupWidthPixels * i, y + 100 - heights[i], 0).color(0, 0, 0, 255)
 						.endVertex();
 			}
