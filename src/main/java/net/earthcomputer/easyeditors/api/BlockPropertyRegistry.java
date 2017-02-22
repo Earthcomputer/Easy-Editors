@@ -149,20 +149,18 @@ public class BlockPropertyRegistry {
 	}
 
 	/**
-	 * Returns an array of all the variant properties in a block state of the
-	 * given block
+	 * Returns all the variant properties in a block state of the given block
 	 * 
 	 * @param block
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public static IProperty<? extends Comparable<?>>[] getVariantProperties(Block block) {
+	public static List<IProperty<? extends Comparable<?>>> getVariantProperties(Block block) {
 		List<IProperty<? extends Comparable<?>>> variantProps = Lists.newArrayList();
 		for (IProperty<? extends Comparable<?>> prop : block.getDefaultState().getProperties().keySet()) {
 			if (isVariantProperty(block, prop))
 				variantProps.add(prop);
 		}
-		return variantProps.toArray(new IProperty[variantProps.size()]);
+		return variantProps;
 	}
 
 }

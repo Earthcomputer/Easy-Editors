@@ -119,8 +119,10 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		int stackSize = 1;
 		int damage = 0;
 		NBTTagCompound nbt = null;
-
+		
+		int argsConsumed = 0;
 		for (int i = 0; i < argOrder.length && i < args.length - index; i++) {
+			argsConsumed++;
 			switch (argOrder[i]) {
 			case COMPONENT_ITEM:
 				item = Item.getByNameOrId(args[index + i]);
@@ -163,7 +165,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 		if (nbt != null)
 			return args.length - index;
-		return argOrder.length;
+		return argsConsumed;
 	}
 
 	@Override

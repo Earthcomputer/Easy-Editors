@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -62,8 +61,8 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		for (Block block : ForgeRegistries.BLOCKS) {
 			ResourceLocation name = block.delegate.name();
 			allBlocks.put(name, block.getDefaultState());
-			allBlocksAndSubBlocks.putAll(name, getVariantStates(block.getDefaultState(),
-					Arrays.asList(BlockPropertyRegistry.getVariantProperties(block))));
+			allBlocksAndSubBlocks.putAll(name,
+					getVariantStates(block.getDefaultState(), BlockPropertyRegistry.getVariantProperties(block)));
 		}
 	}
 
@@ -393,8 +392,8 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 
 		List<String> otherLines = Lists.newArrayList();
 		Iterator<IProperty<?>> iterator1 = blockState.getProperties().keySet().iterator();
-		Iterator<IProperty<? extends Comparable<?>>> iterator2 = Iterators
-				.forArray(BlockPropertyRegistry.getVariantProperties(blockState.getBlock()));
+		Iterator<IProperty<? extends Comparable<?>>> iterator2 = BlockPropertyRegistry
+				.getVariantProperties(blockState.getBlock()).iterator();
 		while (advanced ? iterator1.hasNext() : iterator2.hasNext()) {
 			IProperty<?> prop;
 			if (advanced)
