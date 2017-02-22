@@ -20,6 +20,7 @@ import net.earthcomputer.easyeditors.gui.command.IParticleSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -31,6 +32,8 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -58,7 +61,6 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 	private CommandSlotCheckbox force;
 	private CommandSlotPlayerSelector players;
 	private CommandSlotModifiable<IGuiCommandSlot> args;
-	private CommandSlotVerticalArrangement EMPTY_ARGS;
 
 	private CommandSlotLabel graphsTitles;
 	private Graph xGraph;
@@ -76,7 +78,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 	public CommandSlotParticle() {
 		simulations = Lists.newArrayList();
 
-		type = new ParticleType(simulations);
+		type = new ParticleType();
 		spawnCoord = new CommandSlotRelativeCoordinate() {
 			@Override
 			protected void onChanged() {
@@ -162,7 +164,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 			@Override
 			public void addArgs(List<String> args) throws UIInvalidException {
 				super.addArgs(args);
-				if (args.get(args.size() - 1).equals("@a") && CommandSlotParticle.this.args.getChild() == EMPTY_ARGS) {
+				if (args.get(args.size() - 1).equals("@a") && CommandSlotParticle.this.args.getChild() == null) {
 					args.remove(args.size() - 1);
 				}
 			}
@@ -176,8 +178,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 				return super.readFromArgs(args, index);
 			}
 		};
-		EMPTY_ARGS = new CommandSlotVerticalArrangement();
-		args = new CommandSlotModifiable<IGuiCommandSlot>(EMPTY_ARGS);
+		args = new CommandSlotModifiable<IGuiCommandSlot>(null);
 
 		xGraph = new Graph(simulations, 0);
 		yGraph = new Graph(simulations, 1);
@@ -244,16 +245,16 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 				double paramZ = this.paramZ.getDoubleValue();
 				double paramSpeed = this.paramSpeed.getDoubleValue();
 				int count = this.count.getIntValue();
-				int[] params = new int[0]; // TODO: fix
+				List<String> args = Lists.newArrayList();
+				this.args.addArgs(args);
+				int[] params = new int[args.size()];
+				for (int i = 0; i < params.length; i++) {
+					params[i] = Integer.parseInt(args.get(i));
+				}
 
 				int particleId = type.getParticle().getParticleID();
-				IParticleFactory particleFactory;
-				try {
-					particleFactory = (IParticleFactory) ((Map<?, ?>) particleManagerParticleTypesField
-							.get(Minecraft.getMinecraft().effectRenderer)).get(particleId);
-				} catch (Exception e) {
-					throw Throwables.propagate(e);
-				}
+				IParticleFactory particleFactory = (IParticleFactory) ((Map<?, ?>) particleManagerParticleTypesField
+						.get(Minecraft.getMinecraft().effectRenderer)).get(particleId);
 
 				simulations.ensureCapacity(simulations.size() + 100);
 				for (int i = 0; i < 100; i++) {
@@ -277,8 +278,12 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 					simulations.add(new ParticleSpawnInfo(particle));
 				}
 				graphsTitles.setText(I18n.format(TranslateKeys.GUI_COMMANDEDITOR_PARTICLE_GRAPH, simulations.size()));
+				graphsTitles.setColor(0x000000);
 			} catch (UIInvalidException e) {
 				// ignore
+			} catch (Throwable e) {
+				graphsTitles.setText(Translate.GUI_COMMANDEDITOR_PARTICLE_GRAPH_CANTSIMULATE);
+				graphsTitles.setColor(0xff0000);
 			}
 		}
 		super.draw(x, y, mouseX, mouseY, partialTicks);
@@ -300,17 +305,97 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 		paramSpeed.checkValid();
 		count.checkValid();
 		players.checkValid();
-		// TODO: check args valid
+		args.addArgs(Lists.<String> newArrayList());
 	}
 
-	private static class ParticleType extends CommandSlotHorizontalArrangement implements IParticleSelectorCallback {
+	private void onChangeParticleTo(EnumParticleTypes newType) {
+		switch (newType) {
+		case ITEM_CRACK:
+			args.setChild(new CommandSlotRectangle(new CommandSlotItemStack(1, CommandSlotItemStack.COMPONENT_ITEM,
+					CommandSlotItemStack.COMPONENT_DAMAGE) {
+				@Override
+				public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+					if (args.length == index) {
+						throw new CommandSyntaxException();
+					}
+					Item item;
+					try {
+						item = Item.getItemById(Integer.parseInt(args[index]));
+					} catch (NumberFormatException e) {
+						throw new CommandSyntaxException();
+					}
+					if (item == null) {
+						throw new CommandSyntaxException();
+					}
+					index++;
+					boolean hasMetaArgument = args.length != index;
+					int meta;
+					if (hasMetaArgument) {
+						try {
+							meta = Integer.parseInt(args[index]);
+						} catch (NumberFormatException e) {
+							throw new CommandSyntaxException();
+						}
+					} else {
+						meta = 0;
+					}
+					setItem(new ItemStack(item, 1, meta));
+					return hasMetaArgument ? 2 : 1;
+				}
+
+				@Override
+				public void addArgs(List<String> args) throws UIInvalidException {
+					checkValid();
+
+					ItemStack stack = getItem();
+					Item item = stack.getItem();
+					int meta = stack.getMetadata();
+
+					args.add(String.valueOf(Item.getIdFromItem(item)));
+					if (meta != 0) {
+						args.add(String.valueOf(meta));
+					}
+				}
+			}, Colors.itemBox.color));
+			break;
+		case BLOCK_CRACK:
+		case BLOCK_DUST:
+			args.setChild(new CommandSlotRectangle(new CommandSlotBlock(false, 1, CommandSlotBlock.COMPONENT_BLOCK,
+					CommandSlotBlock.COMPONENT_PROPERTIES) {
+				@Override
+				public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+					if (args.length == index) {
+						throw new CommandSyntaxException();
+					}
+					int blockStateId;
+					try {
+						blockStateId = Integer.parseInt(args[index]);
+					} catch (NumberFormatException e) {
+						throw new CommandSyntaxException();
+					}
+					setBlock(Block.getStateById(blockStateId));
+					return 1;
+				}
+
+				@Override
+				public void addArgs(List<String> args) throws UIInvalidException {
+					checkValid();
+					int blockStateId = Block.getStateId(getBlock());
+					args.add(String.valueOf(blockStateId));
+				}
+			}, Colors.itemBox.color));
+			break;
+		default:
+			args.setChild(null);
+			break;
+		}
+	}
+
+	private class ParticleType extends CommandSlotHorizontalArrangement implements IParticleSelectorCallback {
 		private EnumParticleTypes particleType;
 		private CommandSlotLabel particleName;
 
-		private List<ParticleSpawnInfo> simulations;
-
-		public ParticleType(List<ParticleSpawnInfo> simulations) {
-			this.simulations = simulations;
+		public ParticleType() {
 			particleName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 					Translate.GUI_COMMANDEDITOR_NOPARTICLE, Colors.invalidItemName.color);
 			addChild(particleName);
@@ -353,6 +438,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 			particleName.setText(I18n.format("gui.commandEditor.particle." + particle.getParticleName() + ".name"));
 			particleName.setColor(Colors.itemName.color);
 			simulations.clear();
+			onChangeParticleTo(particle);
 		}
 
 		public void checkValid() throws UIInvalidException {

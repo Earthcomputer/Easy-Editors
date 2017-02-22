@@ -281,8 +281,10 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		for (IPropertyControl<?> property : nonVariants.values()) {
 			property.checkValid();
 		}
-		for (NBTTagHandler handler : nbtHandlers) {
-			handler.checkValid();
+		if (nbtHandlers != null) {
+			for (NBTTagHandler handler : nbtHandlers) {
+				handler.checkValid();
+			}
 		}
 	}
 

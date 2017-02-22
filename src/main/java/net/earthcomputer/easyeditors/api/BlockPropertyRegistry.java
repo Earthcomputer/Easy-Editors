@@ -49,6 +49,8 @@ import net.minecraft.init.Blocks;
  */
 public class BlockPropertyRegistry {
 
+	private static Map<Predicate<Block>, IProperty<? extends Comparable<?>>> variants = Maps.newHashMap();
+
 	static {
 		registerVanillaVariantProps();
 	}
@@ -83,8 +85,6 @@ public class BlockPropertyRegistry {
 		registerVariantProperty(BlockRedSandstone.TYPE);
 		registerVariantProperty(BlockStoneSlabNew.VARIANT);
 	}
-
-	private static Map<Predicate<Block>, IProperty<? extends Comparable<?>>> variants = Maps.newHashMap();
 
 	/**
 	 * Registers an IProperty to be counted as a variant property. More about

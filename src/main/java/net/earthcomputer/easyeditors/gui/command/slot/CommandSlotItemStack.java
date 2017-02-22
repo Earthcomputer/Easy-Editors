@@ -119,7 +119,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		int stackSize = 1;
 		int damage = 0;
 		NBTTagCompound nbt = null;
-		
+
 		int argsConsumed = 0;
 		for (int i = 0; i < argOrder.length && i < args.length - index; i++) {
 			argsConsumed++;
@@ -266,7 +266,9 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	public void checkValid() throws UIInvalidException {
 		if (item == null)
 			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_ITEMINVALID_NOITEM);
-		stackSizeField.checkValid();
+		if (stackSizeField != null) {
+			stackSizeField.checkValid();
+		}
 		for (ItemDamageHandler damageHandler : damageHandlers) {
 			damageHandler.checkValid();
 		}

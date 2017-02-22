@@ -124,6 +124,7 @@ gui.commandEditor.particle.footstep.name=Footstep
 gui.commandEditor.particle.force=Force
 gui.commandEditor.particle.force.tooltip=Always spawn particle, even if player is far away
 gui.commandEditor.particle.graph=Probabilities of actual particle(s) spawned (%s simulated):
+gui.commandEditor.particle.graph.cantSimulate=Unable to simulate particle
 gui.commandEditor.particle.graphX=X:
 gui.commandEditor.particle.graphY=Y:
 gui.commandEditor.particle.graphZ=Z:
