@@ -87,7 +87,7 @@ public class AnimatedBlockRenderer {
 			worldRenderer.pos(x, y, 50).tex(sprite.getMinU(), sprite.getMinV()).endVertex();
 			tessellator.draw();
 			break;
-		case MODEL:
+		case ENTITYBLOCK_ANIMATED:
 			Item item = Item.getItemFromBlock(block);
 			if (item != null) {
 				ItemStack stack = new ItemStack(item);
@@ -101,7 +101,9 @@ public class AnimatedBlockRenderer {
 				GlStateManager.color(0, 0, 0, 0);
 			}
 			break;
-		case ENTITYBLOCK_ANIMATED:
+		case MODEL:
+			GlStateManager.enableDepth();
+			GlStateManager.enableCull();
 			world = new DummyBlockAccess(this.block);
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x, y, 50);
@@ -125,6 +127,7 @@ public class AnimatedBlockRenderer {
 			tessellator.draw();
 			GlStateManager.enableLighting();
 			GlStateManager.popMatrix();
+			GlStateManager.disableDepth();
 			break;
 		case INVISIBLE:
 			break;

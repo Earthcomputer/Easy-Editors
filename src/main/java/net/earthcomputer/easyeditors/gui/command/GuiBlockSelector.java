@@ -352,6 +352,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		}
 
 		// Capitalize the first letter of each word
+		blockNameBuilder.setCharAt(0, Character.toUpperCase(blockNameBuilder.charAt(0)));
 		for (int i = 1; i < blockNameBuilder.length(); i++) {
 			char lastChar = blockNameBuilder.charAt(i - 1);
 			if (lastChar == ' ' || lastChar == '-' || lastChar == '\'' || lastChar == '"')
