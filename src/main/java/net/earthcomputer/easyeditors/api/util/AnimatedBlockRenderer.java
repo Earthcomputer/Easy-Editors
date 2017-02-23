@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -63,6 +64,12 @@ public class AnimatedBlockRenderer {
 
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer worldRenderer = tessellator.getBuffer();
+
+		GlStateManager.enableBlend();
+		boolean isTransparent = block.canRenderInLayer(this.block, BlockRenderLayer.TRANSLUCENT);
+		if (isTransparent) {
+			GlStateManager.depthMask(false);
+		}
 
 		switch (this.block.getRenderType()) {
 		case LIQUID:
@@ -130,6 +137,10 @@ public class AnimatedBlockRenderer {
 			break;
 		case INVISIBLE:
 			break;
+		}
+
+		if (isTransparent) {
+			GlStateManager.depthMask(true);
 		}
 	}
 
