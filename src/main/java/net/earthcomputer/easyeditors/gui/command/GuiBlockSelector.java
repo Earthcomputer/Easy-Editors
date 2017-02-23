@@ -1,7 +1,6 @@
 package net.earthcomputer.easyeditors.gui.command;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -62,27 +61,27 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 			ResourceLocation name = block.delegate.name();
 			allBlocks.put(name, block.getDefaultState());
 			allBlocksAndSubBlocks.putAll(name,
-					getVariantStates(block.getDefaultState(), BlockPropertyRegistry.getVariantProperties(block)));
+					getAllVariantStates(block, BlockPropertyRegistry.getVariantProperties(block)));
 		}
 	}
 
-	private static List<IBlockState> getVariantStates(IBlockState stateSoFar,
-			List<IProperty<? extends Comparable<?>>> remainingProperties) {
-		if (remainingProperties.isEmpty())
-			return Arrays.asList(stateSoFar);
-		List<IBlockState> r = Lists.newArrayList();
-		IProperty<? extends Comparable<?>> variedProperty = remainingProperties.get(0);
-		remainingProperties = remainingProperties.subList(1, remainingProperties.size());
-		for (Object allowedValue : variedProperty.getAllowedValues()) {
-			r.addAll(getVariantStates(stateWithProperty(stateSoFar, variedProperty, (Comparable<?>) allowedValue),
-					remainingProperties));
+	private static List<IBlockState> getAllVariantStates(Block block,
+			List<IProperty<?>> variantProperties) {
+		List<IBlockState> variantStates = Lists.newArrayList(block.getDefaultState());
+		for (IProperty<?> variantProperty : variantProperties) {
+			for (int i = 0, e = variantStates.size(); i < e; i++) {
+				IBlockState state = variantStates.get(i);
+				for (Comparable<?> allowedValue : variantProperty.getAllowedValues()) {
+					variantStates.add(stateWithProperty(state, variantProperty, allowedValue));
+				}
+			}
 		}
-		return r;
+		return variantStates;
 	}
 
 	@SuppressWarnings("unchecked")
 	private static <T extends Comparable<T>, V extends T> IBlockState stateWithProperty(IBlockState state,
-			IProperty<? extends Comparable<?>> prop, Comparable<?> value) {
+			IProperty<?> prop, Comparable<?> value) {
 		return state.withProperty((IProperty<T>) prop, (V) value);
 	}
 
@@ -393,7 +392,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 
 		List<String> otherLines = Lists.newArrayList();
 		Iterator<IProperty<?>> iterator1 = blockState.getProperties().keySet().iterator();
-		Iterator<IProperty<? extends Comparable<?>>> iterator2 = BlockPropertyRegistry
+		Iterator<IProperty<?>> iterator2 = BlockPropertyRegistry
 				.getVariantProperties(blockState.getBlock()).iterator();
 		while (advanced ? iterator1.hasNext() : iterator2.hasNext()) {
 			IProperty<?> prop;

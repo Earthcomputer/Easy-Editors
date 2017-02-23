@@ -1,12 +1,12 @@
 package net.earthcomputer.easyeditors.api;
 
 import java.util.List;
-import java.util.Map;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
@@ -49,7 +49,7 @@ import net.minecraft.init.Blocks;
  */
 public class BlockPropertyRegistry {
 
-	private static Map<Predicate<Block>, IProperty<? extends Comparable<?>>> variants = Maps.newHashMap();
+	private static List<Pair<Predicate<Block>, IProperty<?>>> variants = Lists.newArrayList();
 
 	static {
 		registerVanillaVariantProps();
@@ -93,9 +93,8 @@ public class BlockPropertyRegistry {
 	 * 
 	 * @param property
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends Comparable<T>> void registerVariantProperty(IProperty<T> property) {
-		registerVariantProperty((Predicate<Block>) (Predicate<?>) Predicates.alwaysTrue(), property);
+		registerVariantProperty(Predicates.<Block> alwaysTrue(), property);
 	}
 
 	/**
@@ -124,9 +123,10 @@ public class BlockPropertyRegistry {
 	 * @param blockPredicate
 	 * @param property
 	 */
-	public static <T extends Comparable<T>> void registerVariantProperty(Predicate<Block> blockPredicate,
-			IProperty<T> property) {
-		variants.put(blockPredicate, property);
+	@SuppressWarnings("unchecked")
+	public static void registerVariantProperty(Predicate<Block> blockPredicate, IProperty<?> property) {
+		// Gotta love Java Generics
+		((List<Pair<Predicate<Block>, Object>>) (List<?>) variants).add(Pair.of(blockPredicate, (Object) property));
 	}
 
 	/**
@@ -137,10 +137,10 @@ public class BlockPropertyRegistry {
 	 * @param property
 	 * @return
 	 */
-	public static <T extends Comparable<T>> boolean isVariantProperty(Block block, IProperty<T> property) {
-		for (Map.Entry<Predicate<Block>, IProperty<? extends Comparable<?>>> entry : variants.entrySet()) {
-			if (entry.getKey().apply(block)) {
-				if (entry.getValue().equals(property)) {
+	public static boolean isVariantProperty(Block block, IProperty<?> property) {
+		for (Pair<Predicate<Block>, IProperty<?>> entry : variants) {
+			if (entry.getLeft().apply(block)) {
+				if (entry.getRight().equals(property)) {
 					return true;
 				}
 			}
@@ -154,9 +154,9 @@ public class BlockPropertyRegistry {
 	 * @param block
 	 * @return
 	 */
-	public static List<IProperty<? extends Comparable<?>>> getVariantProperties(Block block) {
-		List<IProperty<? extends Comparable<?>>> variantProps = Lists.newArrayList();
-		for (IProperty<? extends Comparable<?>> prop : block.getDefaultState().getProperties().keySet()) {
+	public static List<IProperty<?>> getVariantProperties(Block block) {
+		List<IProperty<?>> variantProps = Lists.newArrayList();
+		for (IProperty<?> prop : block.getDefaultState().getPropertyKeys()) {
 			if (isVariantProperty(block, prop))
 				variantProps.add(prop);
 		}

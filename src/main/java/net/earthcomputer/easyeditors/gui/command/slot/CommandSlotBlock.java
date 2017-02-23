@@ -301,12 +301,11 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		if (!sameBlock && this.properties != null) {
 			List<IProperty<?>> properties = Lists.newArrayList(block.getPropertyKeys());
-			List<IProperty<? extends Comparable<?>>> variantProperties = BlockPropertyRegistry
-					.getVariantProperties(block.getBlock());
+			List<IProperty<?>> variantProperties = BlockPropertyRegistry.getVariantProperties(block.getBlock());
 			CommandSlotVerticalArrangement propertiesCommandSlot = new CommandSlotVerticalArrangement();
 			if (isTest) {
 				variantsIgnoring = Maps.newHashMap();
-				for (IProperty<? extends Comparable<?>> variantProp : variantProperties) {
+				for (IProperty<?> variantProp : variantProperties) {
 					CommandSlotCheckbox checkbox = new CommandSlotCheckbox(variantProp.getName());
 					propertiesCommandSlot.addChild(checkbox);
 					variantsIgnoring.put(variantProp, checkbox);
