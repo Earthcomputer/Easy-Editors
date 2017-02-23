@@ -12,15 +12,9 @@ apply from: 'lang_constants.gradle'
 setupDecompWorkspace.dependsOn buildLangConstantsFiles
 setupDevWorkspace.dependsOn buildLangConstantsFiles
 setupCiWorkspace.dependsOn buildLangConstantsFiles
+compileJava.dependsOn buildLangConstantsFiles
 
-sourceSets {
-	generated {
-		java {
-			srcDirs = ["$buildDir/src/generated/java"]
-		}
-		compileClasspath += sourceSets.main.output
-	}
-}
+sourceSets.main.java.srcDirs 'src/generated/java'
 eclipse.classpath.file.whenMerged {
 	cp ->
 	cp.entries.add(new org.gradle.plugins.ide.eclipse.model.SourceFolder('src/generated/java', null))
@@ -33,6 +27,7 @@ archivesBaseName = "easyeditors"
 sourceCompatibility = targetCompatibility = 1.6
 compileJava {
     sourceCompatibility = targetCompatibility = 1.6
+	options.debug = false
 }
 
 minecraft {
