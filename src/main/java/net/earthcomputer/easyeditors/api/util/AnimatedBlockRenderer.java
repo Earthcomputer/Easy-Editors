@@ -55,7 +55,6 @@ public class AnimatedBlockRenderer {
 	 * @param x
 	 * @param y
 	 */
-	@SuppressWarnings("deprecation")
 	public void render(int x, int y) {
 		Minecraft mc = Minecraft.getMinecraft();
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -65,14 +64,14 @@ public class AnimatedBlockRenderer {
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer worldRenderer = tessellator.getBuffer();
 
-		switch (block.getRenderType(this.block)) {
+		switch (this.block.getRenderType()) {
 		case LIQUID:
-			String fluid = block.getMaterial(this.block) == Material.LAVA ? "lava" : "water";
+			String fluid = this.block.getMaterial() == Material.LAVA ? "lava" : "water";
 			String state;
-			if (block == BlockLiquid.getStaticBlock(block.getMaterial(this.block)))
+			if (block == BlockLiquid.getStaticBlock(this.block.getMaterial()))
 				state = "still";
-			else if (block == BlockLiquid.getFlowingBlock(block.getMaterial(this.block)))
-				state = "flowing";
+			else if (block == BlockLiquid.getFlowingBlock(this.block.getMaterial()))
+				state = "flow";
 			else {
 				EasyEditorsApi.logger.error("Invalid block with render type 1: " + block.delegate.name());
 				break;
