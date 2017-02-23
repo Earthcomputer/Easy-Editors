@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.BlockPropertyRegistry;
+import net.earthcomputer.easyeditors.api.SmartTranslationRegistry;
 import net.earthcomputer.easyeditors.api.util.AnimatedBlockRenderer;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiTwoWayScroll;
@@ -34,8 +35,13 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.HoverChecker;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -65,8 +71,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		}
 	}
 
-	private static List<IBlockState> getAllVariantStates(Block block,
-			List<IProperty<?>> variantProperties) {
+	private static List<IBlockState> getAllVariantStates(Block block, List<IProperty<?>> variantProperties) {
 		List<IBlockState> variantStates = Lists.newArrayList(block.getDefaultState());
 		for (IProperty<?> variantProperty : variantProperties) {
 			for (int i = 0, e = variantStates.size(); i < e; i++) {
@@ -319,6 +324,23 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 	 * @return
 	 */
 	public static String getDisplayName(IBlockState block) {
+		try {
+			ItemStack item = block.getBlock().getPickBlock(block,
+					new RayTraceResult(new Vec3d(0.5, 1, 0.5), EnumFacing.UP), Minecraft.getMinecraft().world,
+					BlockPos.ORIGIN, Minecraft.getMinecraft().player);
+			if (!item.isEmpty()) {
+				String unlocalizedName = item.getUnlocalizedName() + ".name";
+				if (SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(unlocalizedName)) {
+					return I18n.format(unlocalizedName);
+				}
+			}
+		} catch (Throwable t) {
+			// ignore
+		}
+		String unlocalizedName = block.getBlock().getUnlocalizedName() + ".name";
+		if (SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(unlocalizedName)) {
+			return I18n.format(unlocalizedName);
+		}
 		return getDisplayName(String.valueOf(block.getBlock().delegate.name()));
 	}
 
@@ -392,8 +414,7 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 
 		List<String> otherLines = Lists.newArrayList();
 		Iterator<IProperty<?>> iterator1 = blockState.getProperties().keySet().iterator();
-		Iterator<IProperty<?>> iterator2 = BlockPropertyRegistry
-				.getVariantProperties(blockState.getBlock()).iterator();
+		Iterator<IProperty<?>> iterator2 = BlockPropertyRegistry.getVariantProperties(blockState.getBlock()).iterator();
 		while (advanced ? iterator1.hasNext() : iterator2.hasNext()) {
 			IProperty<?> prop;
 			if (advanced)
