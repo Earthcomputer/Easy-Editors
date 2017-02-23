@@ -27,6 +27,7 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
@@ -45,8 +46,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 	private int[] argOrder;
 	private int optionalStart;
 
-	private Block block;
-	private IBlockState displayedState;
+	private IBlockState state;
 	private Map<IProperty<?>, CommandSlotCheckbox> variantsIgnoring;
 	private Map<IProperty<?>, IPropertyControl<?>> nonVariants;
 	private List<NBTTagHandler> nbtHandlers;
@@ -207,45 +207,41 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		for (int i = 0; i < argOrder.length; i++) {
 			switch (argOrder[i]) {
 			case COMPONENT_BLOCK:
-				ResourceLocation blockName = block.delegate.name();
+				ResourceLocation blockName = state.getBlock().delegate.name();
 				potentialArgs.add(GeneralUtils.resourceLocationToString(blockName));
 				maxElementToCopy = i;
 				break;
 			case COMPONENT_PROPERTIES:
-				Map<IProperty<?>, Comparable<?>> properties = Maps.newHashMap();
-				if (isTest) {
-					for (Map.Entry<IProperty<?>, CommandSlotCheckbox> variantIgnoring : variantsIgnoring.entrySet()) {
-						if (!variantIgnoring.getValue().isChecked()) {
-							properties.put(variantIgnoring.getKey(),
-									this.displayedState.getValue(variantIgnoring.getKey()));
-						}
-					}
-				} else {
-					properties = Maps.newHashMap(this.displayedState.getProperties());
-				}
-				for (Map.Entry<IProperty<?>, IPropertyControl<?>> entry : nonVariants.entrySet()) {
-					if (!entry.getValue().isIgnoringProperty()) {
-						properties.put(entry.getKey(), entry.getValue().getSelectedValue());
-					}
-				}
 				boolean _default;
 				if (!isTest) {
-					IBlockState state = block.getDefaultState();
-					for (Map.Entry<IProperty<?>, Comparable<?>> prop : properties.entrySet()) {
-						state = putProperty(state, prop.getKey(), prop.getValue());
-					}
-					_default = state.equals(block.getDefaultState());
-					potentialArgs.add(String.valueOf(block.getMetaFromState(state)));
+					_default = state.equals(state.getBlock().getDefaultState());
+					potentialArgs.add(String.valueOf(state.getBlock().getMetaFromState(state)));
 				} else {
+					Map<IProperty<?>, Comparable<?>> properties = Maps.newHashMap();
+					if (isTest) {
+						for (Map.Entry<IProperty<?>, CommandSlotCheckbox> variantIgnoring : variantsIgnoring
+								.entrySet()) {
+							if (!variantIgnoring.getValue().isChecked()) {
+								properties.put(variantIgnoring.getKey(), state.getValue(variantIgnoring.getKey()));
+							}
+						}
+					} else {
+						properties = Maps.newHashMap(state.getProperties());
+					}
+					for (Map.Entry<IProperty<?>, IPropertyControl<?>> entry : nonVariants.entrySet()) {
+						if (!entry.getValue().isIgnoringProperty()) {
+							properties.put(entry.getKey(), entry.getValue().getSelectedValue());
+						}
+					}
 					if (properties.isEmpty()) {
 						potentialArgs.add("*");
 						_default = true;
-					} else if (properties.size() == this.displayedState.getProperties().size()) {
-						IBlockState state = block.getDefaultState();
+					} else if (properties.size() == state.getProperties().size()) {
+						IBlockState state = this.state.getBlock().getDefaultState();
 						for (Map.Entry<IProperty<?>, Comparable<?>> prop : properties.entrySet()) {
 							state = putProperty(state, prop.getKey(), prop.getValue());
 						}
-						potentialArgs.add(String.valueOf(block.getMetaFromState(state)));
+						potentialArgs.add(String.valueOf(state.getBlock().getMetaFromState(state)));
 						_default = false;
 					} else {
 						Joiner joiner = Joiner.on(',');
@@ -275,7 +271,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 	}
 
 	public void checkValid() throws UIInvalidException {
-		if (block == null) {
+		if (state == null) {
 			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOBLOCKSELECTED);
 		}
 		for (IPropertyControl<?> property : nonVariants.values()) {
@@ -290,14 +286,13 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 	@Override
 	public IBlockState getBlock() {
-		return displayedState;
+		return state;
 	}
 
 	@Override
 	public void setBlock(IBlockState block) {
-		boolean sameBlock = this.block == block.getBlock();
-		this.block = block.getBlock();
-		this.displayedState = block;
+		boolean sameBlock = state == null ? false : state.getBlock() == block.getBlock();
+		this.state = block;
 
 		if (!sameBlock && this.properties != null) {
 			List<IProperty<?>> properties = Lists.newArrayList(block.getPropertyKeys());
@@ -387,6 +382,29 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		return nbt.hasNoTags() ? null : nbt;
 	}
 
+	@Override
+	public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
+		super.draw(x, y, mouseX, mouseY, partialTicks);
+
+		if (state != null && properties != null) {
+			IBlockState defaultState = state.getBlock().getDefaultState();
+			if (isTest) {
+				for (Map.Entry<IProperty<?>, CommandSlotCheckbox> variant : variantsIgnoring.entrySet()) {
+					if (variant.getValue().isChecked()) {
+						state = putProperty(state, variant.getKey(), defaultState.getValue(variant.getKey()));
+					}
+				}
+			}
+			for (Map.Entry<IProperty<?>, IPropertyControl<?>> prop : nonVariants.entrySet()) {
+				if (!prop.getValue().isIgnoringProperty()) {
+					state = putProperty(state, prop.getKey(), prop.getValue().getSelectedValue());
+				} else {
+					state = putProperty(state, prop.getKey(), defaultState.getValue(prop.getKey()));
+				}
+			}
+		}
+	}
+
 	private class CmdBlock extends GuiCommandSlotImpl {
 
 		private HoverChecker hoverChecker;
@@ -400,16 +418,20 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		@Override
 		public void draw(int x, int y, int mouseX, int mouseY, float partialTicks) {
 			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
-			if (displayedState != null) {
-				new AnimatedBlockRenderer(displayedState).render(x,
+			if (state != null) {
+				new AnimatedBlockRenderer(state).render(x,
 						fontRenderer.FONT_HEIGHT > 16 ? y + fontRenderer.FONT_HEIGHT / 2 - 8 : y);
 			}
 
-			fontRenderer.drawString(getDisplayText(), x + 18,
+			GlStateManager.disableLighting();
+			GlStateManager.disableFog();
+			String str = getDisplayText();
+			fontRenderer.drawString(str, x + 18,
 					fontRenderer.FONT_HEIGHT > 16 ? y : y + 8 - fontRenderer.FONT_HEIGHT / 2,
-					displayedState == null ? Colors.invalidItemName.color : Colors.itemName.color);
+					state == null ? Colors.invalidItemName.color : Colors.itemName.color);
+			setWidth(18 + fontRenderer.getStringWidth(str));
 
-			if (displayedState != null) {
+			if (state != null) {
 				if (hoverChecker == null) {
 					hoverChecker = new HoverChecker(y, y + getHeight(), x, x + getWidth(), 1000);
 				} else {
@@ -419,16 +441,16 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 				if (!getContext().isMouseInBounds(mouseX, mouseY)) {
 					hoverChecker.resetHoverTimer();
 				} else if (hoverChecker.checkHover(mouseX, mouseY)) {
-					drawTooltip(mouseX, mouseY, GuiBlockSelector.getTooltip(displayedState));
+					drawTooltip(mouseX, mouseY, GuiBlockSelector.getTooltip(state));
 				}
 			}
 		}
 
 		private String getDisplayText() {
-			if (displayedState == null) {
+			if (state == null) {
 				return Translate.GUI_COMMANDEDITOR_NOBLOCK;
 			} else {
-				return GuiBlockSelector.getDisplayName(displayedState);
+				return GuiBlockSelector.getDisplayName(state);
 			}
 		}
 
@@ -498,7 +520,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		@Override
 		public IGuiCommandSlot getCommandSlot() {
-			return CommandSlotLabel.createLabel(propertyName, value);
+			return CommandSlotLabel.createLabel(propertyName, Colors.itemLabel.color, value);
 		}
 
 	}
@@ -549,7 +571,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		@Override
 		public IGuiCommandSlot getCommandSlot() {
-			return CommandSlotLabel.createLabel(propertyName, value);
+			return CommandSlotLabel.createLabel(propertyName, Colors.itemLabel.color, value);
 		}
 
 	}
@@ -590,7 +612,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		@Override
 		public IGuiCommandSlot getCommandSlot() {
-			return CommandSlotLabel.createLabel(propertyName, value);
+			return CommandSlotLabel.createLabel(propertyName, Colors.itemLabel.color, value);
 		}
 
 	}
@@ -693,7 +715,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		@Override
 		public IGuiCommandSlot getCommandSlot() {
-			return CommandSlotLabel.createLabel(propertyName, value);
+			return CommandSlotLabel.createLabel(propertyName, Colors.itemLabel.color, value);
 		}
 
 	}

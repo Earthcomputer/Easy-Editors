@@ -132,6 +132,16 @@ public class GuiBlockSelector extends GuiTwoWayScroll {
 		this.callback = callback;
 		this.allowSubBlocks = allowSubBlocks;
 		this.selectedBlock = callback.getBlock();
+		if (!allowSubBlocks) {
+			this.selectedBlock = this.selectedBlock.getBlock().getDefaultState();
+		} else {
+			IBlockState defaultState = this.selectedBlock.getBlock().getDefaultState();
+			for (IProperty<?> prop : defaultState.getPropertyKeys()) {
+				if (!BlockPropertyRegistry.isVariantProperty(defaultState.getBlock(), prop)) {
+					this.selectedBlock = stateWithProperty(this.selectedBlock, prop, defaultState.getValue(prop));
+				}
+			}
+		}
 		setXScrollBarPolicy(SHOWN_NEVER);
 		setUpKey(Keyboard.KEY_UP);
 		setDownKey(Keyboard.KEY_DOWN);
