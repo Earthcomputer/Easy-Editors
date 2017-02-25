@@ -360,6 +360,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 			break;
 		case BLOCK_CRACK:
 		case BLOCK_DUST:
+		case FALLING_DUST:
 			args.setChild(new CommandSlotRectangle(new CommandSlotBlock(false, 1, CommandSlotBlock.COMPONENT_BLOCK,
 					CommandSlotBlock.COMPONENT_PROPERTIES) {
 				@Override
