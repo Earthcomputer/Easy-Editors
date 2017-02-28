@@ -25,8 +25,8 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 public class CommandSlotTextField extends GuiCommandSlotImpl {
 
 	private GuiTypeListenerTextField wrappedTextField;
-	private int x;
-	private int y;
+	protected int x;
+	protected int y;
 	private int minWidth;
 	private int maxWidth;
 	private int wordsToConsume;
@@ -147,6 +147,60 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 	}
 
 	/**
+	 * Gets whether this text field has focus
+	 * 
+	 * @return
+	 */
+	public boolean isFocused() {
+		return wrappedTextField.isFocused();
+	}
+
+	/**
+	 * Sets whether this text field has focus
+	 * 
+	 * @param focused
+	 */
+	public void setFocused(boolean focused) {
+		wrappedTextField.setFocused(focused);
+	}
+
+	/**
+	 * Gets the start of the selection
+	 * 
+	 * @return
+	 */
+	public int getSelectionStart() {
+		return Math.min(wrappedTextField.getCursorPosition(), wrappedTextField.getSelectionEnd());
+	}
+
+	/**
+	 * Gets the end of the selection
+	 * 
+	 * @return
+	 */
+	public int getSelectionEnd() {
+		return Math.max(wrappedTextField.getCursorPosition(), wrappedTextField.getSelectionEnd());
+	}
+
+	/**
+	 * Gets the caret position
+	 * 
+	 * @return
+	 */
+	public int getCaretPos() {
+		return wrappedTextField.getCursorPosition();
+	}
+
+	/**
+	 * Sets the caret position, canceling the selection
+	 * 
+	 * @param caretPos
+	 */
+	public void setCaretPos(int caretPos) {
+		wrappedTextField.setCursorPosition(caretPos);
+	}
+
+	/**
 	 * Called when the text in the text field changes
 	 */
 	protected void onTextChanged() {
@@ -169,7 +223,7 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 
 	private void ensureInView() {
 		onTextChanged();
-		
+
 		String strBefore = wrappedTextField.getText().substring(wrappedTextField.getLineScrollOffset(),
 				wrappedTextField.getCursorPosition() - wrappedTextField.getLineScrollOffset());
 		int x = wrappedTextField.getEnableBackgroundDrawing() ? wrappedTextField.xPosition + 4

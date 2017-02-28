@@ -3,6 +3,7 @@ gui.commandEditor.item.nbt.leatherArmor.color=Colour
 gui.commandEditor.item.nbt.leatherArmor.color.tooltip=The colour this armour has been dyed
 gui.commandEditor.playerSelector.farthest=Furthest
 gui.commandEditor.replaceitem.slot.horse.armor=Horse Armour Slot
+gui.commandEditor.textField.hint.color=Change colour = Ctrl+F
 
 gui.easyeditorsconfig.colortitleline2=Click on the colours to select them more easily
 gui.easyeditorsconfig.colortooltip=Colour Picker

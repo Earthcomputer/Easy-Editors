@@ -10,11 +10,13 @@ import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.FormattedText;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.api.util.Predicates2;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
@@ -271,12 +273,12 @@ public abstract class NBTTagHandler {
 
 	public static class DisplayHandler extends NBTTagHandler {
 
-		private CommandSlotTextField displayName;
+		private CommandSlotFormattedTextField displayName;
 		private CommandSlotList<CommandSlotTextField> lore;
 
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
-			displayName = new CommandSlotTextField(100, 400);
+			displayName = new CommandSlotFormattedTextField(150);
 			displayName.setMaxStringLength(Short.MAX_VALUE);
 			lore = new CommandSlotList<CommandSlotTextField>(new Instantiator<CommandSlotTextField>() {
 				@Override
@@ -316,7 +318,7 @@ public abstract class NBTTagHandler {
 				}
 			}
 
-			this.displayName.setText(displayName);
+			this.displayName.setText(FormattedText.compile(displayName));
 		}
 
 		@Override
@@ -324,7 +326,7 @@ public abstract class NBTTagHandler {
 			NBTTagCompound display = new NBTTagCompound();
 
 			if (!displayName.getText().isEmpty()) {
-				display.setString("Name", displayName.getText());
+				display.setString("Name", displayName.getText().toVanillaText());
 			}
 
 			NBTTagList lore = new NBTTagList();

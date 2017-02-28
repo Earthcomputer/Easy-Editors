@@ -372,6 +372,14 @@ gui.commandEditor.stats.type.QueryResult=Query Result
 gui.commandEditor.stats.type.SuccessCount=Success Count
 gui.commandEditor.stats.type.tooltip=The command result type
 gui.commandEditor.teleport.targetCoordinate=Target Coordinate:
+gui.commandEditor.textField.hint.bold=Bold = Ctrl+B
+gui.commandEditor.textField.hint.color=Change color = Ctrl+F
+gui.commandEditor.textField.hint.italic=Italic = Ctrl+I
+gui.commandEditor.textField.hint.line1=Highlight text to format, then:
+gui.commandEditor.textField.hint.obfuscated=Obfuscated = Ctrl+O
+gui.commandEditor.textField.hint.strikethrough=Strikethrough = Ctrl+S
+gui.commandEditor.textField.hint.underline=Underline = Ctrl+U
+gui.commandEditor.textField.initialHint=Press Ctrl+Space for a list of shortcuts
 gui.commandEditor.time.add=Add to the time
 gui.commandEditor.time.add.subcommand=Time to add
 gui.commandEditor.time.invalid=Invalid number in time
