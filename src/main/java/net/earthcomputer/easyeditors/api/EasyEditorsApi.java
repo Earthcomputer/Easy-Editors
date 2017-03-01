@@ -32,11 +32,12 @@ public class EasyEditorsApi {
 	public static boolean isEasyEditorsActive = true;
 
 	private static Class<?> cls_EasyEditors;
-	private static Class<?> cls_ICommandSyntax;
+	private static Class<?> cls_CommandSyntax;
 	private static Class<?> cls_NBTTagHandler;
 	private static Class<?> cls_SlotHandler;
 
-	private static Method md_ICommandSyntax_registerCommandSyntax;
+	private static Method md_CommandSyntax_registerCommandSyntax;
+	private static Method md_CommandSyntax_registerAlias;
 	private static Method md_NBTTagHandler_registerHandler;
 	private static Method md_SlotHandler_registerHandler;
 
@@ -48,12 +49,13 @@ public class EasyEditorsApi {
 	static {
 		try {
 			cls_EasyEditors = Class.forName("net.earthcomputer.easyeditors.EasyEditors");
-			cls_ICommandSyntax = Class.forName("net.earthcomputer.easyeditors.gui.command.syntax.ICommandSyntax");
+			cls_CommandSyntax = Class.forName("net.earthcomputer.easyeditors.gui.command.syntax.CommandSyntax");
 			cls_NBTTagHandler = Class.forName("net.earthcomputer.easyeditors.gui.command.NBTTagHandler");
 			cls_SlotHandler = Class.forName("net.earthcomputer.easyeditors.gui.command.SlotHandler");
 
-			md_ICommandSyntax_registerCommandSyntax = cls_ICommandSyntax.getMethod("registerCommandSyntax",
-					String.class, Class.class);
+			md_CommandSyntax_registerCommandSyntax = cls_CommandSyntax.getMethod("registerCommandSyntax", String.class,
+					Class.class);
+			md_CommandSyntax_registerAlias = cls_CommandSyntax.getMethod("registerAlias", String.class, String.class);
 			md_NBTTagHandler_registerHandler = cls_NBTTagHandler.getMethod("registerHandler", String.class,
 					Predicate.class, Class.class);
 			md_SlotHandler_registerHandler = cls_SlotHandler.getMethod("registerHandler", cls_SlotHandler);
@@ -81,7 +83,27 @@ public class EasyEditorsApi {
 		if (cls_EasyEditors == null)
 			return;
 		try {
-			md_ICommandSyntax_registerCommandSyntax.invoke(null, commandName, Class.forName(className));
+			md_CommandSyntax_registerCommandSyntax.invoke(null, commandName, Class.forName(className));
+		} catch (Exception e) {
+			GeneralUtils.logStackTrace(logger, e);
+		}
+	}
+
+	/**
+	 * A safe way of registering a command syntax alias without raising a
+	 * {@link NoClassDefFoundError} if the Easy Editors mod is not present.
+	 * 
+	 * @param commandName
+	 * @param className
+	 * 
+	 * @see net.earthcomputer.easyeditors.gui.command.syntax.CommandSyntax#registerCommandSyntax(String,
+	 *      Class) ICommandSyntax.registerCommandSyntax(String, Class)
+	 */
+	public static void registerCommandAlias(String mainCommandName, String aliasName) {
+		if (cls_EasyEditors == null)
+			return;
+		try {
+			md_CommandSyntax_registerAlias.invoke(null, mainCommandName, aliasName);
 		} catch (Exception e) {
 			GeneralUtils.logStackTrace(logger, e);
 		}

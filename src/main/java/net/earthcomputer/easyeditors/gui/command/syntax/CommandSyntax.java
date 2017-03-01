@@ -21,6 +21,7 @@ import net.minecraft.util.ReportedException;
 public abstract class CommandSyntax {
 
 	private static Map<String, Class<? extends CommandSyntax>> commandSyntaxes = Maps.newHashMap();
+	private static Map<String, String> aliases = Maps.newHashMap();
 
 	protected static final Joiner spaceJoiner = Joiner.on(' ');
 
@@ -95,12 +96,28 @@ public abstract class CommandSyntax {
 	}
 
 	/**
+	 * Registers an alias for a command. Modders should not use this method, and
+	 * instead use
+	 * {@link net.earthcomputer.easyeditors.api.EasyEditorsApi#registerCommandAlias(String, String)
+	 * EasyEditorsApi.registerCommandAlias(String, String)} instead
+	 * 
+	 * @param mainCommandName
+	 * @param aliasName
+	 */
+	public static void registerAlias(String mainCommandName, String aliasName) {
+		aliases.put(aliasName, mainCommandName);
+	}
+
+	/**
 	 * Creates an instance of ICommandSyntax from the given command name
 	 * 
 	 * @param commandName
 	 * @return
 	 */
 	public static CommandSyntax forCommandName(String commandName, CommandSlotContext context) {
+		if (aliases.containsKey(commandName)) {
+			commandName = aliases.get(commandName);
+		}
 		Class<? extends CommandSyntax> syntax = commandSyntaxes.get(commandName);
 		if (syntax == null)
 			return null;
@@ -144,6 +161,8 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("particle", SyntaxParticle.class);
 		registerCommandSyntax("me", SyntaxEmote.class);
 		registerCommandSyntax("seed", SyntaxNoArguments.class);
+		registerAlias("?", "help");
+		registerCommandSyntax("?", SyntaxNoArguments.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 
