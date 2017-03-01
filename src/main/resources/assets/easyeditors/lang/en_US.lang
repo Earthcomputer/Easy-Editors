@@ -328,6 +328,8 @@ gui.commandEditor.selectCommand.give.desc=Gives an item stack to a player
 gui.commandEditor.selectCommand.give.example=/give Earthcomputer cobblestone
 gui.commandEditor.selectCommand.kill.desc=Kills an entity
 gui.commandEditor.selectCommand.kill.example=/kill @e[type=slime]
+gui.commandEditor.selectCommand.me.desc=Sends a "fake" message saying the sender has done something
+gui.commandEditor.selectCommand.me.example=/me tried to swim in lava
 gui.commandEditor.selectCommand.particle.desc=Spawns a particle
 gui.commandEditor.selectCommand.particle.example=/particle reddust ~ ~ ~ 0 0 0 1
 gui.commandEditor.selectCommand.replaceitem.desc=Replaces an item in a slot in an inventory
