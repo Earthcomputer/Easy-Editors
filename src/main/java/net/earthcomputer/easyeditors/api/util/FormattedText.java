@@ -646,4 +646,13 @@ public final class FormattedText {
 		return toVanillaText();
 	}
 
+	/**
+	 * Gets the internal unformatted text
+	 * 
+	 * @return
+	 */
+	public String getUnformattedText() {
+		return unformattedText;
+	}
+
 }

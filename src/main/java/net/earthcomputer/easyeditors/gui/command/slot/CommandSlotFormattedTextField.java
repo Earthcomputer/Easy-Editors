@@ -5,6 +5,9 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+
 import net.earthcomputer.easyeditors.api.util.CharFormat;
 import net.earthcomputer.easyeditors.api.util.FormattedText;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
@@ -43,6 +46,7 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 	private int selectionPos;
 	private int scrollPos;
 	private int maxStringLength = 32;
+	private Predicate<FormattedText> contentFilter = Predicates.alwaysTrue();
 	private CharFormat zeroLengthFormat = null;
 
 	public CommandSlotFormattedTextField(int width) {
@@ -89,9 +93,11 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 			newText = newText.concat(this.text.substring(selectionEnd));
 		}
 
-		this.text = newText;
-		setCaretPos(caretPos + selectionStart - selectionPos + lengthToWrite);
-		setSelectionPos(caretPos);
+		if (contentFilter.apply(newText)) {
+			this.text = newText;
+			setCaretPos(caretPos + selectionStart - selectionPos + lengthToWrite);
+			setSelectionPos(caretPos);
+		}
 	}
 
 	private void deleteWords(int count) {
@@ -125,11 +131,13 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 				s = s.concat(this.text.substring(deleteEnd));
 			}
 
-			this.text = s;
+			if (contentFilter.apply(s)) {
+				this.text = s;
 
-			if (deletingBackwards) {
-				setCaretPos(caretPos + count);
-				setSelectionPos(caretPos);
+				if (deletingBackwards) {
+					setCaretPos(caretPos + count);
+					setSelectionPos(caretPos);
+				}
 			}
 
 		}
@@ -349,7 +357,10 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 			} else {
 				format = CharFormat.NO_STYLE;
 			}
-			text = text.withFormatAt(caretPos - 1, format);
+			FormattedText newText = text.withFormatAt(caretPos - 1, format);
+			if (contentFilter.apply(newText)) {
+				text = newText;
+			}
 			return true;
 		}
 		}
@@ -600,7 +611,11 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 				throw new IllegalArgumentException("Invalid style: " + formatting);
 			}
 		} else {
-			text = text.toggleStyle(Math.min(caretPos, selectionPos), Math.max(caretPos, selectionPos), formatting);
+			FormattedText newText = text.toggleStyle(Math.min(caretPos, selectionPos), Math.max(caretPos, selectionPos),
+					formatting);
+			if (contentFilter.apply(newText)) {
+				text = newText;
+			}
 		}
 		return;
 	}
@@ -646,9 +661,11 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 		if (text.length() > maxStringLength) {
 			text = text.substring(0, maxStringLength);
 		}
-		this.text = text;
-		setCaretPos(text.length());
-		setSelectionPos(caretPos);
+		if (contentFilter.apply(text)) {
+			this.text = text;
+			setCaretPos(text.length());
+			setSelectionPos(caretPos);
+		}
 	}
 
 	/**
@@ -708,6 +725,42 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 	 */
 	public int getSelectionPos() {
 		return selectionPos;
+	}
+
+	/**
+	 * Sets the content filter for this formatted text field. Text with an
+	 * unformatted text which the given predicate will not accept will not be
+	 * accepted into this text field.
+	 * 
+	 * @param filter
+	 */
+	public void setStringContentFilter(final Predicate<String> filter) {
+		setContentFilter(new Predicate<FormattedText>() {
+			@Override
+			public boolean apply(FormattedText text) {
+				return filter.apply(text.getUnformattedText());
+			}
+		});
+	}
+
+	/**
+	 * Sets the content filter for this formatted text field. Text which the
+	 * given predicate will not accept will not be accepted into this text
+	 * field.
+	 * 
+	 * @param filter
+	 */
+	public void setContentFilter(Predicate<FormattedText> filter) {
+		this.contentFilter = filter;
+	}
+
+	/**
+	 * Gets the content filter.
+	 * 
+	 * @return
+	 */
+	public Predicate<FormattedText> getContentFilter() {
+		return contentFilter;
 	}
 
 }

@@ -19,7 +19,6 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Translate;
@@ -274,20 +273,21 @@ public abstract class NBTTagHandler {
 	public static class DisplayHandler extends NBTTagHandler {
 
 		private CommandSlotFormattedTextField displayName;
-		private CommandSlotList<CommandSlotTextField> lore;
+		private CommandSlotList<CommandSlotFormattedTextField> lore;
 
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
 			displayName = new CommandSlotFormattedTextField(150);
 			displayName.setMaxStringLength(Short.MAX_VALUE);
-			lore = new CommandSlotList<CommandSlotTextField>(new Instantiator<CommandSlotTextField>() {
-				@Override
-				public CommandSlotTextField newInstance() {
-					return new CommandSlotTextField(100, 400);
-				}
-			}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_APPEND)
-					.setInsertHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_INSERT)
-					.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_REMOVE);
+			lore = new CommandSlotList<CommandSlotFormattedTextField>(
+					new Instantiator<CommandSlotFormattedTextField>() {
+						@Override
+						public CommandSlotFormattedTextField newInstance() {
+							return new CommandSlotFormattedTextField(400);
+						}
+					}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_APPEND)
+							.setInsertHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_INSERT)
+							.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_REMOVE);
 			return new IGuiCommandSlot[] {
 					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_DISPLAYNAME,
 							Colors.itemLabel.color, Translate.GUI_COMMANDEDITOR_ITEM_NBT_DISPLAYNAME_TOOLTIP,
@@ -309,8 +309,8 @@ public abstract class NBTTagHandler {
 					try {
 						NBTTagList lore = display.getTagList("Lore", Constants.NBT.TAG_STRING);
 						for (int i = 0; i < lore.tagCount(); i++) {
-							CommandSlotTextField textField = new CommandSlotTextField(100, 400);
-							textField.setText(lore.getStringTagAt(i));
+							CommandSlotFormattedTextField textField = new CommandSlotFormattedTextField(400);
+							textField.setText(FormattedText.compile(lore.getStringTagAt(i)));
 							this.lore.addEntry(textField);
 						}
 					} catch (Exception e) {
@@ -331,7 +331,7 @@ public abstract class NBTTagHandler {
 
 			NBTTagList lore = new NBTTagList();
 			for (int i = 0; i < this.lore.entryCount(); i++) {
-				lore.appendTag(new NBTTagString(this.lore.getEntry(i).getText()));
+				lore.appendTag(new NBTTagString(this.lore.getEntry(i).getText().toVanillaText()));
 			}
 			if (!lore.hasNoTags())
 				display.setTag("Lore", lore);
