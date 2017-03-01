@@ -163,6 +163,10 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("seed", SyntaxNoArguments.class);
 		registerAlias("?", "help");
 		registerCommandSyntax("?", SyntaxNoArguments.class);
+		// TODO: should the debug command be included?
+		registerAlias("w", "tell");
+		registerAlias("w", "msg");
+		registerCommandSyntax("w", SyntaxTell.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 

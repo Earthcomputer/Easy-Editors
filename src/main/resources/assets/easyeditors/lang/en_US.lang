@@ -353,6 +353,8 @@ gui.commandEditor.selectCommand.toggledownfall.desc=Switches between rain and cl
 gui.commandEditor.selectCommand.toggledownfall.example=/toggledownfall
 gui.commandEditor.selectCommand.tp.desc=Teleports an entity
 gui.commandEditor.selectCommand.tp.example=/tp Earthcomputer 0 64 0
+gui.commandEditor.selectCommand.w.desc=Sends a message to a specified player
+gui.commandEditor.selectCommand.w.example=/tell Earthcomputer You are a great guy!
 gui.commandEditor.selectCommand.weather.desc=Changes the weather
 gui.commandEditor.selectCommand.weather.example=/weather rain
 gui.commandEditor.selectCommand.xp.desc=Adds/removes experience from a player
@@ -379,6 +381,12 @@ gui.commandEditor.stats.type.QueryResult=Query Result
 gui.commandEditor.stats.type.SuccessCount=Success Count
 gui.commandEditor.stats.type.tooltip=The command result type
 gui.commandEditor.teleport.targetCoordinate=Target Coordinate:
+gui.commandEditor.tell.target=Receiver
+gui.commandEditor.tell.word.append=Add word
+gui.commandEditor.tell.word.insert=Insert word above
+gui.commandEditor.tell.word.remove=Remove word
+gui.commandEditor.tell.wordType.selector=Selector
+gui.commandEditor.tell.wordType.word=Word
 gui.commandEditor.textField.hint.bold=Bold = Ctrl+B
 gui.commandEditor.textField.hint.color=Change color = Ctrl+F
 gui.commandEditor.textField.hint.italic=Italic = Ctrl+I
