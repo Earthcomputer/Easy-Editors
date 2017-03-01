@@ -143,6 +143,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("enchant", SyntaxEnchant.class);
 		registerCommandSyntax("particle", SyntaxParticle.class);
 		registerCommandSyntax("me", SyntaxEmote.class);
+		registerCommandSyntax("seed", SyntaxNoArguments.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 
