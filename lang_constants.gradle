@@ -19,7 +19,7 @@ task buildLangConstantsFiles << {
 		if (!line.isEmpty() && !line.startsWith('#')) {
 			String[] key = line.split('=', 2)
 			translateKeysFile.append('\tpublic static final String ')
-			translateKeysFile.append(key[0].toUpperCase().replace('.', '_'))
+			translateKeysFile.append(toConstantName(key[0]))
 			translateKeysFile.append(' = "')
 			translateKeysFile.append(key[0])
 			translateKeysFile.append('";' + nl)
@@ -46,7 +46,7 @@ task buildLangConstantsFiles << {
 		if (!line.isEmpty() && !line.startsWith('#')) {
 			String[] key = line.split('=', 2)
 			translateFile.append('\tpublic static String ')
-			translateFile.append(key[0].toUpperCase().replace('.', '_'))
+			translateFile.append(toConstantName(key[0]))
 			translateFile.append(';' + nl)
 		}
 	}
@@ -65,4 +65,23 @@ task buildLangConstantsFiles << {
 	translateFile.append('\t}' + nl)
 	translateFile.append(nl)
 	translateFile.append('}' + nl)
+}
+
+String toConstantName(String text) {
+	StringBuilder sb = new StringBuilder(text.toUpperCase().replace('.', '_'))
+	for (int i = text.length() - 1; i >= 0; i--) {
+		boolean isValidIdentifier;
+		if (i == 0)
+			isValidIdentifier = Character.isJavaIdentifierStart(sb.charAt(i))
+		else
+			isValidIdentifier = Character.isJavaIdentifierPart(sb.charAt(i))
+		if (!isValidIdentifier) {
+			sb.deleteCharAt(i)
+			String replacement = Integer.toHexString(sb.charAt(i) as int).toUpperCase()
+			while (replacement.length() < 4) replacement = '0' + replacement
+			replacement = 'U' + replacement
+			sb.insert(i, replacement)
+		}
+	}
+	return sb.toString()
 }
