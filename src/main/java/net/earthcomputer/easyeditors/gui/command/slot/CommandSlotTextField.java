@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
  * @author Earthcomputer
  *
  */
-public class CommandSlotTextField extends GuiCommandSlotImpl {
+public class CommandSlotTextField extends GuiCommandSlotImpl implements ITextField<String> {
 
 	private GuiTypeListenerTextField wrappedTextField;
 	protected int x;
@@ -87,41 +87,39 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		}
 	}
 
-	/**
-	 * 
-	 * @return The text contained by the text field
-	 */
+	@Override
 	public String getText() {
 		return wrappedTextField.getText();
 	}
 
-	/**
-	 * Sets the text contained by the text field
-	 * 
-	 * @param text
-	 */
+	@Override
+	public String getTextAsString() {
+		return getText();
+	}
+
+	@Override
 	public void setText(String text) {
 		wrappedTextField.setText(text);
 	}
 
-	/**
-	 * Gets the current filter for the contents of this text field.
-	 * 
-	 * @return
-	 */
+	@Override
+	public void setTextAsString(String text) {
+		setText(text);
+	}
+
+	@Override
 	public Predicate<String> getContentFilter() {
 		return wrappedTextField.getContentFilter();
 	}
 
-	/**
-	 * Sets the filter for the contents of this text field. If the text field is
-	 * allowed to contain some text, the content filter should return true,
-	 * otherwise, it should return false
-	 * 
-	 * @param contentFilter
-	 */
+	@Override
 	public void setContentFilter(Predicate<String> contentFilter) {
 		wrappedTextField.setValidator(contentFilter);
+	}
+
+	@Override
+	public void setStringContentFilter(Predicate<String> contentFilter) {
+		setContentFilter(contentFilter);
 	}
 
 	@Override
@@ -136,30 +134,22 @@ public class CommandSlotTextField extends GuiCommandSlotImpl {
 		wrappedTextField.drawTextBox();
 	}
 
-	/**
-	 * Sets the maximum number of characters allowed in the text field (default
-	 * 32)
-	 * 
-	 * @param maxStringLength
-	 */
+	@Override
 	public void setMaxStringLength(int maxStringLength) {
 		wrappedTextField.setMaxStringLength(maxStringLength);
 	}
 
-	/**
-	 * Gets whether this text field has focus
-	 * 
-	 * @return
-	 */
+	@Override
+	public int getMaxStringLength() {
+		return wrappedTextField.getMaxStringLength();
+	}
+
+	@Override
 	public boolean isFocused() {
 		return wrappedTextField.isFocused();
 	}
 
-	/**
-	 * Sets whether this text field has focus
-	 * 
-	 * @param focused
-	 */
+	@Override
 	public void setFocused(boolean focused) {
 		wrappedTextField.setFocused(focused);
 	}

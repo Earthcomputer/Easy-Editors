@@ -124,7 +124,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		if (block == null) {
 			throw new CommandSyntaxException();
 		}
-		Map<IProperty<?>, Comparable<?>> properties = isTest ? Maps.<IProperty<?>, Comparable<?>> newHashMap()
+		Map<IProperty<?>, Comparable<?>> properties = isTest ? Maps.<IProperty<?>, Comparable<?>>newHashMap()
 				: Maps.newHashMap(block.getDefaultState().getProperties());
 		if (propertiesArg != null) {
 			if (!isTest || (!"-1".equals(propertiesArg) && !"*".equals(propertiesArg))) {
@@ -322,7 +322,8 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		if (this.nbt != null) {
 			if (block.getBlock().hasTileEntity(block)) {
 				TileEntity te = block.getBlock().createTileEntity(Minecraft.getMinecraft().world, block);
-				nbtHandlers = te == null ? null : NBTTagHandler.constructTileEntityHandlers(te.getClass());
+				nbtHandlers = te == null ? null
+						: NBTTagHandler.constructTileEntityHandlers(te.getClass(), getContext());
 			} else {
 				nbtHandlers = null;
 			}

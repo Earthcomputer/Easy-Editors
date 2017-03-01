@@ -19,8 +19,10 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
+import net.earthcomputer.easyeditors.gui.command.slot.ITextField;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
@@ -59,6 +61,8 @@ public abstract class NBTTagHandler {
 		}, ArmorColorHandler.class);
 	}
 
+	private CommandSlotContext context;
+
 	/**
 	 * Sets up the command slots that can be used to edit the handled part of
 	 * the NBT tag. The returned array may be nested inside a
@@ -89,6 +93,19 @@ public abstract class NBTTagHandler {
 	 *             results
 	 */
 	public abstract void checkValid() throws UIInvalidException;
+
+	/**
+	 * Gets the command slot context
+	 * 
+	 * @return
+	 */
+	public CommandSlotContext getContext() {
+		return context;
+	}
+
+	private void setContext(CommandSlotContext context) {
+		this.context = context;
+	}
 
 	/**
 	 * Registers an NBTTagHandler which deals with NBT tags specific to the
@@ -162,8 +179,9 @@ public abstract class NBTTagHandler {
 	 * @param tileEntity
 	 * @return
 	 */
-	public static List<NBTTagHandler> constructTileEntityHandlers(Class<? extends TileEntity> tileEntity) {
-		return constructHandlers("tileEntity", tileEntity);
+	public static List<NBTTagHandler> constructTileEntityHandlers(Class<? extends TileEntity> tileEntity,
+			CommandSlotContext context) {
+		return constructHandlers("tileEntity", tileEntity, context);
 	}
 
 	/**
@@ -172,8 +190,8 @@ public abstract class NBTTagHandler {
 	 * @param itemStack
 	 * @return
 	 */
-	public static List<NBTTagHandler> constructItemStackHandlers(ItemStack itemStack) {
-		return constructHandlers("itemStack", itemStack);
+	public static List<NBTTagHandler> constructItemStackHandlers(ItemStack itemStack, CommandSlotContext context) {
+		return constructHandlers("itemStack", itemStack, context);
 	}
 
 	/**
@@ -182,8 +200,9 @@ public abstract class NBTTagHandler {
 	 * @param entity
 	 * @return
 	 */
-	public static List<NBTTagHandler> constructEntityHandlers(Class<? extends Entity> entity) {
-		return constructHandlers("entity", entity);
+	public static List<NBTTagHandler> constructEntityHandlers(Class<? extends Entity> entity,
+			CommandSlotContext context) {
+		return constructHandlers("entity", entity, context);
 	}
 
 	/**
@@ -197,14 +216,17 @@ public abstract class NBTTagHandler {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<NBTTagHandler> constructHandlers(String handlerType, Object specifier) {
+	public static List<NBTTagHandler> constructHandlers(String handlerType, Object specifier,
+			CommandSlotContext context) {
 		List<NBTTagHandler> handlers = Lists.newArrayList();
 		if (!NBTTagHandler.handlers.containsKey(handlerType))
 			return handlers;
 		if (specifier == null) {
 			for (Class<? extends NBTTagHandler> handler : NBTTagHandler.handlers.get(handlerType).values()) {
 				try {
-					handlers.add(handler.getConstructor().newInstance());
+					NBTTagHandler instance = handler.getConstructor().newInstance();
+					instance.setContext(context);
+					handlers.add(instance);
 				} catch (Exception e) {
 					GeneralUtils.logStackTrace(EasyEditorsApi.logger, e);
 				}
@@ -214,7 +236,9 @@ public abstract class NBTTagHandler {
 					.entrySet()) {
 				if (((Predicate<Object>) entry.getKey()).apply(specifier)) {
 					try {
-						handlers.add(entry.getValue().getConstructor().newInstance());
+						NBTTagHandler instance = entry.getValue().getConstructor().newInstance();
+						instance.setContext(context);
+						handlers.add(instance);
 					} catch (Exception e) {
 						GeneralUtils.logStackTrace(EasyEditorsApi.logger, e);
 					}
@@ -272,26 +296,34 @@ public abstract class NBTTagHandler {
 
 	public static class DisplayHandler extends NBTTagHandler {
 
-		private CommandSlotFormattedTextField displayName;
-		private CommandSlotList<CommandSlotFormattedTextField> lore;
+		private ITextField<?> displayName;
+
+		private CommandSlotList<IGuiCommandSlot> lore;
 
 		@Override
 		public IGuiCommandSlot[] setupCommandSlot() {
-			displayName = new CommandSlotFormattedTextField(150);
+			if (getContext().canHoldFormatting()) {
+				displayName = new CommandSlotFormattedTextField(150);
+			} else {
+				displayName = new CommandSlotTextField(150, 150);
+			}
 			displayName.setMaxStringLength(Short.MAX_VALUE);
-			lore = new CommandSlotList<CommandSlotFormattedTextField>(
-					new Instantiator<CommandSlotFormattedTextField>() {
-						@Override
-						public CommandSlotFormattedTextField newInstance() {
-							return new CommandSlotFormattedTextField(400);
-						}
-					}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_APPEND)
-							.setInsertHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_INSERT)
-							.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_REMOVE);
+			lore = new CommandSlotList<IGuiCommandSlot>(new Instantiator<IGuiCommandSlot>() {
+				@Override
+				public IGuiCommandSlot newInstance() {
+					if (getContext().canHoldFormatting()) {
+						return new CommandSlotFormattedTextField(400);
+					} else {
+						return new CommandSlotTextField(400, 400);
+					}
+				}
+			}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_APPEND)
+					.setInsertHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_INSERT)
+					.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_REMOVE);
 			return new IGuiCommandSlot[] {
 					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_DISPLAYNAME,
 							Colors.itemLabel.color, Translate.GUI_COMMANDEDITOR_ITEM_NBT_DISPLAYNAME_TOOLTIP,
-							displayName),
+							(IGuiCommandSlot) displayName),
 					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE, Colors.itemLabel.color,
 							Translate.GUI_COMMANDEDITOR_ITEM_NBT_LORE_TOOLTIP, lore) };
 		}
@@ -318,20 +350,21 @@ public abstract class NBTTagHandler {
 				}
 			}
 
-			this.displayName.setText(FormattedText.compile(displayName));
+			this.displayName.setTextAsString(displayName);
 		}
 
 		@Override
 		public void writeToNBT(NBTTagCompound nbt) {
 			NBTTagCompound display = new NBTTagCompound();
 
-			if (!displayName.getText().isEmpty()) {
-				display.setString("Name", displayName.getText().toVanillaText());
+			String displayNameText = displayName.getTextAsString();
+			if (!displayNameText.isEmpty()) {
+				display.setString("Name", displayNameText);
 			}
 
 			NBTTagList lore = new NBTTagList();
 			for (int i = 0; i < this.lore.entryCount(); i++) {
-				lore.appendTag(new NBTTagString(this.lore.getEntry(i).getText().toVanillaText()));
+				lore.appendTag(new NBTTagString(((ITextField<?>) this.lore.getEntry(i)).getTextAsString()));
 			}
 			if (!lore.hasNoTags())
 				display.setTag("Lore", lore);

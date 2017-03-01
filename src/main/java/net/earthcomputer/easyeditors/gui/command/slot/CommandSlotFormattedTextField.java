@@ -32,7 +32,7 @@ import net.minecraftforge.fml.client.config.HoverChecker;
  * @author Earthcomputer
  * @see FormattedText
  */
-public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
+public class CommandSlotFormattedTextField extends GuiCommandSlotImpl implements ITextField<FormattedText> {
 
 	private int x, y;
 
@@ -642,21 +642,17 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 		}
 	}
 
-	/**
-	 * Gets the text in this text field
-	 * 
-	 * @return
-	 */
+	@Override
 	public FormattedText getText() {
 		return text;
 	}
 
-	/**
-	 * Sets the text of this text field. Will truncate if greater than the
-	 * maximum string length (see {@link #setMaxStringLength(int)}
-	 * 
-	 * @param text
-	 */
+	@Override
+	public String getTextAsString() {
+		return text.toVanillaText();
+	}
+
+	@Override
 	public void setText(FormattedText text) {
 		if (text.length() > maxStringLength) {
 			text = text.substring(0, maxStringLength);
@@ -668,39 +664,27 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 		}
 	}
 
-	/**
-	 * Returns whether this text field has focus
-	 * 
-	 * @return
-	 */
+	@Override
+	public void setTextAsString(String text) {
+		setText(FormattedText.compile(text));
+	}
+
+	@Override
 	public boolean isFocused() {
 		return focused;
 	}
 
-	/**
-	 * Sets whether this text field has focus
-	 * 
-	 * @param focused
-	 */
+	@Override
 	public void setFocused(boolean focused) {
 		this.focused = focused;
 	}
 
-	/**
-	 * Returns the maximum string length
-	 * 
-	 * @return
-	 */
+	@Override
 	public int getMaxStringLength() {
 		return maxStringLength;
 	}
 
-	/**
-	 * Sets the maximum string length. The length of the text in this text field
-	 * will never exceed this value. Use it to limit the size of the text.
-	 * 
-	 * @param maxStringLength
-	 */
+	@Override
 	public void setMaxStringLength(int maxStringLength) {
 		this.maxStringLength = maxStringLength;
 		if (text.length() > maxStringLength) {
@@ -727,13 +711,7 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 		return selectionPos;
 	}
 
-	/**
-	 * Sets the content filter for this formatted text field. Text with an
-	 * unformatted text which the given predicate will not accept will not be
-	 * accepted into this text field.
-	 * 
-	 * @param filter
-	 */
+	@Override
 	public void setStringContentFilter(final Predicate<String> filter) {
 		setContentFilter(new Predicate<FormattedText>() {
 			@Override
@@ -743,22 +721,12 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl {
 		});
 	}
 
-	/**
-	 * Sets the content filter for this formatted text field. Text which the
-	 * given predicate will not accept will not be accepted into this text
-	 * field.
-	 * 
-	 * @param filter
-	 */
+	@Override
 	public void setContentFilter(Predicate<FormattedText> filter) {
 		this.contentFilter = filter;
 	}
 
-	/**
-	 * Gets the content filter.
-	 * 
-	 * @return
-	 */
+	@Override
 	public Predicate<FormattedText> getContentFilter() {
 		return contentFilter;
 	}

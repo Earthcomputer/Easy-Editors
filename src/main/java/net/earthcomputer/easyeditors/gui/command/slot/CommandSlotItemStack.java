@@ -227,7 +227,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				this.damage = 0;
 			}
 			if (this.nbtSlot != null) {
-				nbtHandlers = NBTTagHandler.constructItemStackHandlers(item);
+				nbtHandlers = NBTTagHandler.constructItemStackHandlers(item, getContext());
 				this.nbtSlot.setChild(NBTTagHandler.setupCommandSlot(nbtHandlers));
 				NBTTagHandler.readFromNBT(item.getTagCompound(), nbtHandlers);
 			}
