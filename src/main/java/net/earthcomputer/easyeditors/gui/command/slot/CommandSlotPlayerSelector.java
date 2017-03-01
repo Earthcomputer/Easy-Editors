@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -220,7 +218,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		@Override
 		public void addArgs(List<String> args) throws UIInvalidException {
 			super.addArgs(args);
-			if (getContext().getSender() instanceof EntityPlayer) {
+			if (getContext().isPlayer()) {
 				if ((getFlags() & NON_PLAYERS_ONLY) == 0) {
 					String lastArg = args.get(args.size() - 1);
 					boolean redundant = false;
@@ -228,18 +226,20 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						redundant = true;
 					} else {
 						EntityPlayer player = (EntityPlayer) getContext().getSender();
-						if (lastArg.equals(player.getName())) {
-							redundant = true;
-						} else if (Patterns.UUID.matcher(lastArg).matches()
-								&& UUID.fromString(lastArg).equals(player.getUniqueID())) {
-							redundant = true;
+						if (player != null) {
+							if (lastArg.equals(player.getName())) {
+								redundant = true;
+							} else if (Patterns.UUID.matcher(lastArg).matches()
+									&& UUID.fromString(lastArg).equals(player.getUniqueID())) {
+								redundant = true;
+							}
 						}
 					}
 					if (redundant) {
 						args.remove(args.size() - 1);
 					}
 				}
-			} else if (getContext().getSender() instanceof Entity) {
+			} else if (getContext().isEntity()) {
 				if ((getFlags() & PLAYERS_ONLY) == 0 && !optionalPlayersOnly) {
 					String lastArg = args.get(args.size() - 1);
 					boolean redundant = false;
@@ -247,9 +247,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						redundant = true;
 					} else {
 						Entity entity = (Entity) getContext().getSender();
-						if (Patterns.UUID.matcher(lastArg).matches()
-								&& UUID.fromString(lastArg).equals(entity.getUniqueID())) {
-							redundant = true;
+						if (entity != null) {
+							if (Patterns.UUID.matcher(lastArg).matches()
+									&& UUID.fromString(lastArg).equals(entity.getUniqueID())) {
+								redundant = true;
+							}
 						}
 					}
 					if (redundant) {
@@ -262,21 +264,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		@Override
 		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 			if (isArgAbsent(args, index)) {
-				if (getContext().getSender() instanceof EntityPlayer) {
-					if ((getFlags() & NON_PLAYERS_ONLY) != 0) {
-						throw new CommandSyntaxException();
-					}
-					super.readFromArgs(ArrayUtils.add(args, "@p"), index);
-					return 0;
-				} else if (getContext().getSender() instanceof Entity) {
-					if ((getFlags() & PLAYERS_ONLY) != 0 || optionalPlayersOnly) {
-						throw new CommandSyntaxException();
-					}
-					super.readFromArgs(ArrayUtils.add(args, "@e[c=1]"), index);
-					return 0;
+				if (getContext().getSenderClass() == null) {
+					super.readFromArgs(new String[] { "@e[c=1]" }, 0);
+				} else if (getContext().isPlayer()) {
+					super.readFromArgs(new String[] { "@p" }, 0);
+				} else if (getContext().isEntity()) {
+					super.readFromArgs(new String[] { "@e[c=1]" }, 0);
 				} else {
 					throw new CommandSyntaxException();
 				}
+				return 0;
 			} else {
 				return super.readFromArgs(args, index);
 			}

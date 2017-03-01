@@ -212,7 +212,7 @@ public class GuiCommandEditor extends GuiTwoWayScroll implements ISizeChangeList
 			setScrollY(newVirtualHeight - getShownHeight());
 	}
 
-	private class Cxt implements ICommandSlotContext, GuiYesNoCallback {
+	private class Cxt extends CommandSlotContext implements GuiYesNoCallback {
 
 		@Override
 		public World getWorld() {

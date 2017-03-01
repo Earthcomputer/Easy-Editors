@@ -6,7 +6,7 @@ import java.util.Map;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 
-import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.CommandSlotContext;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.minecraft.crash.CrashReport;
@@ -24,7 +24,7 @@ public abstract class CommandSyntax {
 
 	protected static final Joiner spaceJoiner = Joiner.on(' ');
 
-	private ICommandSlotContext context;
+	private CommandSlotContext context;
 
 	/**
 	 * Builds the components of the command
@@ -44,7 +44,17 @@ public abstract class CommandSyntax {
 	public void checkValid() throws UIInvalidException {
 	}
 
-	private void setContext(ICommandSlotContext context) {
+	/**
+	 * Returns true if the command sender can use this command
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public boolean canUseCommand(CommandSlotContext context) {
+		return true;
+	}
+
+	private void setContext(CommandSlotContext context) {
 		this.context = context;
 	}
 
@@ -53,7 +63,7 @@ public abstract class CommandSyntax {
 	 * 
 	 * @return
 	 */
-	public ICommandSlotContext getContext() {
+	public CommandSlotContext getContext() {
 		return context;
 	}
 
@@ -90,12 +100,15 @@ public abstract class CommandSyntax {
 	 * @param commandName
 	 * @return
 	 */
-	public static CommandSyntax forCommandName(String commandName, ICommandSlotContext context) {
+	public static CommandSyntax forCommandName(String commandName, CommandSlotContext context) {
 		Class<? extends CommandSyntax> syntax = commandSyntaxes.get(commandName);
 		if (syntax == null)
 			return null;
 		try {
 			CommandSyntax instance = syntax.getConstructor().newInstance();
+			if (!instance.canUseCommand(context)) {
+				return null;
+			}
 			instance.setContext(context);
 			return instance;
 		} catch (Exception e) {
@@ -129,6 +142,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("effect", SyntaxEffect.class);
 		registerCommandSyntax("enchant", SyntaxEnchant.class);
 		registerCommandSyntax("particle", SyntaxParticle.class);
+		registerCommandSyntax("me", SyntaxEmote.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 

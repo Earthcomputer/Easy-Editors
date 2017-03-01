@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.CommandSlotContext;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 
 /**
@@ -123,7 +123,7 @@ public class CommandSlotModifiable<T extends IGuiCommandSlot> extends GuiCommand
 	}
 
 	@Override
-	public void setContext(ICommandSlotContext context) {
+	public void setContext(CommandSlotContext context) {
 		super.setContext(context);
 		if (child != null)
 			child.setContext(context);

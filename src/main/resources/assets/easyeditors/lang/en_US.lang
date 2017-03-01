@@ -82,6 +82,7 @@ gui.commandEditor.kill.target.tooltip=The entity to kill
 gui.commandEditor.list.append=Append
 gui.commandEditor.list.insert=Insert above
 gui.commandEditor.list.remove=Remove
+gui.commandEditor.me.message=Message to say
 gui.commandEditor.noBlock=[No Block]
 gui.commandEditor.noBlockSelected=Please choose a block
 gui.commandEditor.noCommand=[No Command]

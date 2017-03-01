@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.CommandSlotContext;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 
 /**
@@ -201,14 +201,14 @@ public interface IGuiCommandSlot {
 	 * 
 	 * @return The context of this command slot
 	 */
-	ICommandSlotContext getContext();
+	CommandSlotContext getContext();
 
 	/**
 	 * Sets the context of this command slot
 	 * 
 	 * @param context
 	 */
-	void setContext(ICommandSlotContext context);
+	void setContext(CommandSlotContext context);
 
 	/**
 	 * Draws a tooltip on top of everything else

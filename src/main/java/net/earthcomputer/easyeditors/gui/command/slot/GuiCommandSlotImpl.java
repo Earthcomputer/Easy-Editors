@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
-import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.CommandSlotContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -24,7 +24,7 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 
 	private IGuiCommandSlot parent;
 	private List<ISizeChangeListener> sizeChangeListeners = Lists.newArrayList();
-	private ICommandSlotContext context;
+	private CommandSlotContext context;
 
 	private List<Tooltip> tooltips = Lists.newArrayList();
 
@@ -114,12 +114,12 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	}
 
 	@Override
-	public ICommandSlotContext getContext() {
+	public CommandSlotContext getContext() {
 		return context;
 	}
 
 	@Override
-	public void setContext(ICommandSlotContext context) {
+	public void setContext(CommandSlotContext context) {
 		this.context = context;
 	}
 

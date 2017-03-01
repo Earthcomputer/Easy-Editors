@@ -58,7 +58,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 					@Override
 					public void onPress() {
 						Minecraft.getMinecraft().displayGuiScreen(new GuiCommandSelector(
-								Minecraft.getMinecraft().currentScreen, CommandSlotCommand.this));
+								Minecraft.getMinecraft().currentScreen, CommandSlotCommand.this, getContext()));
 					}
 				});
 	}

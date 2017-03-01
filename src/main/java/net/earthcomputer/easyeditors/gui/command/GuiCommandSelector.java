@@ -2,6 +2,7 @@ package net.earthcomputer.easyeditors.gui.command;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -29,7 +30,7 @@ public class GuiCommandSelector extends GuiScreen {
 	private GuiScreen previousScreen;
 	private ICommandEditorCallback callback;
 
-	private List<String> commands = Lists.newArrayList(CommandSyntax.getSyntaxList().keySet());
+	private List<String> commands;
 	private int selectedIndex = 0;
 
 	private GuiButton cancelButton;
@@ -41,10 +42,17 @@ public class GuiCommandSelector extends GuiScreen {
 	 * @param previousScreen
 	 * @param callback
 	 */
-	public GuiCommandSelector(GuiScreen previousScreen, ICommandEditorCallback callback) {
+	public GuiCommandSelector(GuiScreen previousScreen, ICommandEditorCallback callback, CommandSlotContext context) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 
+		commands = Lists.newArrayList(CommandSyntax.getSyntaxList().keySet());
+		Iterator<String> commandsItr = commands.iterator();
+		while (commandsItr.hasNext()) {
+			if (CommandSyntax.forCommandName(commandsItr.next(), context) == null) {
+				commandsItr.remove();
+			}
+		}
 		Collections.sort(commands, String.CASE_INSENSITIVE_ORDER);
 
 		String selectedSyntax = callback.getCommand();

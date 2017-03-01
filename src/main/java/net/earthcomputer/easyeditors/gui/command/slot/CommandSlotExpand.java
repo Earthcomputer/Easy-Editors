@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ISizeChangeListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.ICommandSlotContext;
+import net.earthcomputer.easyeditors.gui.command.CommandSlotContext;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -154,7 +154,7 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 	}
 
 	@Override
-	public void setContext(ICommandSlotContext context) {
+	public void setContext(CommandSlotContext context) {
 		super.setContext(context);
 		child.setContext(context);
 	}
