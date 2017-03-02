@@ -169,6 +169,7 @@ public abstract class CommandSyntax {
 		registerAlias("tell", "msg");
 		registerCommandSyntax("say", SyntaxSay.class);
 		registerCommandSyntax("spawnpoint", SyntaxSpawnpoint.class);
+		registerCommandSyntax("setworldspawn", SyntaxSetWorldSpawn.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 
