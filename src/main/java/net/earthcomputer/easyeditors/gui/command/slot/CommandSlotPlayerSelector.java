@@ -242,20 +242,22 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			} else if (getContext().isEntity()) {
 				if ((getFlags() & PLAYERS_ONLY) == 0 && !optionalPlayersOnly) {
 					String lastArg = args.get(args.size() - 1);
-					boolean redundant = false;
-					if (lastArg.equals("@e[c=1]")) {
-						redundant = true;
-					} else {
-						Entity entity = (Entity) getContext().getSender();
-						if (entity != null) {
-							if (Patterns.UUID.matcher(lastArg).matches()
-									&& UUID.fromString(lastArg).equals(entity.getUniqueID())) {
-								redundant = true;
+					if (isArgRedundant()) {
+						boolean redundant = false;
+						if (lastArg.equals("@e[c=1]")) {
+							redundant = true;
+						} else {
+							Entity entity = (Entity) getContext().getSender();
+							if (entity != null) {
+								if (Patterns.UUID.matcher(lastArg).matches()
+										&& UUID.fromString(lastArg).equals(entity.getUniqueID())) {
+									redundant = true;
+								}
 							}
 						}
-					}
-					if (redundant) {
-						args.remove(args.size() - 1);
+						if (redundant) {
+							args.remove(args.size() - 1);
+						}
 					}
 				}
 			}
@@ -281,6 +283,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		protected boolean isArgAbsent(String[] args, int index) {
 			return args.length == index;
+		}
+
+		protected boolean isArgRedundant() throws UIInvalidException {
+			return false;
 		}
 	}
 
