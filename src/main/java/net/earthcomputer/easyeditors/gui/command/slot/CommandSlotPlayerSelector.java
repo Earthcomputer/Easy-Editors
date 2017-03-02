@@ -221,22 +221,24 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			if (getContext().isPlayer()) {
 				if ((getFlags() & NON_PLAYERS_ONLY) == 0) {
 					String lastArg = args.get(args.size() - 1);
-					boolean redundant = false;
-					if (lastArg.equals("@p")) {
-						redundant = true;
-					} else {
-						EntityPlayer player = (EntityPlayer) getContext().getSender();
-						if (player != null) {
-							if (lastArg.equals(player.getName())) {
-								redundant = true;
-							} else if (Patterns.UUID.matcher(lastArg).matches()
-									&& UUID.fromString(lastArg).equals(player.getUniqueID())) {
-								redundant = true;
+					if (isArgRedundant()) {
+						boolean redundant = false;
+						if (lastArg.equals("@p")) {
+							redundant = true;
+						} else {
+							EntityPlayer player = (EntityPlayer) getContext().getSender();
+							if (player != null) {
+								if (lastArg.equals(player.getName())) {
+									redundant = true;
+								} else if (Patterns.UUID.matcher(lastArg).matches()
+										&& UUID.fromString(lastArg).equals(player.getUniqueID())) {
+									redundant = true;
+								}
 							}
 						}
-					}
-					if (redundant) {
-						args.remove(args.size() - 1);
+						if (redundant) {
+							args.remove(args.size() - 1);
+						}
 					}
 				}
 			} else if (getContext().isEntity()) {
@@ -286,7 +288,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		protected boolean isArgRedundant() throws UIInvalidException {
-			return false;
+			return true;
 		}
 	}
 

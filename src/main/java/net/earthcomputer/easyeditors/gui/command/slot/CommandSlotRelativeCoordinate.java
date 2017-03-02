@@ -57,6 +57,46 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 	protected void onChanged() {
 	}
 
+	public static class WithDefault extends CommandSlotRelativeCoordinate {
+		public boolean isSetToDefault() {
+			return getXArg().getTextField().getDoubleValue() == 0 && getXArg().getRelative().isChecked()
+					&& getYArg().getTextField().getDoubleValue() == 0 && getYArg().getRelative().isChecked()
+					&& getZArg().getTextField().getDoubleValue() == 0 && getZArg().getRelative().isChecked();
+		}
+
+		@Override
+		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+			if (isArgAbsent(args, index)) {
+				getXArg().getTextField().setText("0");
+				getXArg().getRelative().setChecked(true);
+				getYArg().getTextField().setText("0");
+				getYArg().getRelative().setChecked(true);
+				getZArg().getTextField().setText("0");
+				getZArg().getRelative().setChecked(true);
+				return 0;
+			}
+			return super.readFromArgs(args, index);
+		}
+
+		@Override
+		public void addArgs(List<String> args) throws UIInvalidException {
+			getXArg().checkValid();
+			getYArg().checkValid();
+			getZArg().checkValid();
+			if (!isArgRedundant() || !isSetToDefault()) {
+				super.addArgs(args);
+			}
+		}
+
+		protected boolean isArgAbsent(String[] args, int index) {
+			return args.length == index;
+		}
+
+		protected boolean isArgRedundant() throws UIInvalidException {
+			return true;
+		}
+	}
+
 	public static class CoordinateArg extends CommandSlotHorizontalArrangement {
 		private CommandSlotNumberTextField textField;
 		private CommandSlotCheckbox relative;
