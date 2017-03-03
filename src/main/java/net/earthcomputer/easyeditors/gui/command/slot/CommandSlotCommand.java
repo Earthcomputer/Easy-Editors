@@ -3,9 +3,9 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.GuiCommandSelector;
-import net.earthcomputer.easyeditors.gui.command.ICommandEditorCallback;
+import net.earthcomputer.easyeditors.gui.command.GuiSelectCommand;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.syntax.CommandSyntax;
 import net.earthcomputer.easyeditors.util.Translate;
@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
  * @author Earthcomputer
  *
  */
-public class CommandSlotCommand extends CommandSlotVerticalArrangement implements ICommandEditorCallback {
+public class CommandSlotCommand extends CommandSlotVerticalArrangement implements ICallback<String> {
 
 	private String commandName = "";
 	private CommandSyntax commandSyntax;
@@ -57,7 +57,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 				new CommandSlotButton(20, 20, "...") {
 					@Override
 					public void onPress() {
-						Minecraft.getMinecraft().displayGuiScreen(new GuiCommandSelector(
+						Minecraft.getMinecraft().displayGuiScreen(new GuiSelectCommand(
 								Minecraft.getMinecraft().currentScreen, CommandSlotCommand.this, getContext()));
 					}
 				});
@@ -72,12 +72,10 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		super.addArgs(args);
 	}
 
-	@Override
 	public String getCommand() {
 		return commandName;
 	}
 
-	@Override
 	public void setCommand(String rawCommand) {
 		if (!rawCommand.equals(commandName)) {
 			commandName = rawCommand;
@@ -86,6 +84,16 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 			addChild(buildHeader(rawCommand));
 			addChildren(commandSyntax.setupCommand());
 		}
+	}
+
+	@Override
+	public String getCallbackValue() {
+		return getCommand();
+	}
+
+	@Override
+	public void setCallbackValue(String value) {
+		setCommand(value);
 	}
 
 }

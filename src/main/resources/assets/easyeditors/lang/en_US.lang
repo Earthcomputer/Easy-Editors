@@ -408,6 +408,7 @@ gui.commandEditor.selectEffect.title=Select Mob Effect
 gui.commandEditor.selectEnchantment.title=Select Enchantment
 gui.commandEditor.selectEntity.title=Select Entity
 gui.commandEditor.selectItem.title=Select Item
+gui.commandEditor.selectParticle.title=Select Particle
 gui.commandEditor.spawnpoint.target=Player:
 gui.commandEditor.stats.mode=Mode:
 gui.commandEditor.stats.mode.clear=Clear

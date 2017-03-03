@@ -3,9 +3,9 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectEnchantment;
-import net.earthcomputer.easyeditors.gui.command.IEnchantmentSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
  * @author Earthcomputer
  *
  */
-public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement implements IEnchantmentSelectorCallback {
+public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement implements ICallback<ResourceLocation> {
 
 	private ResourceLocation enchantmentName = null;
 	private CommandSlotLabel enchantmentNameLabel;
@@ -99,12 +99,10 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 		}
 	}
 
-	@Override
 	public ResourceLocation getEnchantment() {
 		return enchantmentName;
 	}
 
-	@Override
 	public void setEnchantment(ResourceLocation id) {
 		if (!id.equals(this.enchantmentName)) {
 			this.enchantmentName = id;
@@ -112,6 +110,16 @@ public class CommandSlotEnchantment extends CommandSlotHorizontalArrangement imp
 			enchantmentNameLabel.setText(I18n.format(Enchantment.getEnchantmentByLocation(id.toString()).getName()));
 			onChanged();
 		}
+	}
+
+	@Override
+	public ResourceLocation getCallbackValue() {
+		return getEnchantment();
+	}
+
+	@Override
+	public void setCallbackValue(ResourceLocation value) {
+		setEnchantment(value);
 	}
 
 	/**

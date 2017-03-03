@@ -4,9 +4,9 @@ import java.util.List;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
+import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectEffect;
-import net.earthcomputer.easyeditors.gui.command.IEffectSelectorCallback;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
@@ -16,7 +16,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-public class CommandSlotMobEffect extends CommandSlotHorizontalArrangement implements IEffectSelectorCallback {
+public class CommandSlotMobEffect extends CommandSlotHorizontalArrangement implements ICallback<ResourceLocation> {
 
 	private CommandSlotModifiable<CommandSlotLabel> label;
 	private ResourceLocation effect;
@@ -67,16 +67,24 @@ public class CommandSlotMobEffect extends CommandSlotHorizontalArrangement imple
 		args.add(GeneralUtils.resourceLocationToString(effect));
 	}
 
-	@Override
 	public ResourceLocation getEffect() {
 		return effect;
 	}
 
-	@Override
 	public void setEffect(ResourceLocation effect) {
 		this.effect = effect;
 		label.setChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				I18n.format(ForgeRegistries.POTIONS.getValue(effect).getName()), Colors.itemName.color));
+	}
+
+	@Override
+	public ResourceLocation getCallbackValue() {
+		return getEffect();
+	}
+
+	@Override
+	public void setCallbackValue(ResourceLocation value) {
+		setEffect(value);
 	}
 
 }

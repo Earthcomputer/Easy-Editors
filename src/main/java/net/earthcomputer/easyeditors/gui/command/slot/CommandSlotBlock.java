@@ -13,9 +13,9 @@ import net.earthcomputer.easyeditors.api.util.AnimatedBlockRenderer;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.api.util.NBTToJson;
+import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.GuiBlockSelector;
-import net.earthcomputer.easyeditors.gui.command.IBlockSelectorCallback;
+import net.earthcomputer.easyeditors.gui.command.GuiSelectBlock;
 import net.earthcomputer.easyeditors.gui.command.NBTTagHandler;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.util.Translate;
@@ -36,7 +36,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.property.PropertyFloat;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
-public class CommandSlotBlock extends CommandSlotVerticalArrangement implements IBlockSelectorCallback {
+public class CommandSlotBlock extends CommandSlotVerticalArrangement implements ICallback<IBlockState> {
 
 	public static final int COMPONENT_BLOCK = 1;
 	public static final int COMPONENT_PROPERTIES = 2;
@@ -67,7 +67,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		addChild(new CommandSlotHorizontalArrangement(new CmdBlock(), new CommandSlotButton(20, 20, "...") {
 			@Override
 			public void onPress() {
-				Minecraft.getMinecraft().displayGuiScreen(new GuiBlockSelector(Minecraft.getMinecraft().currentScreen,
+				Minecraft.getMinecraft().displayGuiScreen(new GuiSelectBlock(Minecraft.getMinecraft().currentScreen,
 						CommandSlotBlock.this, (finalDisplayComponents & (COMPONENT_PROPERTIES | COMPONENT_NBT)) != 0));
 			}
 		}));
@@ -284,12 +284,10 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		}
 	}
 
-	@Override
 	public IBlockState getBlock() {
 		return state;
 	}
 
-	@Override
 	public void setBlock(IBlockState block) {
 		boolean sameBlock = state == null ? false : state.getBlock() == block.getBlock();
 		this.state = block;
@@ -333,6 +331,16 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 				this.nbt.setChild(NBTTagHandler.setupCommandSlot(nbtHandlers));
 			}
 		}
+	}
+
+	@Override
+	public IBlockState getCallbackValue() {
+		return getBlock();
+	}
+
+	@Override
+	public void setCallbackValue(IBlockState value) {
+		setBlock(value);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -442,7 +450,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 				if (!getContext().isMouseInBounds(mouseX, mouseY)) {
 					hoverChecker.resetHoverTimer();
 				} else if (hoverChecker.checkHover(mouseX, mouseY)) {
-					drawTooltip(mouseX, mouseY, GuiBlockSelector.getTooltip(state));
+					drawTooltip(mouseX, mouseY, GuiSelectBlock.getBlockStateTooltip(state));
 				}
 			}
 		}
@@ -451,7 +459,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 			if (state == null) {
 				return Translate.GUI_COMMANDEDITOR_NOBLOCK;
 			} else {
-				return GuiBlockSelector.getDisplayName(state);
+				return GuiSelectBlock.getDisplayName(state);
 			}
 		}
 

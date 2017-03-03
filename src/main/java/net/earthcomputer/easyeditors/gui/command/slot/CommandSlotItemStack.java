@@ -8,9 +8,9 @@ import com.google.common.collect.Lists;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.api.util.NBTToJson;
+import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.GuiItemSelector;
-import net.earthcomputer.easyeditors.gui.command.IItemSelectorCallback;
+import net.earthcomputer.easyeditors.gui.command.GuiSelectItem;
 import net.earthcomputer.easyeditors.gui.command.ItemDamageHandler;
 import net.earthcomputer.easyeditors.gui.command.NBTTagHandler;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
@@ -35,7 +35,7 @@ import net.minecraftforge.fml.client.config.HoverChecker;
  * @author Earthcomputer
  *
  */
-public class CommandSlotItemStack extends CommandSlotVerticalArrangement implements IItemSelectorCallback {
+public class CommandSlotItemStack extends CommandSlotVerticalArrangement implements ICallback<ItemStack> {
 
 	/**
 	 * The item name component
@@ -91,7 +91,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		addChild(new CommandSlotHorizontalArrangement(new CmdItem(), new CommandSlotButton(20, 20, "...") {
 			@Override
 			public void onPress() {
-				Minecraft.getMinecraft().displayGuiScreen(new GuiItemSelector(Minecraft.getMinecraft().currentScreen,
+				Minecraft.getMinecraft().displayGuiScreen(new GuiSelectItem(Minecraft.getMinecraft().currentScreen,
 						CommandSlotItemStack.this, (finalDisplayComponents & (COMPONENT_DAMAGE | COMPONENT_NBT)) != 0));
 			}
 		}));
@@ -205,7 +205,6 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		args.addAll(potentialArgs);
 	}
 
-	@Override
 	public void setItem(ItemStack item) {
 		if (item.isEmpty()) {
 			this.item = null;
@@ -234,11 +233,20 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		}
 	}
 
-	@Override
 	public ItemStack getItem() {
 		ItemStack stack = new ItemStack(item, stackSizeField == null ? 1 : stackSizeField.getIntValue(), getDamage());
 		stack.setTagCompound(getNbt());
 		return stack;
+	}
+
+	@Override
+	public ItemStack getCallbackValue() {
+		return getItem();
+	}
+
+	@Override
+	public void setCallbackValue(ItemStack value) {
+		setItem(value);
 	}
 
 	private int getDamage() {
