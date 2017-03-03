@@ -170,6 +170,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("say", SyntaxSay.class);
 		registerCommandSyntax("spawnpoint", SyntaxSpawnpoint.class);
 		registerCommandSyntax("setworldspawn", SyntaxSetWorldSpawn.class);
+		registerCommandSyntax("gamerule", SyntaxGamerule.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 

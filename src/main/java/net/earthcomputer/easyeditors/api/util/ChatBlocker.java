@@ -3,8 +3,11 @@ package net.earthcomputer.easyeditors.api.util;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer.EnumChatVisibility;
@@ -13,7 +16,9 @@ import net.minecraft.scoreboard.IScoreCriteria;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -319,6 +324,162 @@ public class ChatBlocker {
 					.getScoreObjectives();
 			objectives.returnValue(Lists.newArrayList(objectivesCollection));
 		}
+	}
+
+	private static final Splitter GAME_RULE_LIST_SPLITTER = Splitter.on(", ");
+
+	/**
+	 * Obtains a list of game rules from somewhere.
+	 * 
+	 * @param gameRules
+	 *            - the listener for obtaining the list of game rules. The
+	 *            meaning of the abort codes are as follows:<br/>
+	 *            0: Timed out<br/>
+	 *            1: No permission
+	 */
+	public static void getGameRuleNames(final ReturnedValueListener<List<String>> gameRules) {
+		if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
+			addBlock(new Blocker() {
+
+				private boolean done = false;
+				private boolean aborted = false;
+				private long lastActivity = System.nanoTime();
+
+				@Override
+				public boolean isDone() {
+					if (System.nanoTime() > lastActivity + 10000000000L) {
+						gameRules.abortFindingValue(0);
+						aborted = true;
+					}
+					return done || aborted;
+				}
+
+				@Override
+				public boolean accept(ITextComponent chat) {
+					if (!(chat instanceof TextComponentString)) {
+						if (chat instanceof TextComponentTranslation) {
+							String translation = ((TextComponentTranslation) chat).getKey();
+							if ("commands.generic.permission".equals(translation)) {
+								gameRules.abortFindingValue(1);
+								aborted = true;
+								return false;
+							}
+						}
+						return true;
+					}
+					TextComponentString text = (TextComponentString) chat;
+					if (!text.getSiblings().isEmpty() || !text.getStyle().isEmpty()) {
+						return true;
+					}
+					List<String> gameRuleList = GAME_RULE_LIST_SPLITTER.splitToList(text.getText());
+					if (gameRuleList.isEmpty()) {
+						return true;
+					}
+					String lastGameRule = gameRuleList.get(gameRuleList.size() - 1);
+					if (!lastGameRule.contains(" and ")) {
+						return true;
+					}
+					int andIndex = lastGameRule.indexOf(" and ");
+					gameRuleList.remove(gameRuleList.size() - 1);
+					gameRuleList.add(lastGameRule.substring(0, andIndex));
+					gameRuleList.add(lastGameRule.substring(andIndex + 5));
+
+					// check for certain known game rules to check if this
+					// actually is the game rule message
+					if (!gameRuleList.contains("doFireTick") || !gameRuleList.contains("mobGriefing")
+							|| !gameRuleList.contains("keepInventory")) {
+						return true;
+					}
+					gameRules.returnValue(gameRuleList);
+					done = true;
+					lastActivity = System.nanoTime();
+					return false;
+				}
+			});
+			executeCommand("/gamerule");
+		} else {
+			gameRules.returnValue(Lists.newArrayList(Minecraft.getMinecraft().getIntegratedServer()
+					.worldServerForDimension(0).getGameRules().getRules()));
+		}
+	}
+
+	/**
+	 * Obtains a map of game rules and their values from somewhere.
+	 * 
+	 * @param gameRules
+	 *            - the listener for obtaining the map of game rules. The
+	 *            meaning of the abort codes are as follows:<br/>
+	 *            0: Timed out<br/>
+	 *            1: No permission
+	 */
+	public static void getGameRules(final ReturnedValueListener<Map<String, String>> gameRules) {
+		getGameRuleNames(new ReturnedValueListener<List<String>>() {
+			@Override
+			public void returnValue(final List<String> gameRuleNames) {
+				if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
+					final Map<String, String> gameRuleMap = Maps.newHashMap();
+					for (final String gameRuleName : gameRuleNames) {
+						addBlock(new Blocker() {
+							private boolean done = false;
+							private boolean aborted = false;
+							private long lastActivity = System.nanoTime();
+
+							@Override
+							public boolean isDone() {
+								if (System.nanoTime() > lastActivity + 10000000000L) {
+									gameRules.abortFindingValue(0);
+									aborted = true;
+								}
+								return done || aborted;
+							}
+
+							@Override
+							public boolean accept(ITextComponent chat) {
+								if (!(chat instanceof TextComponentString)) {
+									if (chat instanceof TextComponentTranslation) {
+										String translation = ((TextComponentTranslation) chat).getKey();
+										if ("commands.generic.permission".equals(translation)) {
+											gameRules.abortFindingValue(1);
+											aborted = true;
+											return false;
+										}
+									}
+								}
+								String text = chat.getUnformattedText();
+								String[] nameAndValue = text.split(" = ", 2);
+								if (nameAndValue.length != 2) {
+									return true;
+								}
+								if (!gameRuleName.equals(nameAndValue[0])) {
+									return true;
+								}
+								gameRuleMap.put(gameRuleName, nameAndValue[1]);
+								if (gameRuleMap.size() == gameRuleNames.size()) {
+									gameRules.returnValue(gameRuleMap);
+								}
+								done = true;
+								lastActivity = System.nanoTime();
+								return false;
+							}
+						});
+						executeCommand(String.format("/gamerule %s", gameRuleName));
+					}
+				} else {
+					GameRules gameRulesObj = Minecraft.getMinecraft().getIntegratedServer().worldServerForDimension(0)
+							.getGameRules();
+					Map<String, String> gameRuleMap = Maps.newHashMap();
+					for (String gameRuleName : gameRuleNames) {
+						gameRuleMap.put(gameRuleName, gameRulesObj.getString(gameRuleName));
+					}
+					gameRules.returnValue(gameRuleMap);
+				}
+			}
+
+			@Override
+			public void abortFindingValue(int reason) {
+				gameRules.abortFindingValue(reason);
+			}
+		});
 	}
 
 	@SubscribeEvent
