@@ -627,7 +627,7 @@ public class CommandSlotFormattedTextField extends GuiCommandSlotImpl implements
 			if (i != index) {
 				text += " ";
 			}
-			text += args[index];
+			text += args[i];
 		}
 
 		this.text = FormattedText.compile(text);
