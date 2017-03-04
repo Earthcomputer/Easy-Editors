@@ -1,17 +1,21 @@
 package net.earthcomputer.easyeditors.gui.command.syntax;
 
+import java.util.Collections;
 import java.util.List;
 
 import net.earthcomputer.easyeditors.api.SmartTranslationRegistry;
 import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.ReturnedValueListener;
+import net.earthcomputer.easyeditors.gui.GuiSelectFromList;
+import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotButton;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCheckbox;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotHorizontalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
-import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotMenu;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotModifiable;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRadioList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
@@ -29,7 +33,7 @@ public class SyntaxGamerule extends CommandSyntax {
 
 	private CommandSlotRadioList action;
 	private CommandSlotModifiable<IGuiCommandSlot> rule;
-	private CommandSlotMenu ruleMenu;
+	private CommandSlotGameRule ruleMenu;
 	private String waitingGameRule;
 	private CommandSlotModifiable<IGuiCommandSlot> value;
 	private CommandSlotCheckbox valueCheckbox;
@@ -93,43 +97,10 @@ public class SyntaxGamerule extends CommandSyntax {
 
 		ChatBlocker.getGameRuleNames(new ReturnedValueListener<List<String>>() {
 			@Override
-			public void returnValue(final List<String> value) {
-				String[] values = value.toArray(new String[value.size()]);
-				String[] displayedValues = values.clone();
-				for (int i = 0; i < displayedValues.length; i++) {
-					String translationKey = "gui.commandEditor.gamerule.rule." + displayedValues[i];
-					if (SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(translationKey)) {
-						displayedValues[i] = I18n.format(translationKey);
-					}
-				}
-				ruleMenu = new CommandSlotMenu(displayedValues, values) {
-					{
-						onChanged(getValueAt(0));
-					}
-
-					@Override
-					protected void onChanged(String to) {
-						GameRules gameRules = Minecraft.getMinecraft().world.getGameRules();
-						boolean isBooleanRule = false;
-						if (gameRules.hasRule(to)) {
-							if (gameRules.areSameType(to, GameRules.ValueType.BOOLEAN_VALUE)) {
-								isBooleanRule = true;
-							}
-						}
-						if (isBooleanRule) {
-							SyntaxGamerule.this.value.setChild(valueCheckbox);
-						} else {
-							SyntaxGamerule.this.value.setChild((IGuiCommandSlot) valueTextField);
-						}
-					}
-				};
+			public void returnValue(List<String> value) {
+				ruleMenu = new CommandSlotGameRule(value);
 				if (waitingGameRule != null) {
-					int index = value.indexOf(waitingGameRule);
-					if (index == -1) {
-						index = 0;
-					}
-					ruleMenu.setCurrentIndex(index);
-					waitingGameRule = null;
+					ruleMenu.setSelectedRule(waitingGameRule);
 				}
 				rule.setChild(ruleMenu);
 			}
@@ -195,6 +166,126 @@ public class SyntaxGamerule extends CommandSyntax {
 
 		return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_GAMERULE_ACTION,
 				new CommandSlotRectangle(action, Colors.miscBigBoxBox.color)), arg };
+	}
+
+	private class CommandSlotGameRule extends CommandSlotHorizontalArrangement implements ICallback<String> {
+		private List<String> rules;
+		private String selectedRule = null;
+		private CommandSlotLabel label;
+
+		public CommandSlotGameRule(List<String> rules) {
+			this.rules = rules;
+			this.label = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+					Translate.GUI_COMMANDEDITOR_NOGAMERULE, Colors.invalidItemName.color);
+			addChild(label);
+			addChild(new CommandSlotButton(20, 20, "...") {
+				@Override
+				public void onPress() {
+					Minecraft.getMinecraft()
+							.displayGuiScreen(new GuiSelectFromList<String>(Minecraft.getMinecraft().currentScreen,
+									CommandSlotGameRule.this, CommandSlotGameRule.this.rules,
+									Translate.GUI_COMMANDEDITOR_SELECTGAMERULE_TITLE) {
+								@Override
+								protected List<String> getTooltip(String value) {
+									return Collections.emptyList();
+								}
+
+								@Override
+								protected void drawSlot(int y, String value) {
+									String str;
+									String unlocalizedName = "gui.commandEditor.gamerule.rule." + value;
+									if (SmartTranslationRegistry.getLanguageMapInstance()
+											.isKeyTranslated(unlocalizedName)) {
+										str = I18n.format(unlocalizedName);
+									} else {
+										str = value;
+									}
+									fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
+											y + 2, 0xffffff);
+									str = value;
+									fontRendererObj.drawString(str, width / 2 - fontRendererObj.getStringWidth(str) / 2,
+											y + 4 + fontRendererObj.FONT_HEIGHT, 0xc0c0c0);
+								}
+
+								@Override
+								protected boolean doesSearchTextMatch(String searchText, String value) {
+									if (value.toLowerCase().contains(searchText)) {
+										return true;
+									}
+									String unlocalizedName = "gui.commandEditor.gamerule.rule." + value;
+									if (SmartTranslationRegistry.getLanguageMapInstance()
+											.isKeyTranslated(unlocalizedName)) {
+										if (I18n.format(unlocalizedName).toLowerCase().contains(searchText)) {
+											return true;
+										}
+									}
+									return false;
+								}
+							});
+				}
+			});
+		}
+
+		public String getSelectedRule() {
+			return selectedRule;
+		}
+
+		public void setSelectedRule(String rule) {
+			if (!rules.contains(rule)) {
+				rule = rules.get(0);
+			}
+			this.selectedRule = rule;
+			String unlocalizedName = "gui.commandEditor.gamerule.rule." + rule;
+			if (SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(unlocalizedName)) {
+				this.label.setText(I18n.format(unlocalizedName));
+			} else {
+				this.label.setText(rule);
+			}
+			this.label.setColor(Colors.itemName.color);
+
+			GameRules gameRules = Minecraft.getMinecraft().world.getGameRules();
+			boolean isBooleanRule = false;
+			if (gameRules.hasRule(rule)) {
+				if (gameRules.areSameType(rule, GameRules.ValueType.BOOLEAN_VALUE)) {
+					isBooleanRule = true;
+				}
+			}
+			if (isBooleanRule) {
+				SyntaxGamerule.this.value.setChild(valueCheckbox);
+			} else {
+				SyntaxGamerule.this.value.setChild((IGuiCommandSlot) valueTextField);
+			}
+		}
+
+		@Override
+		public String getCallbackValue() {
+			return getSelectedRule();
+		}
+
+		@Override
+		public void setCallbackValue(String value) {
+			setSelectedRule(value);
+		}
+
+		@Override
+		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+			if (args.length == index) {
+				throw new CommandSyntaxException();
+			}
+			if (!rules.contains(args[index])) {
+				throw new CommandSyntaxException();
+			}
+			setSelectedRule(args[index]);
+			return 1;
+		}
+
+		@Override
+		public void addArgs(List<String> args) throws UIInvalidException {
+			if (selectedRule == null) {
+				throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOGAMERULESELECTED);
+			}
+			args.add(selectedRule);
+		}
 	}
 
 }
