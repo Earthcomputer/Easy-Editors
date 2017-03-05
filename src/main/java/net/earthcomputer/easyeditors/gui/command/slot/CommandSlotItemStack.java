@@ -56,10 +56,12 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 
 	private int optionalStart;
 	private int[] argOrder;
+	private boolean isTest;
 	private Item item;
 	private int damage;
 
 	private CommandSlotIntTextField stackSizeField;
+	private CommandSlotRadioList optionalDamage;
 	private List<ItemDamageHandler> damageHandlers = Lists.newArrayList();
 	private CommandSlotModifiable<IGuiCommandSlot> damageSlot;
 	private List<NBTTagHandler> nbtHandlers = Lists.newArrayList();
@@ -80,6 +82,28 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	 *            contains {@link #COMPONENT_NBT}, it must be the last element
 	 */
 	public CommandSlotItemStack(int optionalStart, int... argOrder) {
+		this(false, optionalStart, argOrder);
+	}
+
+	/**
+	 * Constructs a new command slot which represents an item stack
+	 * 
+	 * @param isTest
+	 *            - true if we're testing for an item, false if we're creating
+	 *            an item
+	 * @param optionalStart
+	 *            - the index at which the arguments start becoming optional,
+	 *            relative to where this command slot starts reading. E.g. 0
+	 *            would mean all the arguments are optional
+	 * @param argOrder
+	 *            - The order at which the arguments are to be inputed and
+	 *            outputed. The sub-arguments are called components, and the
+	 *            constants needed for this argument are defined in this class.
+	 *            This array must contain {@link #COMPONENT_ITEM} and if it
+	 *            contains {@link #COMPONENT_NBT}, it must be the last element
+	 */
+	public CommandSlotItemStack(boolean isTest, int optionalStart, int... argOrder) {
+		this.isTest = isTest;
 		this.optionalStart = optionalStart;
 		this.argOrder = argOrder;
 		int displayComponents = 0;
@@ -103,8 +127,23 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 							.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_ITEM_STACKSIZE_INVALID)
 							.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_ITEM_STACKSIZE_OUTOFBOUNDS)));
 
-		if ((displayComponents & COMPONENT_DAMAGE) != 0)
-			addChild(damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
+		if ((displayComponents & COMPONENT_DAMAGE) != 0) {
+			damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null);
+			IGuiCommandSlot damage;
+			if (isTest) {
+				optionalDamage = new CommandSlotRadioList(CommandSlotLabel
+						.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_DAMAGE_ANY, Colors.itemLabel.color), damageSlot) {
+					@Override
+					protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
+						throw new UnsupportedOperationException();
+					}
+				};
+				damage = optionalDamage;
+			} else {
+				damage = damageSlot;
+			}
+			addChild(damage);
+		}
 
 		if ((displayComponents & COMPONENT_NBT) != 0)
 			addChild(nbtSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
@@ -116,7 +155,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			throw new CommandSyntaxException();
 
 		Item item = null;
-		int stackSize = 1;
+		int stackSize = isTest ? -1 : 1;
 		int damage = 0;
 		NBTTagCompound nbt = null;
 
@@ -182,8 +221,14 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				maxElementToCopy = i;
 				break;
 			case COMPONENT_STACK_SIZE:
-				int stackSize = stackSizeField.getIntValue();
-				if (i < optionalStart || stackSize != 1)
+				int stackSize;
+				if (stackSizeField.getText().isEmpty()) {
+					// can only happen if isTest is true
+					stackSize = -1;
+				} else {
+					stackSize = stackSizeField.getIntValue();
+				}
+				if (i < optionalStart || (isTest ? stackSize != -1 : stackSize != 1))
 					maxElementToCopy = i;
 				potentialArgs.add(String.valueOf(stackSize));
 				break;
@@ -216,12 +261,25 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				this.nbtSlot.setChild(null);
 		} else {
 			this.item = item.getItem();
-			if (stackSizeField != null)
-				stackSizeField.setText(String.valueOf(item.getCount()));
+			if (stackSizeField != null) {
+				int stackSize = item.getCount();
+				if (isTest && stackSize == -1) {
+					stackSizeField.setText("");
+				} else {
+					stackSizeField.setText(String.valueOf(stackSize));
+				}
+			}
 			if (this.damageSlot != null) {
 				damageHandlers = ItemDamageHandler.getHandlers(item);
 				this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item));
-				this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
+				if (isTest && item.getItemDamage() == -1) {
+					this.optionalDamage.setSelectedIndex(0);
+				} else {
+					if (isTest) {
+						this.optionalDamage.setSelectedIndex(1);
+					}
+					this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
+				}
 			} else {
 				this.damage = 0;
 			}
@@ -252,6 +310,8 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	private int getDamage() {
 		if (damageSlot == null)
 			return damage;
+		else if (isTest && optionalDamage.getSelectedIndex() == 0)
+			return -1;
 		else
 			return ItemDamageHandler.getDamage(damageHandlers, damage);
 	}
@@ -275,10 +335,14 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 		if (item == null)
 			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_ITEMINVALID_NOITEM);
 		if (stackSizeField != null) {
-			stackSizeField.checkValid();
+			if (!isTest || !stackSizeField.getText().isEmpty()) {
+				stackSizeField.checkValid();
+			}
 		}
-		for (ItemDamageHandler damageHandler : damageHandlers) {
-			damageHandler.checkValid();
+		if (!isTest || optionalDamage.getSelectedIndex() == 1) {
+			for (ItemDamageHandler damageHandler : damageHandlers) {
+				damageHandler.checkValid();
+			}
 		}
 		for (NBTTagHandler nbtHandler : nbtHandlers) {
 			nbtHandler.checkValid();
