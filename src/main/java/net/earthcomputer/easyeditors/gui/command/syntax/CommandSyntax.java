@@ -172,6 +172,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("setworldspawn", SyntaxSetWorldSpawn.class);
 		registerCommandSyntax("gamerule", SyntaxGamerule.class);
 		registerCommandSyntax("clear", SyntaxClear.class);
+		registerCommandSyntax("testfor", SyntaxTestFor.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 	}
 

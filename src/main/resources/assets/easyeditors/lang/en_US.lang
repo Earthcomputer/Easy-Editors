@@ -401,6 +401,8 @@ gui.commandEditor.selectCommand.tell.desc=Sends a message to a specified player
 gui.commandEditor.selectCommand.tell.example=/tell Earthcomputer You are a great guy!
 gui.commandEditor.selectCommand.test.desc=A test command
 gui.commandEditor.selectCommand.test.example=/test Sample text
+gui.commandEditor.selectCommand.testfor.desc=Tests for an entity's existence
+gui.commandEditor.selectCommand.testfor.example=/testfor @e[type=creeper]
 gui.commandEditor.selectCommand.time.desc=Sets/queries the world time
 gui.commandEditor.selectCommand.time.example=/time set day
 gui.commandEditor.selectCommand.title=Select Command
@@ -438,6 +440,8 @@ gui.commandEditor.stats.type.SuccessCount=Success Count
 gui.commandEditor.stats.type.tooltip=The command result type
 gui.commandEditor.teleport.targetCoordinate=Target Coordinate:
 gui.commandEditor.tell.target=Receiver
+gui.commandEditor.testfor.nbt=Entity NBT:
+gui.commandEditor.testfor.testingFor=Testing For:
 gui.commandEditor.textField.hint.bold=Bold = Ctrl+B
 gui.commandEditor.textField.hint.color=Change color = Ctrl+F
 gui.commandEditor.textField.hint.italic=Italic = Ctrl+I
@@ -499,12 +503,14 @@ gui.commandEditor.xp.xp.tooltip=The amount of XP to give the player
 gui.easyeditorsconfig.active=Active
 gui.easyeditorsconfig.colors.box.command=Commands
 gui.easyeditorsconfig.colors.box.item=Items
+gui.easyeditorsconfig.colors.box.nbt=NBT
 gui.easyeditorsconfig.colors.box.playerSelector=Player Selectors
 gui.easyeditorsconfig.colors.box.tpTarget=tp Target
 gui.easyeditorsconfig.colors.misc.itemName=Item Name
 gui.easyeditorsconfig.colors.misc.itemName.invalid=Invalid Item Name
 gui.easyeditorsconfig.colors.label.generic=Labels
 gui.easyeditorsconfig.colors.label.item=Item Labels
+gui.easyeditorsconfig.colors.label.nbt=NBT Labels
 gui.easyeditorsconfig.colors.label.playerSelector=Player Selector Labels
 gui.easyeditorsconfig.colors.label.tpTarget=tp Target Labels
 gui.easyeditorsconfig.colors.misc.commandName=Command Names
