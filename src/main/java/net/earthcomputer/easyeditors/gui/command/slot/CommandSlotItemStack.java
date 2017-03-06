@@ -61,9 +61,9 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	private int damage;
 
 	private CommandSlotIntTextField stackSizeField;
-	private CommandSlotRadioList optionalDamage;
 	private List<ItemDamageHandler> damageHandlers = Lists.newArrayList();
 	private CommandSlotModifiable<IGuiCommandSlot> damageSlot;
+	private CommandSlotCheckbox ignoreDamage;
 	private List<NBTTagHandler> nbtHandlers = Lists.newArrayList();
 	private CommandSlotModifiable<IGuiCommandSlot> nbtSlot;
 
@@ -127,23 +127,11 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 							.setNumberInvalidMessage(TranslateKeys.GUI_COMMANDEDITOR_ITEM_STACKSIZE_INVALID)
 							.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_ITEM_STACKSIZE_OUTOFBOUNDS)));
 
-		if ((displayComponents & COMPONENT_DAMAGE) != 0) {
-			damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null);
-			IGuiCommandSlot damage;
+		if ((displayComponents & COMPONENT_DAMAGE) != 0)
 			if (isTest) {
-				optionalDamage = new CommandSlotRadioList(CommandSlotLabel
-						.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_DAMAGE_ANY, Colors.itemLabel.color), damageSlot) {
-					@Override
-					protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
-						throw new UnsupportedOperationException();
-					}
-				};
-				damage = optionalDamage;
-			} else {
-				damage = damageSlot;
+				addChild(ignoreDamage = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_ITEM_DAMAGE_ANY));
 			}
-			addChild(damage);
-		}
+		addChild(damageSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
 
 		if ((displayComponents & COMPONENT_NBT) != 0)
 			addChild(nbtSlot = new CommandSlotModifiable<IGuiCommandSlot>(null));
@@ -198,9 +186,21 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			}
 		}
 
-		ItemStack stack = new ItemStack(item, stackSize, damage);
+		ItemStack stack = new ItemStack(item, (isTest && stackSize == -1) ? 1 : stackSize, damage);
 		stack.setTagCompound(nbt);
 		setItem(stack);
+		// need to put isTest special cases below because ItemStacks don't like
+		// having -1s everywhere
+		if (isTest) {
+			if (damageSlot != null) {
+				ignoreDamage.setChecked(damage == -1);
+			}
+			if (stackSizeField != null) {
+				if (stackSize == -1) {
+					stackSizeField.setText("");
+				}
+			}
+		}
 
 		if (nbt != null)
 			return args.length - index;
@@ -263,23 +263,12 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 			this.item = item.getItem();
 			if (stackSizeField != null) {
 				int stackSize = item.getCount();
-				if (isTest && stackSize == -1) {
-					stackSizeField.setText("");
-				} else {
-					stackSizeField.setText(String.valueOf(stackSize));
-				}
+				stackSizeField.setText(String.valueOf(stackSize));
 			}
 			if (this.damageSlot != null) {
 				damageHandlers = ItemDamageHandler.getHandlers(item);
 				this.damageSlot.setChild(ItemDamageHandler.setupCommandSlot(damageHandlers, item));
-				if (isTest && item.getItemDamage() == -1) {
-					this.optionalDamage.setSelectedIndex(0);
-				} else {
-					if (isTest) {
-						this.optionalDamage.setSelectedIndex(1);
-					}
-					this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
-				}
+				this.damage = ItemDamageHandler.setDamage(damageHandlers, item.getItemDamage());
 			} else {
 				this.damage = 0;
 			}
@@ -310,7 +299,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 	private int getDamage() {
 		if (damageSlot == null)
 			return damage;
-		else if (isTest && optionalDamage.getSelectedIndex() == 0)
+		else if (isTest && ignoreDamage.isChecked())
 			return -1;
 		else
 			return ItemDamageHandler.getDamage(damageHandlers, damage);
@@ -339,7 +328,7 @@ public class CommandSlotItemStack extends CommandSlotVerticalArrangement impleme
 				stackSizeField.checkValid();
 			}
 		}
-		if (!isTest || optionalDamage.getSelectedIndex() == 1) {
+		if (!isTest || !ignoreDamage.isChecked()) {
 			for (ItemDamageHandler damageHandler : damageHandlers) {
 				damageHandler.checkValid();
 			}
