@@ -90,6 +90,15 @@ public class CommandSlotLabel extends GuiCommandSlotImpl {
 	}
 
 	/**
+	 * Sets the text displayed when the mouse hovers over the label
+	 * 
+	 * @param hoverText
+	 */
+	public void setHoverText(String hoverText) {
+		this.hoverText = hoverText;
+	}
+
+	/**
 	 * 
 	 * @return The text displayed when the mouse hovers over the label
 	 */
