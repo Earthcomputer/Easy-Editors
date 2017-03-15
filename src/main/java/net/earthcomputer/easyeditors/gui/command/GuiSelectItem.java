@@ -3,6 +3,7 @@ package net.earthcomputer.easyeditors.gui.command;
 import java.util.List;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -21,15 +22,23 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class GuiSelectItem extends GuiSelectFromList<ItemStack> {
 
-	private static List<ItemStack> createAllowedValues(boolean allowSubItems) {
+	private static List<ItemStack> createAllowedValues(boolean allowSubItems,
+			Predicate<ItemStack> allowItemStackPredicate) {
 		List<ItemStack> values = Lists.newArrayList();
 		for (Item item : ForgeRegistries.ITEMS) {
 			if (allowSubItems) {
 				NonNullList<ItemStack> subItems = NonNullList.create();
 				item.getSubItems(item, null, subItems);
-				values.addAll(subItems);
+				for (ItemStack subItem : subItems) {
+					if (allowItemStackPredicate.apply(subItem)) {
+						values.add(subItem);
+					}
+				}
 			} else {
-				values.add(new ItemStack(item));
+				ItemStack stackToAdd = new ItemStack(item);
+				if (allowItemStackPredicate.apply(stackToAdd)) {
+					values.add(stackToAdd);
+				}
 			}
 		}
 		return values;
@@ -40,8 +49,13 @@ public class GuiSelectItem extends GuiSelectFromList<ItemStack> {
 	}
 
 	public GuiSelectItem(GuiScreen prevScreen, ICallback<ItemStack> callback, boolean allowSubItems) {
-		super(prevScreen, callback, createAllowedValues(allowSubItems), Translate.GUI_COMMANDEDITOR_SELECTITEM_TITLE,
-				18);
+		this(prevScreen, callback, allowSubItems, Predicates.<ItemStack>alwaysTrue());
+	}
+
+	public GuiSelectItem(GuiScreen prevScreen, ICallback<ItemStack> callback, boolean allowSubItems,
+			Predicate<ItemStack> allowItemStackPredicate) {
+		super(prevScreen, callback, createAllowedValues(allowSubItems, allowItemStackPredicate),
+				Translate.GUI_COMMANDEDITOR_SELECTITEM_TITLE, 18);
 	}
 
 	@Override

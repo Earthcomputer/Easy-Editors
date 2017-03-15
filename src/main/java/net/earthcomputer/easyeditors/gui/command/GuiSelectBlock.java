@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -30,13 +31,23 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class GuiSelectBlock extends GuiSelectFromList<IBlockState> {
 
-	private static List<IBlockState> createAllowedValues(boolean allowSubBlocks) {
+	private static List<IBlockState> createAllowedValues(boolean allowSubBlocks,
+			Predicate<IBlockState> allowBlockStatePredicate) {
 		List<IBlockState> blocks = Lists.newArrayList();
 		for (Block block : ForgeRegistries.BLOCKS) {
 			if (allowSubBlocks) {
-				blocks.addAll(getAllVariantStates(block, BlockPropertyRegistry.getVariantProperties(block)));
+				List<IBlockState> variantStates = getAllVariantStates(block,
+						BlockPropertyRegistry.getVariantProperties(block));
+				for (IBlockState variantState : variantStates) {
+					if (allowBlockStatePredicate.apply(variantState)) {
+						blocks.add(variantState);
+					}
+				}
 			} else {
-				blocks.add(block.getDefaultState());
+				IBlockState defaultState = block.getDefaultState();
+				if (allowBlockStatePredicate.apply(defaultState)) {
+					blocks.add(defaultState);
+				}
 			}
 		}
 		return blocks;
@@ -65,8 +76,13 @@ public class GuiSelectBlock extends GuiSelectFromList<IBlockState> {
 	}
 
 	public GuiSelectBlock(GuiScreen prevScreen, ICallback<IBlockState> callback, boolean allowSubBlocks) {
-		super(prevScreen, callback, createAllowedValues(allowSubBlocks), Translate.GUI_COMMANDEDITOR_SELECTBLOCK_TITLE,
-				18);
+		this(prevScreen, callback, allowSubBlocks, Predicates.<IBlockState>alwaysTrue());
+	}
+
+	public GuiSelectBlock(GuiScreen prevScreen, ICallback<IBlockState> callback, boolean allowSubBlocks,
+			Predicate<IBlockState> allowBlockStatePredicate) {
+		super(prevScreen, callback, createAllowedValues(allowSubBlocks, allowBlockStatePredicate),
+				Translate.GUI_COMMANDEDITOR_SELECTBLOCK_TITLE, 18);
 	}
 
 	@Override

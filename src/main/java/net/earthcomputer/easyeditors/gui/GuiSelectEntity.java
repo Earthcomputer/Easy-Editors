@@ -9,6 +9,7 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.EasyEditors;
@@ -68,6 +69,12 @@ public class GuiSelectEntity extends GuiScreen {
 
 	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
 			boolean includeLightning, ResourceLocation... additionalOptions) {
+
+	}
+
+	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
+			boolean includeLightning, Predicate<ResourceLocation> inclusionPredicate,
+			ResourceLocation... additionalOptions) {
 		this.previousScreen = previousScreen;
 		this.callback = callback;
 
@@ -78,6 +85,12 @@ public class GuiSelectEntity extends GuiScreen {
 			allEntities.remove(EntityList.LIGHTNING_BOLT);
 		for (ResourceLocation additionalOption : additionalOptions)
 			allEntities.add(additionalOption);
+		Iterator<ResourceLocation> allEntitiesItr = allEntities.iterator();
+		while (allEntitiesItr.hasNext()) {
+			if (!inclusionPredicate.apply(allEntitiesItr.next())) {
+				allEntitiesItr.remove();
+			}
+		}
 		Collections.sort(allEntities, new Comparator<ResourceLocation>() {
 			@Override
 			public int compare(ResourceLocation s1, ResourceLocation s2) {

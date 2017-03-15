@@ -27,7 +27,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -362,8 +361,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private static final String TEAM_ANY_NAME = "any";
 		private static final String TEAM_NONE_NAME = "none";
 
-		private List<ScoreObjective> objectivesList;
-		private String objectiveErrorMessage;
 		private CommandSlotList<CmdScoreTest> scoreTests;
 
 		private CommandSlotRadioList tag;
@@ -386,7 +383,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			obtainTeamsList();
 
 			setupScoresSlot();
-			obtainObjectiveList();
 
 			preSetupRotationsSlot();
 			preSetupPlayersOnlySlot();
@@ -455,63 +451,12 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 				@Override
 				public CmdScoreTest newInstance() {
-					CmdScoreTest r = new CmdScoreTest();
-
-					if (objectivesList != null) {
-						String[] names = new String[objectivesList.size()];
-						String[] displayNames = new String[names.length];
-
-						for (int i = 0; i < names.length; i++) {
-							names[i] = objectivesList.get(i).getName();
-							displayNames[i] = objectivesList.get(i).getDisplayName();
-						}
-
-						r.objective = new CommandSlotMenu(displayNames, names);
-						r.modifiableObjective.setChild(r.objective);
-					} else if (objectiveErrorMessage != null) {
-						r.modifiableObjective.setChild(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-								objectiveErrorMessage, 0xff0000));
-					}
-					return r;
+					return new CmdScoreTest();
 				}
 
 			}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_APPEND)
 					.setInsertHoverText(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_INSERT)
 					.setRemoveHoverText(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_REMOVE);
-		}
-
-		private void obtainObjectiveList() {
-			ChatBlocker.obtainObjectiveList(new ReturnedValueListener<List<ScoreObjective>>() {
-
-				@Override
-				public void returnValue(List<ScoreObjective> value) {
-					objectivesList = value;
-					String[] names = new String[value.size()];
-					String[] displayNames = new String[names.length];
-
-					for (int i = 0; i < names.length; i++) {
-						names[i] = value.get(i).getName();
-						displayNames[i] = value.get(i).getDisplayName();
-					}
-
-					for (int i = 0; i < scoreTests.entryCount(); i++) {
-						CmdScoreTest entry = scoreTests.getEntry(i);
-						entry.modifiableObjective.setChild(entry.objective = new CommandSlotMenu(displayNames, names));
-					}
-				}
-
-				@Override
-				public void abortFindingValue(int reason) {
-					objectiveErrorMessage = reason == 0 ? TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_TIMEDOUT
-							: TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_NOPERMISSION;
-					objectiveErrorMessage = I18n.format(objectiveErrorMessage);
-					for (int i = 0; i < scoreTests.entryCount(); i++) {
-						scoreTests.getEntry(i).modifiableObjective.setChild(new CommandSlotLabel(
-								Minecraft.getMinecraft().fontRendererObj, objectiveErrorMessage, 0xff0000));
-					}
-				}
-
-			});
 		}
 
 		private void preSetupRotationsSlot() {
@@ -1264,13 +1209,13 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 						// If score test ends with "_min", it is a minimum
 						// score, and "_min" is not included in the objective
 						// name
-						objective = objective.substring(objective.length() - 4, objective.length());
+						objective = objective.substring(0, objective.length() - 4);
 						min = true;
 					}
 
 					// Create a new entry for this score test
 					CmdScoreTest scoreTest = this.scoreTests.newEntry();
-					scoreTest.waitingObjective = objective;
+					scoreTest.objective.setScore(objective);
 					scoreTest.minOrMax.setCurrentIndex(min ? CmdScoreTest.TEST_MIN : CmdScoreTest.TEST_MAX);
 					scoreTest.value.setText(String.valueOf(parseInt(specifier.getValue())));
 					// Add the entry
@@ -1566,8 +1511,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			// scores
 			for (int i = 0; i < this.scoreTests.entryCount(); i++) {
 				CmdScoreTest scoreTest = this.scoreTests.getEntry(i);
-				String key = scoreTest.objective == null ? scoreTest.waitingObjective
-						: scoreTest.objective.getCurrentValue();
+				String key = scoreTest.objective.getScore();
 				key = "score_" + key;
 				if (scoreTest.minOrMax.getCurrentIndex() == CmdScoreTest.TEST_MIN)
 					key += "_min";
@@ -1757,9 +1701,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private class CmdScoreTest extends CommandSlotHorizontalArrangement {
 
-			String waitingObjective;
-			CommandSlotModifiable<IGuiCommandSlot> modifiableObjective;
-			CommandSlotMenu objective;
+			CommandSlotScore objective;
 			CommandSlotMenu minOrMax;
 			CommandSlotIntTextField value;
 
@@ -1767,10 +1709,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			public static final int TEST_MAX = 1;
 
 			public CmdScoreTest() {
-				modifiableObjective = new CommandSlotModifiable<IGuiCommandSlot>(
-						new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-								Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_WAITING, 0x404040));
-				addChild(modifiableObjective);
+				objective = new CommandSlotScore();
+				addChild(objective);
 
 				minOrMax = new CommandSlotMenu(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_MIN,
 						Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_MAX);
@@ -1782,15 +1722,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 
 			public void checkValid() throws UIInvalidException {
-				if (objective == null) {
-					if (waitingObjective == null)
-						throw new UIInvalidException(
-								TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORETESTINVALID_NOOBJECTIVE);
-				} else if (objective.wordCount() == 0) {
-					throw new UIInvalidException(
-							TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORETESTINVALID_NOOBJECTIVESINLIST);
-				}
-
+				objective.checkValid();
 				value.checkValid();
 			}
 

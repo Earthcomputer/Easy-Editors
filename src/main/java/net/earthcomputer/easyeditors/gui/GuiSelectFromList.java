@@ -33,6 +33,7 @@ public abstract class GuiSelectFromList<T> extends GuiTwoWayScroll {
 	private T hoveredValue = null;
 
 	private GuiTextField searchTextField;
+	private GuiButton doneButton;
 	private GuiButton cancelButton;
 	private HoverChecker hoverChecker;
 
@@ -55,6 +56,13 @@ public abstract class GuiSelectFromList<T> extends GuiTwoWayScroll {
 		this.selectedValue = callback.getCallbackValue();
 		if (selectedValue == null) {
 			selectedValue = displayedValues.get(0);
+		} else {
+			for (T value : allValues) {
+				if (areEqual(selectedValue, value)) {
+					selectedValue = value;
+					break;
+				}
+			}
 		}
 
 		setXScrollBarPolicy(SHOWN_NEVER);
@@ -70,7 +78,7 @@ public abstract class GuiSelectFromList<T> extends GuiTwoWayScroll {
 
 		super.initGui();
 
-		addButton(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
+		doneButton = addButton(new GuiButton(0, width / 2 - 160, height - 15 - 10, 150, 20, I18n.format("gui.done")));
 		cancelButton = addButton(new GuiButton(1, width / 2 + 5, height - 15 - 10, 150, 20, I18n.format("gui.cancel")));
 		int labelWidth = fontRendererObj.getStringWidth(Translate.GUI_COMMANDEDITOR_SEARCH);
 		searchTextField = new GuiTextField(0, fontRendererObj, width / 2 - (205 + labelWidth) / 2 + labelWidth + 5, 25,
@@ -86,7 +94,7 @@ public abstract class GuiSelectFromList<T> extends GuiTwoWayScroll {
 	public void actionPerformed(GuiButton button) throws IOException {
 		switch (button.id) {
 		case 0:
-			callback.setCallbackValue(selectedValue);
+			callback.setCallbackValue(getOverrideCallbackValue(selectedValue));
 			// FALLTHROUGH
 		case 1:
 			mc.displayGuiScreen(prevScreen);
@@ -222,10 +230,30 @@ public abstract class GuiSelectFromList<T> extends GuiTwoWayScroll {
 		return a.equals(b);
 	}
 
+	protected T getOverrideCallbackValue(T originalValue) {
+		return originalValue;
+	}
+
 	protected abstract List<String> getTooltip(T value);
 
 	protected abstract void drawSlot(int y, T value);
 
 	protected abstract boolean doesSearchTextMatch(String searchText, T value);
+
+	public T getSelectedValue() {
+		return selectedValue;
+	}
+
+	public GuiTextField getSearchTextField() {
+		return searchTextField;
+	}
+
+	public GuiButton getDoneButton() {
+		return doneButton;
+	}
+
+	public GuiButton getCancelButton() {
+		return cancelButton;
+	}
 
 }
