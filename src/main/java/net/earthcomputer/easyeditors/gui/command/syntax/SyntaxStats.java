@@ -2,9 +2,7 @@ package net.earthcomputer.easyeditors.gui.command.syntax;
 
 import java.util.List;
 
-import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
-import net.earthcomputer.easyeditors.api.util.ReturnedValueListener;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
@@ -14,12 +12,12 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRadioList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRelativeCoordinate;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotScore;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrangement;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandResultStats;
-import net.minecraft.scoreboard.ScoreObjective;
 
 public class SyntaxStats extends CommandSyntax {
 
@@ -32,35 +30,10 @@ public class SyntaxStats extends CommandSyntax {
 	private CommandSlotVerticalArrangement setModeParam;
 	private CommandSlotVerticalArrangement clearModeParam;
 	private CommandSlotPlayerSelector targetEntity;
-	private CommandSlotModifiable<IGuiCommandSlot> modifiableTargetObjective;
-	private CommandSlotMenu targetObjective;
+	private CommandSlotScore targetObjective;
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
-		modifiableTargetObjective = new CommandSlotModifiable<IGuiCommandSlot>(
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_WAITING));
-		ChatBlocker.obtainObjectiveList(new ReturnedValueListener<List<ScoreObjective>>() {
-			@Override
-			public void returnValue(List<ScoreObjective> value) {
-				String[] objectiveNames = new String[value.size()];
-				String[] objectiveValues = new String[objectiveNames.length];
-				for (int i = 0; i < objectiveNames.length; i++) {
-					ScoreObjective objective = value.get(i);
-					objectiveNames[i] = objective.getDisplayName();
-					objectiveValues[i] = objective.getName();
-				}
-				targetObjective = new CommandSlotMenu(objectiveNames, objectiveValues);
-				modifiableTargetObjective.setChild(targetObjective);
-			}
-
-			@Override
-			public void abortFindingValue(int reason) {
-				String message = reason == 0 ? Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_TIMEDOUT
-						: Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_SCORE_NOPERMISSION;
-				modifiableTargetObjective.setChild(CommandSlotLabel.createLabel(message, 0xff0000));
-			}
-		});
-
 		sourceBlock = new CommandSlotRelativeCoordinate(Colors.miscBigBoxLabel.color);
 		sourceEntity = new CommandSlotPlayerSelector();
 		source = new CommandSlotRadioList(
@@ -132,12 +105,14 @@ public class SyntaxStats extends CommandSyntax {
 
 		targetEntity = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.ONE_ONLY);
 
+		targetObjective = new CommandSlotScore();
+
 		setModeParam = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_STATS_TARGETENTITY,
 						Translate.GUI_COMMANDEDITOR_STATS_TARGETENTITY_TOOLTIP,
 						new CommandSlotRectangle(targetEntity, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_STATS_TARGETOBJECTIVE,
-						Translate.GUI_COMMANDEDITOR_STATS_TARGETOBJECTIVE_TOOLTIP, modifiableTargetObjective));
+						Translate.GUI_COMMANDEDITOR_STATS_TARGETOBJECTIVE_TOOLTIP, targetObjective));
 
 		clearModeParam = new CommandSlotVerticalArrangement();
 
