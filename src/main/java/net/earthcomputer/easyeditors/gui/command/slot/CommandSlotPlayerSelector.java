@@ -6,16 +6,13 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import net.earthcomputer.easyeditors.api.util.ChatBlocker;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.api.util.Predicates2;
-import net.earthcomputer.easyeditors.api.util.ReturnedValueListener;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
@@ -27,7 +24,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameType;
@@ -349,17 +345,16 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private static final int GAMEMODE_ANY = 0;
 
-		private String waitingTeamName;
-		private IGuiCommandSlot team;
 		private CommandSlotModifiable<IGuiCommandSlot> modifiableTeam;
-		private CommandSlotCheckbox teamInverted;
-		private IGuiCommandSlot teamName;
-		private CommandSlotModifiable<IGuiCommandSlot> modifiableTeamName;
+		private IGuiCommandSlot team;
+		private CommandSlotRadioList teamMenu;
+		private CommandSlotCheckbox teamNameInverted;
+		private CommandSlotTeam teamName;
 
 		private static final int TEAM_ANY = 0;
 		private static final int TEAM_NONE = 1;
-		private static final String TEAM_ANY_NAME = "any";
-		private static final String TEAM_NONE_NAME = "none";
+		private static final int TEAM_NOT_NONE = 2;
+		private static final int TEAM_WITH_NAME = 3;
 
 		private CommandSlotList<CmdScoreTest> scoreTests;
 
@@ -380,7 +375,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private void preSetup() {
 			setupTeamSlot();
-			obtainTeamsList();
 
 			setupScoresSlot();
 
@@ -389,61 +383,33 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private void setupTeamSlot() {
-			teamInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_INVERTED);
+			teamNameInverted = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_INVERTED);
 
-			teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_WAITING, 0x404040);
-			modifiableTeamName = new CommandSlotModifiable<IGuiCommandSlot>(teamName);
+			teamName = new CommandSlotTeam();
+
+			IGuiCommandSlot teamNameOption = CommandSlotLabel.createLabel(
+					Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM, Colors.playerSelectorLabel.color, teamNameInverted,
+					teamName);
+
+			teamMenu = new CommandSlotRadioList(
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_ANY,
+							Colors.playerSelectorLabel.color),
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_NONE,
+							Colors.playerSelectorLabel.color),
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_NOTNONE,
+							Colors.playerSelectorLabel.color),
+					teamNameOption) {
+				@Override
+				protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
+					throw new UnsupportedOperationException();
+				}
+			};
 
 			team = CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM,
-					Colors.playerSelectorLabel.color, teamInverted, modifiableTeamName);
+					Colors.playerSelectorLabel.color,
+					new CommandSlotRectangle(teamMenu, Colors.playerSelectorBox.color));
+
 			modifiableTeam = new CommandSlotModifiable<IGuiCommandSlot>(team);
-		}
-
-		private void obtainTeamsList() {
-			ChatBlocker.obtainTeamsList(new ReturnedValueListener<List<ScorePlayerTeam>>() {
-
-				@Override
-				public void returnValue(List<ScorePlayerTeam> value) {
-					List<String> registeredNames = Lists.newArrayList();
-					registeredNames.add(TEAM_ANY_NAME);
-					registeredNames.add(TEAM_NONE_NAME);
-
-					List<String> displayNames = Lists.newArrayList();
-					displayNames.add(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_ANY);
-					displayNames.add(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_NONE);
-
-					for (ScorePlayerTeam team : value) {
-						registeredNames.add(team.getRegisteredName());
-						displayNames.add(team.getTeamName());
-					}
-
-					CommandSlotMenu teamMenu;
-					String[] displayNamesArray = displayNames.toArray(new String[displayNames.size()]);
-					String[] registeredNamesArray = registeredNames.toArray(new String[registeredNames.size()]);
-					teamName = teamMenu = new CommandSlotMenu(displayNamesArray, registeredNamesArray);
-					modifiableTeamName.setChild(teamName);
-
-					if ("".equals(waitingTeamName))
-						teamMenu.setCurrentIndex(1);
-					else if (waitingTeamName != null) {
-						for (int i = 2; i < value.size(); i++) {
-							if (value.get(i).equals(waitingTeamName))
-								teamMenu.setCurrentIndex(i);
-						}
-					}
-				}
-
-				@Override
-				public void abortFindingValue(int reason) {
-					String errorMessage = reason == 0 ? TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_TIMEDOUT
-							: TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_TEAM_NOPERMISSION;
-					errorMessage = I18n.format(errorMessage);
-					teamName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, errorMessage, 0xff0000);
-					modifiableTeamName.setChild(teamName);
-				}
-			});
-
 		}
 
 		private void setupScoresSlot() {
@@ -1158,41 +1124,32 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 				}
 			}
 
-			// By default, there is no waiting team name
-			this.waitingTeamName = null;
-			// By default, the team is not inverted
-			this.teamInverted.setChecked(false);
+			// By default, could match any team
+			this.teamMenu.setSelectedIndex(TEAM_ANY);
+			// By default, the team name is not inverted
+			this.teamNameInverted.setChecked(false);
 
 			if (specifiers.containsKey("team")) {
 				String teamName = specifiers.get("team");
+				boolean inverted = false;
 
 				if (teamName.startsWith("!")) {
 					// If the specified team name starts with !, it is inverted
 					teamName = teamName.substring(1);
-					this.teamInverted.setChecked(true);
+					inverted = true;
 				}
 
-				// We now know the team name, so set the waiting team name
-				this.waitingTeamName = teamName;
-
-				boolean teamsHaveBeenObtained = this.teamName instanceof CommandSlotMenu;
-				if (teamsHaveBeenObtained && this.modifiableTeam.getChild() == this.team) {
-					CommandSlotMenu teamMenu = (CommandSlotMenu) this.teamName;
-
-					// Default to any team
-					teamMenu.setCurrentIndex(TEAM_ANY);
-					if ("".equals(this.waitingTeamName)) {
-						// If team name is specified but empty, it means no team
-						teamMenu.setCurrentIndex(TEAM_NONE);
+				// If team name is empty, we are dealing with a wildcard
+				if (teamName.isEmpty()) {
+					if (inverted) {
+						this.teamMenu.setSelectedIndex(TEAM_NONE);
 					} else {
-						// Otherwise, find appropriate team
-						for (int i = 2; i < teamMenu.wordCount(); i++) {
-							if (teamMenu.getValueAt(i).equals(waitingTeamName)) {
-								teamMenu.setCurrentIndex(i);
-								break;
-							}
-						}
+						this.teamMenu.setSelectedIndex(TEAM_NOT_NONE);
 					}
+				} else {
+					this.teamMenu.setSelectedIndex(TEAM_WITH_NAME);
+					this.teamNameInverted.setChecked(inverted);
+					this.teamName.setTeam(teamName);
 				}
 			}
 
@@ -1478,34 +1435,22 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 			}
 
 			// team
-			boolean teamsHaveBeenObtained = this.teamName instanceof CommandSlotMenu;
-			if (teamsHaveBeenObtained && this.modifiableTeam.getChild() == this.team) {
-				CommandSlotMenu teamMenu = (CommandSlotMenu) this.teamName;
-				// Any team is not coded
-				if (teamMenu.getCurrentIndex() != TEAM_ANY) {
-					String team;
-
-					if (teamMenu.getCurrentIndex() == TEAM_NONE) {
-						// No team is coded as an empty string
-						team = "";
-					} else {
-						team = teamMenu.getCurrentValue();
-					}
-
-					if (this.teamInverted.isChecked()) {
-						// Inverted team is prefixed by !
-						team = "!" + team;
-					}
-
-					specifiers.put("team", team);
+			switch (this.teamMenu.getSelectedIndex()) {
+			case TEAM_ANY:
+				break;
+			case TEAM_NONE:
+				specifiers.put("team", "!");
+				break;
+			case TEAM_NOT_NONE:
+				specifiers.put("team", "");
+				break;
+			case TEAM_WITH_NAME:
+				String teamName = this.teamName.getTeam();
+				if (this.teamNameInverted.isChecked()) {
+					teamName = "!" + teamName;
 				}
-			} else if (this.waitingTeamName != null) {
-				String team = this.waitingTeamName;
-
-				if (this.teamInverted.isChecked())
-					team = "!" + team;
-
-				specifiers.put("team", team);
+				specifiers.put("team", teamName);
+				break;
 			}
 
 			// scores
@@ -1688,10 +1633,8 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					maxExp.checkValid();
 			}
 
-			boolean teamsHaveBeenObtained = teamName instanceof CommandSlotMenu;
-			if (teamsHaveBeenObtained && modifiableTeamName.getChild() == teamName) {
-				if (((CommandSlotMenu) teamName).getCurrentIndex() == TEAM_ANY && teamInverted.isChecked())
-					throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOTANY);
+			if (modifiableTeam.getChild() == team && teamMenu.getSelectedIndex() == TEAM_WITH_NAME) {
+				teamName.checkValid();
 			}
 
 			for (int i = 0; i < scoreTests.entryCount(); i++) {
