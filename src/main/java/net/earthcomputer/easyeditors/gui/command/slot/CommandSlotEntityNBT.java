@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.google.common.base.Joiner;
 
 import net.earthcomputer.easyeditors.api.util.NBTToJson;
+import net.earthcomputer.easyeditors.gui.command.CommandSlotContext;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.NBTTagHandler;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
@@ -23,14 +24,17 @@ public class CommandSlotEntityNBT extends CommandSlotModifiable<IGuiCommandSlot>
 	private List<NBTTagHandler> entityHandlers;
 	private Class<? extends Entity> entityType;
 
-	public CommandSlotEntityNBT() {
-		this(true);
+	public CommandSlotEntityNBT(CommandSlotContext context) {
+		this(true, context);
 	}
 
-	public CommandSlotEntityNBT(boolean optional) {
+	public CommandSlotEntityNBT(boolean optional, CommandSlotContext context) {
 		super(null);
 		this.optional = optional;
-		setEntityType(null);
+
+		entityHandlers = NBTTagHandler.constructEntityHandlers(null, context);
+		setChild(NBTTagHandler.setupCommandSlot(entityHandlers));
+		NBTTagHandler.readFromNBT(nbt, entityHandlers);
 	}
 
 	public void setEntityType(Class<? extends Entity> entityType) {

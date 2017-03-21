@@ -37,6 +37,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.effect.EntityLightningBolt;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
@@ -685,6 +687,23 @@ public class GeneralUtils {
 			desktopClass.getMethod("browse", URI.class).invoke(desktopInstance, uri);
 		} catch (Throwable throwable) {
 			MC_LOGGER.error("Couldn't open link", throwable);
+		}
+	}
+
+	/**
+	 * Gets entity class from resource location, including for lightning bolts
+	 * and players
+	 * 
+	 * @param location
+	 * @return
+	 */
+	public static Class<? extends Entity> getEntityClassFromLocation(ResourceLocation location) {
+		if (EntityList.LIGHTNING_BOLT.equals(location)) {
+			return EntityLightningBolt.class;
+		} else if (location.getResourceDomain().equals("minecraft") && location.getResourcePath().equals("player")) {
+			return EntityPlayer.class;
+		} else {
+			return EntityList.getClass(location);
 		}
 	}
 

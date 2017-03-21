@@ -5,16 +5,14 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.passive.AbstractHorse;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -149,16 +147,9 @@ public abstract class SlotHandler {
 
 		@Override
 		public boolean handlesEntity(ResourceLocation entityType) {
-			Class<?> entity;
-			if (GuiSelectEntity.PLAYER.equals(entityType)) {
-				entity = EntityPlayer.class;
-			} else if (EntityList.LIGHTNING_BOLT.equals(entityType)) {
-				entity = EntityLightningBolt.class;
-			} else {
-				entity = EntityList.getClass(entityType);
-				if (entity == null) {
-					throw new AssertionError();
-				}
+			Class<?> entity = GeneralUtils.getEntityClassFromLocation(entityType);
+			if (entity == null) {
+				throw new AssertionError();
 			}
 			return this.entityType.isAssignableFrom(entity);
 		}
