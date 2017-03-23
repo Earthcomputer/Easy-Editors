@@ -1,7 +1,8 @@
 package net.earthcomputer.easyeditors.gui.command.syntax;
 
+import com.google.common.base.Supplier;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
-import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.gui.command.CommandSlotContext;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
@@ -29,9 +30,9 @@ public class SyntaxSay extends CommandSyntax {
 
 	public static class Message extends CommandSlotList<Word> {
 		public Message(final CommandSlotContext context) {
-			super(new Instantiator<Word>() {
+			super(new Supplier<Word>() {
 				@Override
-				public Word newInstance() {
+				public Word get() {
 					return new Word(context);
 				}
 			});

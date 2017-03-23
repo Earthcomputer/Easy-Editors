@@ -2,9 +2,10 @@ package net.earthcomputer.easyeditors.gui.command.syntax;
 
 import java.util.List;
 
+import com.google.common.base.Supplier;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
-import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCheckbox;
@@ -146,9 +147,9 @@ public class SyntaxScoreboard extends CommandSyntax {
 			}
 		};
 		player2 = new CommandSlotPlayerSelector();
-		playerList = new CommandSlotList<IGuiCommandSlot>(new Instantiator<IGuiCommandSlot>() {
+		playerList = new CommandSlotList<IGuiCommandSlot>(new Supplier<IGuiCommandSlot>() {
 			@Override
-			public IGuiCommandSlot newInstance() {
+			public IGuiCommandSlot get() {
 				return new CommandSlotRectangle(new CommandSlotPlayerSelector(CommandSlotPlayerSelector.DISALLOW_UUID),
 						Colors.playerSelectorBox.color);
 			}

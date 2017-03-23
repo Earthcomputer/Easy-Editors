@@ -2,9 +2,9 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
-import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
@@ -23,7 +23,7 @@ import net.minecraftforge.fml.client.config.GuiUtils;
  */
 public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerticalArrangement {
 
-	private Instantiator<E> instantiator;
+	private Supplier<E> supplier;
 	private List<E> entries = Lists.newArrayList();
 
 	private String insertHoverText = Translate.GUI_COMMANDEDITOR_LIST_INSERT;
@@ -39,9 +39,9 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 	 * @param children
 	 *            - pre-existing entries
 	 */
-	public CommandSlotList(Instantiator<E> instantiator, E... children) {
+	public CommandSlotList(Supplier<E> instantiator, E... children) {
 		super();
-		this.instantiator = instantiator;
+		this.supplier = instantiator;
 		for (E child : children) {
 			addEntry(child);
 		}
@@ -52,7 +52,7 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 
 			@Override
 			public void onPress() {
-				addEntry(CommandSlotList.this.instantiator.newInstance());
+				addEntry(CommandSlotList.this.supplier.get());
 			}
 		});
 	}
@@ -207,7 +207,7 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 	 *         button
 	 */
 	public E newEntry() {
-		return instantiator.newInstance();
+		return supplier.get();
 	}
 
 	private class Entry extends CommandSlotHorizontalArrangement {
@@ -226,7 +226,7 @@ public class CommandSlotList<E extends IGuiCommandSlot> extends CommandSlotVerti
 
 				@Override
 				public void onPress() {
-					addEntry(Entry.this.ind, instantiator.newInstance());
+					addEntry(Entry.this.ind, supplier.get());
 				}
 			});
 			addChild(removeButton = new CommandSlotButton(20, 20, "x", removeHoverText) {

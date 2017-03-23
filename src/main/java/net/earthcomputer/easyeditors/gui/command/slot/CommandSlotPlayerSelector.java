@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
-import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.api.util.Patterns;
 import net.earthcomputer.easyeditors.api.util.Predicates2;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
@@ -347,10 +347,10 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private void setupScoresSlot() {
-			scoreTests = new CommandSlotList<CmdScoreTest>(new Instantiator<CmdScoreTest>() {
+			scoreTests = new CommandSlotList<CmdScoreTest>(new Supplier<CmdScoreTest>() {
 
 				@Override
-				public CmdScoreTest newInstance() {
+				public CmdScoreTest get() {
 					return new CmdScoreTest();
 				}
 

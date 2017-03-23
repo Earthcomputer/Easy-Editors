@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -12,7 +13,6 @@ import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.FormattedText;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
-import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.api.util.Predicates2;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
@@ -308,9 +308,9 @@ public abstract class NBTTagHandler {
 				displayName = new CommandSlotTextField(150, 150);
 			}
 			displayName.setMaxStringLength(Short.MAX_VALUE);
-			lore = new CommandSlotList<IGuiCommandSlot>(new Instantiator<IGuiCommandSlot>() {
+			lore = new CommandSlotList<IGuiCommandSlot>(new Supplier<IGuiCommandSlot>() {
 				@Override
-				public IGuiCommandSlot newInstance() {
+				public IGuiCommandSlot get() {
 					if (getContext().canHoldFormatting()) {
 						return new CommandSlotFormattedTextField(400);
 					} else {
@@ -431,9 +431,9 @@ public abstract class NBTTagHandler {
 		public IGuiCommandSlot[] setupCommandSlot() {
 			return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH,
 					Colors.itemLabel.color, Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH_TOOLTIP,
-					list = new CommandSlotList<CommandSlotEnchantment>(new Instantiator<CommandSlotEnchantment>() {
+					list = new CommandSlotList<CommandSlotEnchantment>(new Supplier<CommandSlotEnchantment>() {
 						@Override
-						public CommandSlotEnchantment newInstance() {
+						public CommandSlotEnchantment get() {
 							return new CommandSlotEnchantment();
 						}
 					}).setAppendHoverText(Translate.GUI_COMMANDEDITOR_ITEM_NBT_ENCH_APPEND)

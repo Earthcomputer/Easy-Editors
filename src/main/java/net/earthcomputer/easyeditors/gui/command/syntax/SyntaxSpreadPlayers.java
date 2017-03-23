@@ -1,7 +1,8 @@
 package net.earthcomputer.easyeditors.gui.command.syntax;
 
+import com.google.common.base.Supplier;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
-import net.earthcomputer.easyeditors.api.util.Instantiator;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCheckbox;
@@ -37,19 +38,20 @@ public class SyntaxSpreadPlayers extends CommandSyntax {
 		CommandSlotCheckbox respectTeams = new CommandSlotCheckbox(
 				Translate.GUI_COMMANDEDITOR_SPREADPLAYERS_RESPECTTEAMS);
 
-		final Instantiator<IGuiCommandSlot> instantiator = new Instantiator<IGuiCommandSlot>() {
-			@Override
-			public IGuiCommandSlot newInstance() {
-				return new CommandSlotRectangle(new CommandSlotPlayerSelector(CommandSlotPlayerSelector.DISALLOW_UUID),
-						Colors.playerSelectorBox.color);
-			}
-		};
-		CommandSlotList<IGuiCommandSlot> players = new CommandSlotList<IGuiCommandSlot>(instantiator) {
+		CommandSlotList<IGuiCommandSlot> players = new CommandSlotList<IGuiCommandSlot>(
+				new Supplier<IGuiCommandSlot>() {
+					@Override
+					public IGuiCommandSlot get() {
+						return new CommandSlotRectangle(
+								new CommandSlotPlayerSelector(CommandSlotPlayerSelector.DISALLOW_UUID),
+								Colors.playerSelectorBox.color);
+					}
+				}) {
 			@Override
 			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 				clearEntries();
 				for (int i = index; i < args.length; i++) {
-					addEntry(instantiator.newInstance());
+					addEntry(newEntry());
 				}
 				return super.readFromArgs(args, index);
 			}
