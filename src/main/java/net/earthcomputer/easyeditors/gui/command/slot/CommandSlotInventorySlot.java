@@ -24,8 +24,7 @@ public class CommandSlotInventorySlot extends CommandSlotVerticalArrangement {
 
 	private ResourceLocation currentEntityType;
 	private CommandSlotMenu slotHandlersMenu;
-	private CommandSlotModifiable<CommandSlotVerticalArrangement> parametersWrapper = new CommandSlotModifiable<CommandSlotVerticalArrangement>(
-			null);
+	private CommandSlotModifiable parametersWrapper = new CommandSlotModifiable();
 	private List<SlotHandler> slotHandlers;
 	private IGuiCommandSlot[] logicalParameters;
 

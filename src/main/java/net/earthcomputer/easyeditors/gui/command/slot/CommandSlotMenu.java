@@ -2,7 +2,10 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
+import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -191,6 +194,45 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	 */
 	public int wordCount() {
 		return values.length;
+	}
+
+	public static class Optional extends CommandSlotMenu implements IOptionalCommandSlot {
+
+		private String defaultValue;
+
+		public Optional(String defaultValue, String... values) {
+			super(values);
+			if (!ArrayUtils.contains(values, defaultValue)) {
+				throw new IllegalArgumentException(
+						"defaultValue \"" + defaultValue + "\" is not contained in values " + values);
+			}
+			this.defaultValue = defaultValue;
+		}
+
+		public Optional(String defaultValue, String[] displayValues, String... values) {
+			super(displayValues, values);
+			if (!ArrayUtils.contains(values, defaultValue)) {
+				throw new IllegalArgumentException(
+						"defaultValue \"" + defaultValue + "\" is not contained in values " + values);
+			}
+			this.defaultValue = defaultValue;
+		}
+
+		@Override
+		public boolean isDefault() throws UIInvalidException {
+			return getCurrentValue().equals(defaultValue);
+		}
+
+		@Override
+		public void setToDefault() {
+			for (int i = 0, e = wordCount(); i < e; i++) {
+				if (getValueAt(i).equals(defaultValue)) {
+					setCurrentIndex(i);
+					return;
+				}
+			}
+		}
+
 	}
 
 }

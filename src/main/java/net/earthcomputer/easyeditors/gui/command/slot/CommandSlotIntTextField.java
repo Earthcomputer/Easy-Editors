@@ -133,4 +133,34 @@ public class CommandSlotIntTextField extends CommandSlotTextField {
 		return MathHelper.clamp(intVal, minValue, maxValue);
 	}
 
+	public static class Optional extends CommandSlotIntTextField implements IOptionalCommandSlot {
+		private int defaultValue;
+
+		public Optional(int minWidth, int maxWidth, int defaultValue) {
+			super(minWidth, maxWidth);
+			this.defaultValue = defaultValue;
+		}
+
+		public Optional(int minWidth, int maxWidth, int minValue, int defaultValue) {
+			super(minWidth, maxWidth, minValue);
+			this.defaultValue = defaultValue;
+		}
+
+		public Optional(int minWidth, int maxWidth, int minValue, int maxValue, int defaultValue) {
+			super(minWidth, maxWidth, minValue, maxValue);
+			this.defaultValue = defaultValue;
+		}
+
+		@Override
+		public boolean isDefault() throws UIInvalidException {
+			checkValid();
+			return getIntValue() == defaultValue;
+		}
+
+		@Override
+		public void setToDefault() {
+			setText(String.valueOf(defaultValue));
+		}
+	}
+
 }

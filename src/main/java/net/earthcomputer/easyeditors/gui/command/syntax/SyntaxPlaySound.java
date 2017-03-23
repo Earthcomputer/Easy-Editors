@@ -2,12 +2,13 @@ package net.earthcomputer.easyeditors.gui.command.syntax;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
-import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
-import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotMenu;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotNumberTextField;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotOptional;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRelativeCoordinate;
@@ -22,10 +23,10 @@ public class SyntaxPlaySound extends CommandSyntax {
 	private CommandSlotSound sound;
 	private CommandSlotMenu category;
 	private CommandSlotPlayerSelector target;
-	private CommandSlotRelativeCoordinate.WithDefault position;
-	private CommandSlotNumberTextField volume;
-	private CommandSlotNumberTextField pitch;
-	private CommandSlotNumberTextField minVolume;
+	private CommandSlotRelativeCoordinate position;
+	private CommandSlotNumberTextField.Optional volume;
+	private CommandSlotNumberTextField.Optional pitch;
+	private CommandSlotNumberTextField.Optional minVolume;
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
@@ -42,135 +43,29 @@ public class SyntaxPlaySound extends CommandSyntax {
 
 		target = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.PLAYERS_ONLY);
 
-		position = new CommandSlotRelativeCoordinate.WithDefault() {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				int i = index;
-				if (args.length == i) {
-					getXArg().getTextField().setText("0");
-					getXArg().getRelative().setChecked(true);
-				} else {
-					getXArg().readFromArgs(args, i);
-					i++;
-				}
-				if (args.length == i) {
-					getYArg().getTextField().setText("0");
-					getYArg().getRelative().setChecked(true);
-				} else {
-					getYArg().readFromArgs(args, i);
-					i++;
-				}
-				if (args.length == i) {
-					getZArg().getTextField().setText("0");
-					getZArg().getRelative().setChecked(true);
-				} else {
-					getZArg().readFromArgs(args, i);
-					i++;
-				}
-				return i - index;
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				if (!isArgRedundant()) {
-					getXArg().addArgs(args);
-					getYArg().addArgs(args);
-					getZArg().addArgs(args);
-				} else {
-					boolean xDefault = getXArg().getTextField().getDoubleValue() == 0
-							&& getXArg().getRelative().isChecked();
-					boolean yDefault = getYArg().getTextField().getDoubleValue() == 0
-							&& getYArg().getRelative().isChecked();
-					boolean zDefault = getZArg().getTextField().getDoubleValue() == 0
-							&& getZArg().getRelative().isChecked();
-					if (!xDefault || !yDefault || !zDefault) {
-						getXArg().addArgs(args);
-						if (!yDefault || !zDefault) {
-							getYArg().addArgs(args);
-							if (!zDefault) {
-								getZArg().addArgs(args);
-							}
-						}
-					}
-				}
-			}
-
-			@Override
-			protected boolean isArgRedundant() throws UIInvalidException {
-				return volume.getDoubleValue() == 1 && pitch.getDoubleValue() == 1 && minVolume.getDoubleValue() == 0;
-			}
-		};
+		position = new CommandSlotRelativeCoordinate();
 
 		// TODO: convert max to fraction
-		volume = new CommandSlotNumberTextField(50, 50, 0, 3.4028234663852886E38D) {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setText("1");
-					return 0;
-				}
-				return super.readFromArgs(args, index);
-			}
+		volume = new CommandSlotNumberTextField.Optional(50, 50, 0, 3.4028234663852886E38D, 1);
 
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				if (getDoubleValue() == 1 && pitch.getDoubleValue() == 1 && minVolume.getDoubleValue() == 0) {
-					return;
-				}
-				super.addArgs(args);
-			}
-		};
-		volume.setText("1");
+		pitch = new CommandSlotNumberTextField.Optional(50, 50, 0, 2, 1);
 
-		pitch = new CommandSlotNumberTextField(50, 50, 0, 2) {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setText("1");
-					return 0;
-				}
-				return super.readFromArgs(args, index);
-			}
+		minVolume = new CommandSlotNumberTextField.Optional(50, 50, 0, 1, 0);
 
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				if (getDoubleValue() == 1 && minVolume.getDoubleValue() == 0) {
-					return;
-				}
-				super.addArgs(args);
-			}
-		};
-		pitch.setText("1");
-
-		minVolume = new CommandSlotNumberTextField(50, 50, 0, 1) {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setText("0");
-					return 0;
-				}
-				return super.readFromArgs(args, index);
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				checkValid();
-				if (getDoubleValue() == 0) {
-					return;
-				}
-				super.addArgs(args);
-			}
-		};
-		minVolume.setText("0");
+		List<CommandSlotOptional> optionalGroup = Lists.newArrayList();
 
 		return new IGuiCommandSlot[] { CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_SOUND, sound),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_CATEGORY, category),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_TARGET,
 						new CommandSlotRectangle(target, Colors.playerSelectorBox.color)),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_POS, position),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_VOLUME, volume),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_PITCH, pitch),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_MINVOLUME, minVolume) };
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_POS,
+						new CommandSlotOptional.Impl(position, optionalGroup)),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_VOLUME,
+						new CommandSlotOptional.Impl(volume, optionalGroup)),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_PITCH,
+						new CommandSlotOptional.Impl(pitch, optionalGroup)),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYSOUND_MINVOLUME,
+						new CommandSlotOptional.Impl(minVolume, optionalGroup)) };
 	}
 
 }

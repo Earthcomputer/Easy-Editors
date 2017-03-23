@@ -1,9 +1,12 @@
 package net.earthcomputer.easyeditors.gui.command.syntax;
 
+import com.google.common.collect.Lists;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEntityNBT;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotOptional;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
@@ -31,7 +34,9 @@ public class SyntaxTestFor extends CommandSyntax {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TESTFOR_TESTINGFOR,
 						new CommandSlotRectangle(testingFor, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TESTFOR_NBT,
-						new CommandSlotRectangle(nbt, Colors.nbtBox.color)) };
+						new CommandSlotRectangle(
+								new CommandSlotOptional.Impl(nbt, Lists.<CommandSlotOptional>newArrayList()),
+								Colors.nbtBox.color)) };
 	}
 
 }

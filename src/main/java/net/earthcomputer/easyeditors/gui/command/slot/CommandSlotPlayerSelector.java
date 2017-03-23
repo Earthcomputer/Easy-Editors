@@ -2,10 +2,10 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
@@ -23,7 +23,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameType;
@@ -137,11 +136,6 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		return radioList;
 	}
 
-	// Hacky method to get player selector because Java is stupid
-	private static CmdPlayerSelector getPlayerSelector(CommandSlotPlayerSelector selector) {
-		return selector.playerSelector;
-	}
-
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
@@ -186,104 +180,44 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 	protected void onSetEntityTo(ResourceLocation newEntityType) {
 	}
 
-	public static class WithDefault extends CommandSlotPlayerSelector {
+	public static class Optional extends CommandSlotPlayerSelector implements IOptionalCommandSlot {
 		private boolean optionalPlayersOnly = true;
 
-		public WithDefault() {
+		public Optional() {
 		}
 
-		public WithDefault(int flags) {
+		public Optional(int flags) {
 			super(flags);
 		}
 
-		public WithDefault(int flags, boolean optionalPlayersOnly) {
+		public Optional(int flags, boolean optionalPlayersOnly) {
 			super(flags);
 			this.optionalPlayersOnly = optionalPlayersOnly;
-			if ((flags & NON_PLAYERS_ONLY) == 0) {
-				getRadioList().setSelectedIndex(2);
+		}
+
+		@Override
+		public boolean isDefault() throws UIInvalidException {
+			List<String> args = Lists.newArrayListWithCapacity(1);
+			addArgs(args);
+			String arg = args.get(0);
+			if (optionalPlayersOnly) {
+				return "@p".equals(arg);
 			} else {
-				getRadioList().setSelectedIndex(2);
-				getPlayerSelector(this).selectorType.setCurrentIndex(0);
-				if ((flags & ONE_ONLY) != 0) {
-					getPlayerSelector(this).countField.setText("1");
-				}
+				return "@e[c=1]".equals(arg);
 			}
 		}
 
 		@Override
-		public void addArgs(List<String> args) throws UIInvalidException {
-			super.addArgs(args);
-			if (getContext().isPlayer()) {
-				if ((getFlags() & NON_PLAYERS_ONLY) == 0) {
-					String lastArg = args.get(args.size() - 1);
-					if (isArgRedundant()) {
-						boolean redundant = false;
-						if (lastArg.equals("@p")) {
-							redundant = true;
-						} else {
-							EntityPlayer player = (EntityPlayer) getContext().getSender();
-							if (player != null) {
-								if (lastArg.equals(player.getName())) {
-									redundant = true;
-								} else if (Patterns.UUID.matcher(lastArg).matches()
-										&& UUID.fromString(lastArg).equals(player.getUniqueID())) {
-									redundant = true;
-								}
-							}
-						}
-						if (redundant) {
-							args.remove(args.size() - 1);
-						}
-					}
-				}
-			} else if (getContext().isEntity()) {
-				if ((getFlags() & PLAYERS_ONLY) == 0 && !optionalPlayersOnly) {
-					String lastArg = args.get(args.size() - 1);
-					if (isArgRedundant()) {
-						boolean redundant = false;
-						if (lastArg.equals("@e[c=1]")) {
-							redundant = true;
-						} else {
-							Entity entity = (Entity) getContext().getSender();
-							if (entity != null) {
-								if (Patterns.UUID.matcher(lastArg).matches()
-										&& UUID.fromString(lastArg).equals(entity.getUniqueID())) {
-									redundant = true;
-								}
-							}
-						}
-						if (redundant) {
-							args.remove(args.size() - 1);
-						}
-					}
-				}
-			}
-		}
-
-		@Override
-		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-			if (isArgAbsent(args, index)) {
-				if (getContext().getSenderClass() == null) {
-					super.readFromArgs(new String[] { "@e[c=1]" }, 0);
-				} else if (getContext().isPlayer()) {
-					super.readFromArgs(new String[] { "@p" }, 0);
-				} else if (getContext().isEntity()) {
-					super.readFromArgs(new String[] { "@e[c=1]" }, 0);
+		public void setToDefault() {
+			try {
+				if (optionalPlayersOnly) {
+					readFromArgs(new String[] { "@p" }, 0);
 				} else {
-					throw new CommandSyntaxException();
+					readFromArgs(new String[] { "@e[c=1]" }, 0);
 				}
-				return 0;
-			} else {
-				return super.readFromArgs(args, index);
+			} catch (CommandSyntaxException e) {
+				throw new Error(e);
 			}
-		}
-
-		protected boolean isArgAbsent(String[] args, int index) {
-			return args.length == index;
-		}
-
-		protected boolean isArgRedundant() throws UIInvalidException {
-			return true;
 		}
 	}
 
@@ -302,7 +236,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		private IGuiCommandSlot count;
 		private CommandSlotIntTextField countField;
-		private CommandSlotModifiable<IGuiCommandSlot> modifiableCountField;
+		private CommandSlotModifiable modifiableCountField;
 
 		private CommandSlotCheckbox nameInverted;
 		private CommandSlotTextField entityName;
@@ -335,17 +269,17 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		private CommandSlotIntTextField minVRotation;
 		private CommandSlotIntTextField maxVRotation;
 		private IGuiCommandSlot rotations;
-		private CommandSlotModifiable<IGuiCommandSlot> modifiableRotations;
+		private CommandSlotModifiable modifiableRotations;
 
 		private CommandSlotIntTextField minExp;
 		private CommandSlotIntTextField maxExp;
 		private CommandSlotMenu gamemode;
 		private IGuiCommandSlot playersOnlySlots;
-		private CommandSlotModifiable<IGuiCommandSlot> modifiablePlayersOnlySlots;
+		private CommandSlotModifiable modifiablePlayersOnlySlots;
 
 		private static final int GAMEMODE_ANY = 0;
 
-		private CommandSlotModifiable<IGuiCommandSlot> modifiableTeam;
+		private CommandSlotModifiable modifiableTeam;
 		private IGuiCommandSlot team;
 		private CommandSlotRadioList teamMenu;
 		private CommandSlotCheckbox teamNameInverted;
@@ -409,7 +343,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					Colors.playerSelectorLabel.color,
 					new CommandSlotRectangle(teamMenu, Colors.playerSelectorBox.color));
 
-			modifiableTeam = new CommandSlotModifiable<IGuiCommandSlot>(team);
+			modifiableTeam = new CommandSlotModifiable(team);
 		}
 
 		private void setupScoresSlot() {
@@ -426,11 +360,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 		}
 
 		private void preSetupRotationsSlot() {
-			modifiableRotations = new CommandSlotModifiable<IGuiCommandSlot>(null);
+			modifiableRotations = new CommandSlotModifiable();
 		}
 
 		private void preSetupPlayersOnlySlot() {
-			modifiablePlayersOnlySlots = new CommandSlotModifiable<IGuiCommandSlot>(null);
+			modifiablePlayersOnlySlots = new CommandSlotModifiable();
 		}
 
 		private void setupHeader() {
@@ -534,7 +468,7 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 					.setOutOfBoundsMessage(TranslateKeys.GUI_COMMANDEDITOR_PLAYERSELECTOR_COUNT_OUTOFBOUNDS);
 			count = CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PLAYERSELECTOR_COUNT,
 					Colors.playerSelectorLabel.color, countField);
-			modifiableCountField = new CommandSlotModifiable<IGuiCommandSlot>(count);
+			modifiableCountField = new CommandSlotModifiable(count);
 
 			countField.setText("1");
 

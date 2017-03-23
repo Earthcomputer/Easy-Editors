@@ -33,11 +33,11 @@ import net.minecraft.util.text.TextFormatting;
 public class SyntaxScoreboard extends CommandSyntax {
 
 	private CommandSlotMenu subCommand;
-	private CommandSlotModifiable<IGuiCommandSlot> subCommandArgs;
+	private CommandSlotModifiable subCommandArgs;
 
 	private IGuiCommandSlot subCommandObjectives;
 	private CommandSlotMenu objectivesSubCommand;
-	private CommandSlotModifiable<IGuiCommandSlot> objectivesSubCommandArgs;
+	private CommandSlotModifiable objectivesSubCommandArgs;
 	private IGuiCommandSlot argsObjectivesList;
 	private IGuiCommandSlot argsObjectivesAdd;
 	private IGuiCommandSlot argsObjectivesRemove;
@@ -45,7 +45,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 	private IGuiCommandSlot subCommandPlayers;
 	private CommandSlotMenu playersSubCommand;
-	private CommandSlotModifiable<IGuiCommandSlot> playersSubCommandArgs;
+	private CommandSlotModifiable playersSubCommandArgs;
 	private IGuiCommandSlot argsPlayersList;
 	private IGuiCommandSlot argsPlayersAdd;
 	private IGuiCommandSlot argsPlayersRemove;
@@ -58,7 +58,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 	private IGuiCommandSlot subCommandTeams;
 	private CommandSlotMenu teamsSubCommand;
-	private CommandSlotModifiable<IGuiCommandSlot> teamsSubCommandArgs;
+	private CommandSlotModifiable teamsSubCommandArgs;
 	private IGuiCommandSlot argsTeamsList;
 	private IGuiCommandSlot argsTeamsAdd;
 	private IGuiCommandSlot argsTeamsRemove;
@@ -78,17 +78,17 @@ public class SyntaxScoreboard extends CommandSyntax {
 	private ITextField<?> displayName;
 	private CommandSlotScoreCriteria criteria;
 	private CommandSlotMenu objectiveDisplaySlot;
-	private CommandSlotModifiable<IGuiCommandSlot> modifiableSidebarTeam;
+	private CommandSlotModifiable modifiableSidebarTeam;
 	private IGuiCommandSlot sidebarTeam;
 	private CommandSlotMenu operation;
 	private CommandSlotMenu tagOperation;
-	private CommandSlotModifiable<IGuiCommandSlot> tagOperationArg;
+	private CommandSlotModifiable tagOperationArg;
 	private IGuiCommandSlot tagOperationList;
 	private IGuiCommandSlot tagOperationAddRemove;
 	private CommandSlotTextField tag;
 	private CommandSlotTeam team;
 	private CommandSlotMenu teamOption;
-	private CommandSlotModifiable<IGuiCommandSlot> teamOptionArg;
+	private CommandSlotModifiable teamOptionArg;
 	private CommandSlotMenu teamOptionColor;
 	private CommandSlotCheckbox teamOptionBoolean;
 	private CommandSlotMenu teamOptionVisibility;
@@ -137,6 +137,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 	public IGuiCommandSlot[] setupCommand() {
 		objective1 = new CommandSlotScore();
 		objective2 = new CommandSlotScore();
+		playerNBT = new CommandSlotEntityNBT(getContext());
 		player1 = new CommandSlotPlayerSelector() {
 			@Override
 			protected void onSetEntityTo(ResourceLocation newEntityType) {
@@ -164,7 +165,6 @@ public class SyntaxScoreboard extends CommandSyntax {
 				return amtRead;
 			}
 		};
-		playerNBT = new CommandSlotEntityNBT(getContext());
 		value1 = new CommandSlotIntTextField(50, 50);
 		value2 = new CommandSlotIntTextField(50, 50);
 		if (getContext().canHoldFormatting()) {
@@ -230,10 +230,10 @@ public class SyntaxScoreboard extends CommandSyntax {
 				}
 			}
 		};
-		modifiableSidebarTeam = new CommandSlotModifiable<IGuiCommandSlot>(null);
+		modifiableSidebarTeam = new CommandSlotModifiable();
 		sidebarTeam = CommandSlotLabel.createLabel(
 				Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVES_SETDISPLAY_SIDEBAR_TEAM,
-				new CommandSlotModifiable<IGuiCommandSlot>(teamOptionColor) {
+				new CommandSlotModifiable(teamOptionColor) {
 					@Override
 					public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 						return 0;
@@ -273,7 +273,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 		tagOperationAddRemove = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_TAG_NAME, tag),
 				new CommandSlotRectangle(playerNBT, Colors.nbtBox.color));
-		tagOperationArg = new CommandSlotModifiable<IGuiCommandSlot>(tagOperationList);
+		tagOperationArg = new CommandSlotModifiable(tagOperationList);
 		team = new CommandSlotTeam();
 		teamOption = new CommandSlotMenu(
 				new String[] { Translate.GUI_COMMANDEDITOR_SELECTTEAM_OPTIONS_COLOR,
@@ -323,7 +323,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 			displayNames[i] = I18n.format("gui.commandEditor.selectTeam.options.collisionRule." + values[i]);
 		}
 		teamOptionCollisionRule = new CommandSlotMenu(displayNames, values);
-		teamOptionArg = new CommandSlotModifiable<IGuiCommandSlot>(teamOptionColor);
+		teamOptionArg = new CommandSlotModifiable(teamOptionColor);
 
 		objectivesSubCommand = new CommandSlotMenu(
 				new String[] { Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVES_LIST,
@@ -363,7 +363,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 						objectiveDisplaySlot),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1));
 
-		objectivesSubCommandArgs = new CommandSlotModifiable<IGuiCommandSlot>(argsObjectivesList);
+		objectivesSubCommandArgs = new CommandSlotModifiable(argsObjectivesList);
 
 		subCommandObjectives = new CommandSlotVerticalArrangement(objectivesSubCommand, objectivesSubCommandArgs);
 
@@ -451,7 +451,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 		argsPlayersTag = new CommandSlotVerticalArrangement(tagOperation, tagOperationArg);
 
-		playersSubCommandArgs = new CommandSlotModifiable<IGuiCommandSlot>(argsPlayersList);
+		playersSubCommandArgs = new CommandSlotModifiable(argsPlayersList);
 
 		subCommandPlayers = new CommandSlotVerticalArrangement(playersSubCommand, playersSubCommandArgs);
 
@@ -497,11 +497,11 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 		argsTeamsOption = new CommandSlotVerticalArrangement(team, teamOption, teamOptionArg);
 
-		teamsSubCommandArgs = new CommandSlotModifiable<IGuiCommandSlot>(argsTeamsList);
+		teamsSubCommandArgs = new CommandSlotModifiable(argsTeamsList);
 
 		subCommandTeams = new CommandSlotVerticalArrangement(teamsSubCommand, teamsSubCommandArgs);
 
-		subCommandArgs = new CommandSlotModifiable<IGuiCommandSlot>(subCommandObjectives);
+		subCommandArgs = new CommandSlotModifiable(subCommandObjectives);
 
 		subCommand = new CommandSlotMenu(
 				new String[] { Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVES,

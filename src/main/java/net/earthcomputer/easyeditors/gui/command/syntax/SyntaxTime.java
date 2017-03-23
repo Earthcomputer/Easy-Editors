@@ -16,7 +16,7 @@ import net.earthcomputer.easyeditors.util.TranslateKeys;
 public class SyntaxTime extends CommandSyntax {
 
 	private CommandSlotMenu subcommand;
-	private CommandSlotModifiable<IGuiCommandSlot> subcommandArgs;
+	private CommandSlotModifiable subcommandArgs;
 	private IGuiCommandSlot subcommandSet;
 	private IGuiCommandSlot subcommandAdd;
 	private IGuiCommandSlot subcommandQuery;
@@ -31,7 +31,7 @@ public class SyntaxTime extends CommandSyntax {
 		subcommandSet = setupSubcommandSetSlot();
 		subcommandAdd = setupSubcommandAddSlot();
 		subcommandQuery = setupSubcommandQuerySlot();
-		subcommandArgs = new CommandSlotModifiable<IGuiCommandSlot>(subcommandSet);
+		subcommandArgs = new CommandSlotModifiable(subcommandSet);
 		return new IGuiCommandSlot[] {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TIME_SUBCOMMAND, subcommand), subcommandArgs };
 	}

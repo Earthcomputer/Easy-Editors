@@ -51,8 +51,8 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 	private Map<IProperty<?>, IPropertyControl<?>> nonVariants;
 	private List<NBTTagHandler> nbtHandlers;
 
-	private CommandSlotModifiable<IGuiCommandSlot> properties;
-	private CommandSlotModifiable<IGuiCommandSlot> nbt;
+	private CommandSlotModifiable properties;
+	private CommandSlotModifiable nbt;
 
 	public CommandSlotBlock(boolean isTest, int optionalStart, int... argOrder) {
 		this.isTest = isTest;
@@ -73,11 +73,11 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		}));
 
 		if ((displayComponents & COMPONENT_PROPERTIES) != 0) {
-			addChild(properties = new CommandSlotModifiable<IGuiCommandSlot>(null));
+			addChild(properties = new CommandSlotModifiable());
 		}
 
 		if ((displayComponents & COMPONENT_NBT) != 0) {
-			addChild(nbt = new CommandSlotModifiable<IGuiCommandSlot>(null));
+			addChild(nbt = new CommandSlotModifiable());
 		}
 	}
 

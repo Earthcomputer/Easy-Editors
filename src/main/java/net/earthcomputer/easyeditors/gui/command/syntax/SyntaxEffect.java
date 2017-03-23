@@ -2,6 +2,8 @@ package net.earthcomputer.easyeditors.gui.command.syntax;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
@@ -9,6 +11,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCheckbox;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotMobEffect;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotOptional;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRadioList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
@@ -23,9 +26,9 @@ public class SyntaxEffect extends CommandSyntax {
 	private CommandSlotRadioList action;
 	private CommandSlotMobEffect effect;
 	private CommandSlotRadioList actionOnEffect;
-	private CommandSlotIntTextField duration;
-	private CommandSlotIntTextField tier;
-	private CommandSlotCheckbox hidden;
+	private CommandSlotIntTextField.Optional duration;
+	private CommandSlotIntTextField.Optional tier;
+	private CommandSlotCheckbox.Optional hidden;
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
@@ -68,35 +71,11 @@ public class SyntaxEffect extends CommandSyntax {
 			}
 		};
 
-		duration = new CommandSlotIntTextField(50, 100, 1, 1000000) {
+		duration = new CommandSlotIntTextField.Optional(50, 100, 1, 1000000, 30);
+
+		tier = new CommandSlotIntTextField.Optional(50, 100, 1, 256, 1) {
 			@Override
 			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setText("30");
-					return 0;
-				}
-				return super.readFromArgs(args, index);
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				checkValid();
-				tier.checkValid();
-				if (getIntValue() == 30 && tier.getIntValue() == 1 && !hidden.isChecked()) {
-					return;
-				}
-				super.addArgs(args);
-			}
-		};
-		duration.setText("30");
-
-		tier = new CommandSlotIntTextField(50, 100, 1, 256) {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setText("1");
-					return 0;
-				}
 				int i;
 				try {
 					i = Integer.parseInt(args[index]);
@@ -110,44 +89,25 @@ public class SyntaxEffect extends CommandSyntax {
 
 			@Override
 			public void addArgs(List<String> args) throws UIInvalidException {
-				// already checked valid by duration
-				int i = getIntValue();
-				if (i == 1 && !hidden.isChecked()) {
-					return;
-				}
-				i--;
-				args.add(String.valueOf(i));
+				args.add(String.valueOf(getIntValue() + 1));
 			}
 		};
-		tier.setText("1");
 
-		hidden = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_HIDDEN) {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setChecked(false);
-					return 0;
-				}
-				return super.readFromArgs(args, index);
-			}
+		hidden = new CommandSlotCheckbox.Optional(Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_HIDDEN,
+				false);
 
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				if (!isChecked()) {
-					return;
-				}
-				super.addArgs(args);
-			}
-		};
+		List<CommandSlotOptional> optionalGroup = Lists.newArrayList();
 
 		IGuiCommandSlot addEffect = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_DURATION,
 						Colors.miscBigBoxLabel.color,
-						Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_DURATION_TOOLTIP, duration),
+						Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_DURATION_TOOLTIP,
+						new CommandSlotOptional.Impl(duration, optionalGroup)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_TIER,
 						Colors.miscBigBoxLabel.color,
-						Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_TIER_TOOLTIP, tier),
-				hidden);
+						Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD_TIER_TOOLTIP,
+						new CommandSlotOptional.Impl(tier, optionalGroup)),
+				new CommandSlotOptional.Impl(hidden, optionalGroup));
 
 		actionOnEffect = new CommandSlotRadioList(clearEffect,
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_EFFECT_ACTION_SPECIFIC_ACTION_ADD,

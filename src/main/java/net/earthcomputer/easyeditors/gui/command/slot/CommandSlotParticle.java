@@ -57,10 +57,10 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 	private CommandSlotNumberTextField paramZ;
 	// so-called "speed"
 	private CommandSlotNumberTextField paramSpeed;
-	private CommandSlotIntTextField count;
-	private CommandSlotCheckbox force;
+	private CommandSlotIntTextField.Optional count;
+	private CommandSlotCheckbox.Optional force;
 	private CommandSlotPlayerSelector players;
-	private CommandSlotModifiable<IGuiCommandSlot> args;
+	private CommandSlotModifiable args;
 
 	private CommandSlotLabel graphsTitles;
 	private Graph xGraph;
@@ -99,86 +99,29 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 		paramY = new ChangeListeningNumberTextField(50, 100);
 		paramZ = new ChangeListeningNumberTextField(50, 100);
 		paramSpeed = new ChangeListeningNumberTextField(50, 100);
-		count = new CommandSlotIntTextField(50, 100, 0) {
+
+		List<CommandSlotOptional> optionalGroup = Lists.newArrayList();
+		count = new CommandSlotIntTextField.Optional(50, 100, 0, 0) {
 			@Override
 			protected void onTextChanged() {
 				simulations.clear();
 			}
-
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setText("0");
-					return 0;
-				}
-				return super.readFromArgs(args, index);
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				checkValid();
-				if (getIntValue() == 0 && !force.isChecked()) {
-					List<String> tmpArgs = Lists.newArrayListWithCapacity(1);
-					players.addArgs(tmpArgs);
-					if (tmpArgs.isEmpty()) {
-						return;
-					}
-				}
-				super.addArgs(args);
-			}
 		};
-		force = new CommandSlotCheckbox(Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE,
-				Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE_TOOLTIP) {
+		force = new CommandSlotCheckbox.Optional(Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE,
+				Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE_TOOLTIP, false) {
 			@Override
 			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					setChecked(false);
-					return 0;
-				} else {
-					setChecked(args[index].equals("force"));
-					return 1;
-				}
+				setChecked(args[index].equals("force"));
+				return 1;
 			}
 
 			@Override
 			public void addArgs(List<String> args) throws UIInvalidException {
-				if (!isChecked()) {
-					List<String> tmpArgs = Lists.newArrayListWithCapacity(1);
-					players.addArgs(tmpArgs);
-					if (tmpArgs.isEmpty()) {
-						return;
-					}
-				}
 				args.add(isChecked() ? "force" : "");
 			}
 		};
-		players = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.PLAYERS_ONLY) {
-			{
-				try {
-					super.readFromArgs(new String[] { "@a" }, 0);
-				} catch (CommandSyntaxException e) {
-					throw Throwables.propagate(e);
-				}
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				super.addArgs(args);
-				if (args.get(args.size() - 1).equals("@a") && CommandSlotParticle.this.args.getChild() == null) {
-					args.remove(args.size() - 1);
-				}
-			}
-
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (args.length == index) {
-					super.readFromArgs(new String[] { "@a" }, 0);
-					return 0;
-				}
-				return super.readFromArgs(args, index);
-			}
-		};
-		args = new CommandSlotModifiable<IGuiCommandSlot>(null);
+		players = new CommandSlotPlayerSelector(CommandSlotPlayerSelector.PLAYERS_ONLY);
+		args = new CommandSlotModifiable();
 
 		xGraph = new Graph(simulations, 0);
 		yGraph = new Graph(simulations, 1);
@@ -203,13 +146,42 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_PARAMSPEED,
 				Translate.GUI_COMMANDEDITOR_PARTICLE_PARAMSPEED_TOOLTIP, paramSpeed));
 		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_COUNT,
-				Translate.GUI_COMMANDEDITOR_PARTICLE_COUNT_TOOLTIP, count));
+				Translate.GUI_COMMANDEDITOR_PARTICLE_COUNT_TOOLTIP,
+				new CommandSlotOptional.Impl(count, optionalGroup)));
 		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE,
-				Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE_TOOLTIP, force));
+				Translate.GUI_COMMANDEDITOR_PARTICLE_FORCE_TOOLTIP,
+				new CommandSlotOptional.Impl(force, optionalGroup)));
 		addChild(CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_PARTICLE_PLAYERS,
 				Translate.GUI_COMMANDEDITOR_PARTICLE_PLAYERS_TOOLTIP,
-				new CommandSlotRectangle(players, Colors.playerSelectorBox.color)));
+				new CommandSlotRectangle(new CommandSlotOptional(players, optionalGroup) {
+					@Override
+					protected boolean isDefault() throws UIInvalidException {
+						List<String> args = Lists.newArrayList();
+						getChild().addArgs(args);
+						return args.get(0).equals("@a");
+					}
+
+					@Override
+					protected void setToDefault() {
+						try {
+							getChild().readFromArgs(new String[] { "@a" }, 0);
+						} catch (CommandSyntaxException e) {
+							throw new Error(e);
+						}
+					}
+				}, Colors.playerSelectorBox.color)));
 		addChild(args);
+		new CommandSlotOptional(args, optionalGroup) {
+			@Override
+			protected boolean isDefault() throws UIInvalidException {
+				return args.getChild() == null;
+			}
+
+			@Override
+			protected void setToDefault() {
+				args.setChild(null);
+			}
+		};
 
 		graphsTitles = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
 				I18n.format(TranslateKeys.GUI_COMMANDEDITOR_PARTICLE_GRAPH, 0));

@@ -26,7 +26,7 @@ public class SyntaxStats extends CommandSyntax {
 	private CommandSlotPlayerSelector sourceEntity;
 	private CommandSlotMenu mode;
 	private CommandSlotMenu commandResultType;
-	private CommandSlotModifiable<CommandSlotVerticalArrangement> modeParam;
+	private CommandSlotModifiable modeParam;
 	private CommandSlotVerticalArrangement setModeParam;
 	private CommandSlotVerticalArrangement clearModeParam;
 	private CommandSlotPlayerSelector targetEntity;
@@ -116,7 +116,7 @@ public class SyntaxStats extends CommandSyntax {
 
 		clearModeParam = new CommandSlotVerticalArrangement();
 
-		modeParam = new CommandSlotModifiable<CommandSlotVerticalArrangement>(setModeParam);
+		modeParam = new CommandSlotModifiable(setModeParam);
 
 		return new IGuiCommandSlot[] {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_STATS_SOURCE,

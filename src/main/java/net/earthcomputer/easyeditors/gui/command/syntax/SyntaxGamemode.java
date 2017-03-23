@@ -1,9 +1,12 @@
 package net.earthcomputer.easyeditors.gui.command.syntax;
 
+import com.google.common.collect.Lists;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotMenu;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotOptional;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
@@ -14,7 +17,7 @@ import net.minecraft.world.GameType;
 public class SyntaxGamemode extends CommandSyntax {
 
 	private CommandSlotMenu gamemode;
-	private CommandSlotPlayerSelector player;
+	private IGuiCommandSlot player;
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
@@ -32,8 +35,10 @@ public class SyntaxGamemode extends CommandSyntax {
 		return new GameModeMenu();
 	}
 
-	private CommandSlotPlayerSelector buildPlayerSlot() {
-		return new CommandSlotPlayerSelector.WithDefault(CommandSlotPlayerSelector.PLAYERS_ONLY);
+	private IGuiCommandSlot buildPlayerSlot() {
+		return new CommandSlotOptional.Impl(
+				new CommandSlotPlayerSelector.Optional(CommandSlotPlayerSelector.PLAYERS_ONLY),
+				Lists.<CommandSlotOptional>newArrayList());
 	}
 
 	public static class GameModeMenu extends CommandSlotMenu {

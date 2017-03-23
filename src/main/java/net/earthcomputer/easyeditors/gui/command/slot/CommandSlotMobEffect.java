@@ -18,13 +18,12 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class CommandSlotMobEffect extends CommandSlotHorizontalArrangement implements ICallback<ResourceLocation> {
 
-	private CommandSlotModifiable<CommandSlotLabel> label;
+	private CommandSlotModifiable label;
 	private ResourceLocation effect;
 
 	public CommandSlotMobEffect() {
-		label = new CommandSlotModifiable<CommandSlotLabel>(
-				new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj, Translate.GUI_COMMANDEDITOR_NOEFFECT,
-						Colors.invalidItemName.color));
+		label = new CommandSlotModifiable(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+				Translate.GUI_COMMANDEDITOR_NOEFFECT, Colors.invalidItemName.color));
 		addChild(label);
 		addChild(new CommandSlotButton(20, 20, "...") {
 			@Override

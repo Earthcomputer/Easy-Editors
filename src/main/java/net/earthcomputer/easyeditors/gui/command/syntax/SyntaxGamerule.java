@@ -32,20 +32,20 @@ import net.minecraft.world.GameRules;
 public class SyntaxGamerule extends CommandSyntax {
 
 	private CommandSlotRadioList action;
-	private CommandSlotModifiable<IGuiCommandSlot> rule;
+	private CommandSlotModifiable rule;
 	private CommandSlotGameRule ruleMenu;
 	private String waitingGameRule;
-	private CommandSlotModifiable<IGuiCommandSlot> value;
+	private CommandSlotModifiable value;
 	private CommandSlotCheckbox valueCheckbox;
 	private ITextField<?> valueTextField;
-	private CommandSlotModifiable<IGuiCommandSlot> arg;
+	private CommandSlotModifiable arg;
 	private IGuiCommandSlot argList;
 	private IGuiCommandSlot argQuery;
 	private IGuiCommandSlot argSet;
 
 	@Override
 	public IGuiCommandSlot[] setupCommand() {
-		rule = new CommandSlotModifiable<IGuiCommandSlot>(
+		rule = new CommandSlotModifiable(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_GAMERULE_WAITING, 0xff0000)) {
 			@Override
 			public void addArgs(List<String> args) throws UIInvalidException {
@@ -93,7 +93,7 @@ public class SyntaxGamerule extends CommandSyntax {
 			};
 		}
 
-		value = new CommandSlotModifiable<IGuiCommandSlot>((IGuiCommandSlot) valueTextField);
+		value = new CommandSlotModifiable((IGuiCommandSlot) valueTextField);
 
 		ChatBlocker.getGameRuleNames(new ReturnedValueListener<List<String>>() {
 			@Override
@@ -113,7 +113,7 @@ public class SyntaxGamerule extends CommandSyntax {
 			}
 		});
 
-		arg = new CommandSlotModifiable<IGuiCommandSlot>(null);
+		arg = new CommandSlotModifiable();
 
 		argList = new CommandSlotVerticalArrangement();
 

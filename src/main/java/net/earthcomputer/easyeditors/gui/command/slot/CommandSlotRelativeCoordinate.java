@@ -15,7 +15,7 @@ import net.earthcomputer.easyeditors.util.Translate;
  * @author Earthcomputer
  *
  */
-public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangement {
+public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangement implements IOptionalCommandSlot {
 
 	private CoordinateArg x;
 	private CoordinateArg y;
@@ -57,47 +57,19 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 	protected void onChanged() {
 	}
 
-	public static class WithDefault extends CommandSlotRelativeCoordinate {
-		public boolean isSetToDefault() {
-			return getXArg().getTextField().getDoubleValue() == 0 && getXArg().getRelative().isChecked()
-					&& getYArg().getTextField().getDoubleValue() == 0 && getYArg().getRelative().isChecked()
-					&& getZArg().getTextField().getDoubleValue() == 0 && getZArg().getRelative().isChecked();
-		}
-
-		@Override
-		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-			if (isArgAbsent(args, index)) {
-				getXArg().getTextField().setText("0");
-				getXArg().getRelative().setChecked(true);
-				getYArg().getTextField().setText("0");
-				getYArg().getRelative().setChecked(true);
-				getZArg().getTextField().setText("0");
-				getZArg().getRelative().setChecked(true);
-				return 0;
-			}
-			return super.readFromArgs(args, index);
-		}
-
-		@Override
-		public void addArgs(List<String> args) throws UIInvalidException {
-			getXArg().checkValid();
-			getYArg().checkValid();
-			getZArg().checkValid();
-			if (!isArgRedundant() || !isSetToDefault()) {
-				super.addArgs(args);
-			}
-		}
-
-		protected boolean isArgAbsent(String[] args, int index) {
-			return args.length == index;
-		}
-
-		protected boolean isArgRedundant() throws UIInvalidException {
-			return true;
-		}
+	@Override
+	public boolean isDefault() throws UIInvalidException {
+		return x.isDefault() && y.isDefault() && z.isDefault();
 	}
 
-	public static class CoordinateArg extends CommandSlotHorizontalArrangement {
+	@Override
+	public void setToDefault() {
+		x.setToDefault();
+		y.setToDefault();
+		z.setToDefault();
+	}
+
+	public static class CoordinateArg extends CommandSlotHorizontalArrangement implements IOptionalCommandSlot {
 		private CommandSlotNumberTextField textField;
 		private CommandSlotCheckbox relative;
 
@@ -185,6 +157,18 @@ public class CommandSlotRelativeCoordinate extends CommandSlotVerticalArrangemen
 		}
 
 		protected void onChanged() {
+		}
+
+		@Override
+		public boolean isDefault() throws UIInvalidException {
+			textField.checkValid();
+			return textField.getDoubleValue() == 0 && relative.isChecked();
+		}
+
+		@Override
+		public void setToDefault() {
+			textField.setText("0");
+			relative.setChecked(true);
 		}
 	}
 

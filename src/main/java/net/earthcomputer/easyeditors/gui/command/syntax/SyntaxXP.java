@@ -2,11 +2,14 @@ package net.earthcomputer.easyeditors.gui.command.syntax;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotOptional;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRadioList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
@@ -50,14 +53,16 @@ public class SyntaxXP extends CommandSyntax {
 				}
 			}
 		};
-		CommandSlotPlayerSelector player = new CommandSlotPlayerSelector.WithDefault(
+		CommandSlotPlayerSelector.Optional player = new CommandSlotPlayerSelector.Optional(
 				CommandSlotPlayerSelector.PLAYERS_ONLY);
 		return new IGuiCommandSlot[] {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_XP_XP,
 						Translate.GUI_COMMANDEDITOR_XP_XP_TOOLTIP, xp),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_XP_PLAYER,
 						Translate.GUI_COMMANDEDITOR_XP_PLAYER_TOOLTIP,
-						new CommandSlotRectangle(player, Colors.playerSelectorBox.color)) };
+						new CommandSlotRectangle(
+								new CommandSlotOptional.Impl(player, Lists.<CommandSlotOptional>newArrayList()),
+								Colors.playerSelectorBox.color)) };
 	}
 
 }

@@ -118,4 +118,32 @@ public class CommandSlotCheckbox extends GuiCommandSlotImpl {
 	protected void onChecked(boolean checked) {
 	}
 
+	public static class Optional extends CommandSlotCheckbox implements IOptionalCommandSlot {
+		private boolean defaultValue;
+
+		public Optional(boolean defaultValue) {
+			this.defaultValue = defaultValue;
+		}
+
+		public Optional(String text, boolean defaultValue) {
+			super(text);
+			this.defaultValue = defaultValue;
+		}
+
+		public Optional(String text, String hoverText, boolean defaultValue) {
+			super(text, hoverText);
+			this.defaultValue = defaultValue;
+		}
+
+		@Override
+		public boolean isDefault() throws UIInvalidException {
+			return isChecked() == defaultValue;
+		}
+
+		@Override
+		public void setToDefault() {
+			setChecked(defaultValue);
+		}
+	}
+
 }
