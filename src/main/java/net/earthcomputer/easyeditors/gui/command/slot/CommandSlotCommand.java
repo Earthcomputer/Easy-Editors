@@ -2,7 +2,9 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import net.earthcomputer.easyeditors.api.EasyEditorsApi;
 import net.earthcomputer.easyeditors.api.util.Colors;
+import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectCommand;
@@ -38,6 +40,7 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 		try {
 			return super.readFromArgs(args, index + 1) + 1;
 		} catch (CommandSyntaxException e) {
+			GeneralUtils.logStackTrace(EasyEditorsApi.logger, e);
 			getContext().commandSyntaxError();
 			clearChildren();
 			addChild(header);
