@@ -2,22 +2,27 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import com.google.common.base.Predicate;
+
 import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectTeam;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
-import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
 
 public class CommandSlotTeam extends CommandSlotHorizontalArrangement implements ICallback<String> {
 
-	private String selectedTeam = null;
-	private CommandSlotLabel teamLabel;
+	private CommandSlotTextField teamTextField;
 
 	public CommandSlotTeam() {
-		addChild(teamLabel = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-				Translate.GUI_COMMANDEDITOR_NOTEAM, 0xff0000));
+		addChild(teamTextField = new CommandSlotTextField(100, 100));
+		teamTextField.setContentFilter(new Predicate<String>() {
+			@Override
+			public boolean apply(String input) {
+				return !input.contains(" ");
+			}
+		});
 
 		addChild(new CommandSlotButton(20, 20, "...") {
 			@Override
@@ -29,13 +34,11 @@ public class CommandSlotTeam extends CommandSlotHorizontalArrangement implements
 	}
 
 	public String getTeam() {
-		return selectedTeam;
+		return teamTextField.getText();
 	}
 
 	public void setTeam(String score) {
-		this.selectedTeam = score;
-		teamLabel.setText(score);
-		teamLabel.setColor(0x000000);
+		teamTextField.setText(score);
 	}
 
 	@Override
@@ -60,12 +63,12 @@ public class CommandSlotTeam extends CommandSlotHorizontalArrangement implements
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		checkValid();
-		args.add(selectedTeam);
+		args.add(teamTextField.getText());
 	}
 
 	public void checkValid() throws UIInvalidException {
-		if (selectedTeam == null) {
-			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOSCORESELECTED);
+		if (teamTextField.getText().isEmpty()) {
+			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOTEAMSELECTED);
 		}
 	}
 
