@@ -419,6 +419,7 @@ gui.commandEditor.scoreboard.players.operation.targetPlayer.tooltip=The player w
 gui.commandEditor.scoreboard.players.operation.type=Type:
 gui.commandEditor.scoreboard.players.remove=Subtract from Player Score
 gui.commandEditor.scoreboard.players.reset=Reset Player Score
+gui.commandEditor.scoreboard.players.reset.all=Reset All Score Objectives
 gui.commandEditor.scoreboard.players.set=Set Player Score
 gui.commandEditor.scoreboard.players.tag=Tag Player
 gui.commandEditor.scoreboard.players.tag.add=Add Tag

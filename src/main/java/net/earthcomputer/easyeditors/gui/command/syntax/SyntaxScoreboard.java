@@ -3,11 +3,13 @@ package net.earthcomputer.easyeditors.gui.command.syntax;
 import java.util.List;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotBox;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCheckbox;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEntityNBT;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
@@ -16,7 +18,9 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotMenu;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotModifiable;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotOptional;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotPlayerSelector;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRadioList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotRectangle;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotScore;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotScoreCriteria;
@@ -232,9 +236,19 @@ public class SyntaxScoreboard extends CommandSyntax {
 			}
 		};
 		modifiableSidebarTeam = new CommandSlotModifiable();
+		String[] displayNames = new String[17];
+		String[] values = new String[17];
+		displayNames[0] = Translate.GUI_COMMANDEDITOR_SELECTTEAM_OPTIONS_COLOR_NONE;
+		values[0] = "none";
+		for (int i = 1; i < 17; i++) {
+			values[i] = TextFormatting.fromColorIndex(i - 1).getFriendlyName();
+			displayNames[i] = I18n.format("color." + values[i]);
+		}
+		// TODO: make teamOptionColor a cycle button
+		teamOptionColor = new CommandSlotMenu(displayNames, values);
 		sidebarTeam = CommandSlotLabel.createLabel(
 				Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVES_SETDISPLAY_SIDEBAR_TEAM,
-				new CommandSlotModifiable(teamOptionColor) {
+				new CommandSlotBox(teamOptionColor) {
 					@Override
 					public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 						return 0;
@@ -273,7 +287,9 @@ public class SyntaxScoreboard extends CommandSyntax {
 		tagOperationList = new CommandSlotVerticalArrangement();
 		tagOperationAddRemove = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_TAG_NAME, tag),
-				new CommandSlotRectangle(playerNBT, Colors.nbtBox.color));
+				new CommandSlotRectangle(
+						new CommandSlotOptional.Impl(playerNBT, Lists.<CommandSlotOptional>newArrayList()),
+						Colors.nbtBox.color));
 		tagOperationArg = new CommandSlotModifiable(tagOperationList);
 		team = new CommandSlotTeam();
 		teamOption = new CommandSlotMenu(
@@ -300,15 +316,6 @@ public class SyntaxScoreboard extends CommandSyntax {
 				}
 			}
 		};
-		String[] displayNames = new String[17];
-		String[] values = new String[17];
-		displayNames[0] = Translate.GUI_COMMANDEDITOR_SELECTTEAM_OPTIONS_COLOR_NONE;
-		values[0] = "none";
-		for (int i = 1; i < 17; i++) {
-			values[i] = TextFormatting.fromColorIndex(i - 1).getFriendlyName();
-			displayNames[i] = I18n.format("color." + values[i]);
-		}
-		teamOptionColor = new CommandSlotMenu(displayNames, values);
 		teamOptionBoolean = new CommandSlotCheckbox(Translate.GUI_ON);
 		values = new String[Team.EnumVisible.values().length];
 		displayNames = new String[values.length];
@@ -354,7 +361,19 @@ public class SyntaxScoreboard extends CommandSyntax {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVES_ADD_CRITERIA, criteria),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_DISPLAYNAME,
-						(IGuiCommandSlot) displayName));
+						new CommandSlotOptional((IGuiCommandSlot) displayName,
+								Lists.<CommandSlotOptional>newArrayList()) {
+							@Override
+							protected boolean isDefault() throws UIInvalidException {
+								return displayName.getTextAsString().equals(objective1.getScore())
+										|| displayName.getTextAsString().isEmpty();
+							}
+
+							@Override
+							protected void setToDefault() {
+								displayName.setTextAsString("");
+							}
+						}));
 
 		argsObjectivesRemove = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1));
@@ -362,6 +381,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 		argsObjectivesSetdisplay = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVES_SETDISPLAY_SLOT,
 						objectiveDisplaySlot),
+				modifiableSidebarTeam,
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1));
 
 		objectivesSubCommandArgs = new CommandSlotModifiable(argsObjectivesList);
@@ -407,13 +427,26 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 		argsPlayersList = new CommandSlotVerticalArrangement();
 
+		List<CommandSlotOptional> optionalGroup = Lists.newArrayList();
 		argsPlayersAdd = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYER,
 						new CommandSlotRectangle(player1, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_VALUE, value1),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_NBT,
-						new CommandSlotRectangle(playerNBT, Colors.nbtBox.color)));
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_VALUE,
+						new CommandSlotOptional(value1, optionalGroup) {
+							@Override
+							protected boolean isDefault() throws UIInvalidException {
+								value1.checkValid();
+								return value1.getIntValue() == 0;
+							}
+
+							@Override
+							protected void setToDefault() {
+								value1.setText("0");
+							}
+						}),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_NBT, new CommandSlotRectangle(
+						new CommandSlotOptional.Impl(playerNBT, optionalGroup), Colors.nbtBox.color)));
 
 		argsPlayersRemove = argsPlayersAdd;
 
@@ -422,20 +455,72 @@ public class SyntaxScoreboard extends CommandSyntax {
 						new CommandSlotRectangle(player1, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_VALUE, value1),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_NBT,
-						new CommandSlotRectangle(playerNBT, Colors.nbtBox.color)));
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_NBT, new CommandSlotRectangle(
+						new CommandSlotOptional.Impl(playerNBT, optionalGroup), Colors.nbtBox.color)));
 
 		argsPlayersReset = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYER,
 						new CommandSlotRectangle(player1, Colors.playerSelectorBox.color)),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1));
+				new CommandSlotRadioList(
+						CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_RESET_ALL),
+						CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1)) {
+					@Override
+					protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
+						return args.length == index ? 0 : 1;
+					}
+				});
 
 		argsPlayersTest = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYER,
 						new CommandSlotRectangle(player1, Colors.playerSelectorBox.color)),
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_TEST_MIN, value1),
-				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_TEST_MAX, value2));
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_TEST_MIN,
+						new CommandSlotBox(value1) {
+							@Override
+							public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+								if (args.length == index) {
+									throw new CommandSyntaxException();
+								} else if ("*".equals(args[index])) {
+									value1.setText(String.valueOf(Integer.MIN_VALUE));
+									return 1;
+								} else {
+									return value1.readFromArgs(args, index);
+								}
+							}
+
+							@Override
+							public void addArgs(List<String> args) throws UIInvalidException {
+								value1.checkValid();
+								if (value1.getIntValue() == Integer.MIN_VALUE) {
+									args.add("*");
+								} else {
+									value1.addArgs(args);
+								}
+							}
+						}),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_TEST_MAX,
+						new CommandSlotOptional(new CommandSlotBox(value2) {
+							@Override
+							public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+								if ("*".equals(args[index])) {
+									value2.setText(String.valueOf(Integer.MAX_VALUE));
+									return 1;
+								} else {
+									return value2.readFromArgs(args, index);
+								}
+							}
+						}, Lists.<CommandSlotOptional>newArrayList()) {
+							@Override
+							protected boolean isDefault() throws UIInvalidException {
+								value2.checkValid();
+								return value2.getIntValue() == Integer.MAX_VALUE;
+							}
+
+							@Override
+							protected void setToDefault() {
+								value2.setText(String.valueOf(Integer.MAX_VALUE));
+							}
+						}));
 
 		argsPlayersOperation = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_OPERATION_TARGETPLAYER,
@@ -486,7 +571,19 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 		argsTeamsList = new CommandSlotVerticalArrangement();
 
-		argsTeamsAdd = new CommandSlotVerticalArrangement(team, (IGuiCommandSlot) displayName);
+		argsTeamsAdd = new CommandSlotVerticalArrangement(team,
+				new CommandSlotOptional((IGuiCommandSlot) displayName, Lists.<CommandSlotOptional>newArrayList()) {
+					@Override
+					protected boolean isDefault() throws UIInvalidException {
+						return displayName.getTextAsString().isEmpty()
+								|| displayName.getTextAsString().equals(team.getTeam());
+					}
+
+					@Override
+					protected void setToDefault() {
+						displayName.setTextAsString("");
+					}
+				});
 
 		argsTeamsRemove = new CommandSlotVerticalArrangement(team);
 
