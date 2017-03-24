@@ -11,6 +11,7 @@ import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotBox;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCheckbox;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotCycleButton;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEntityNBT;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
@@ -94,7 +95,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 	private CommandSlotTeam team;
 	private CommandSlotMenu teamOption;
 	private CommandSlotModifiable teamOptionArg;
-	private CommandSlotMenu teamOptionColor;
+	private CommandSlotCycleButton teamOptionColor;
 	private CommandSlotCheckbox teamOptionBoolean;
 	private CommandSlotMenu teamOptionVisibility;
 	private CommandSlotMenu teamOptionCollisionRule;
@@ -244,8 +245,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 			values[i] = TextFormatting.fromColorIndex(i - 1).getFriendlyName();
 			displayNames[i] = I18n.format("color." + values[i]);
 		}
-		// TODO: make teamOptionColor a cycle button
-		teamOptionColor = new CommandSlotMenu(displayNames, values);
+		teamOptionColor = new CommandSlotCycleButton(100, 20, displayNames, values);
 		sidebarTeam = CommandSlotLabel.createLabel(
 				Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVES_SETDISPLAY_SIDEBAR_TEAM,
 				new CommandSlotBox(teamOptionColor) {
