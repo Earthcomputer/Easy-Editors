@@ -211,6 +211,20 @@ public interface IGuiCommandSlot {
 	void setContext(CommandSlotContext context);
 
 	/**
+	 * Returns whether the command slot context is 'detached', i.e. independent
+	 * from the parent
+	 * 
+	 * @return
+	 */
+	boolean isDetachedContext();
+
+	/**
+	 * Makes the command slot context 'detached', i.e. independent from the
+	 * parent
+	 */
+	void detachContext();
+
+	/**
 	 * Draws a tooltip on top of everything else
 	 * 
 	 * @param x

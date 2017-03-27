@@ -142,7 +142,9 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 	public void setContext(CommandSlotContext context) {
 		super.setContext(context);
 		for (IGuiCommandSlot child : children) {
-			child.setContext(context);
+			if (!child.isDetachedContext()) {
+				child.setContext(context);
+			}
 		}
 	}
 
@@ -165,7 +167,9 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		children.add(child);
 		child.addSizeChangeListener(this);
 		child.setParent(this);
-		child.setContext(getContext());
+		if (!child.isDetachedContext()) {
+			child.setContext(getContext());
+		}
 		recalcSize();
 		recalcPosChildren();
 	}
@@ -180,7 +184,9 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		children.add(index, child);
 		child.addSizeChangeListener(this);
 		child.setParent(this);
-		child.setContext(getContext());
+		if (!child.isDetachedContext()) {
+			child.setContext(getContext());
+		}
 		recalcSize();
 		recalcPosChildren();
 	}
@@ -214,7 +220,9 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
 			child.setParent(this);
-			child.setContext(getContext());
+			if (!child.isDetachedContext()) {
+				child.setContext(getContext());
+			}
 		}
 		recalcSize();
 		recalcPosChildren();
@@ -231,7 +239,9 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		for (IGuiCommandSlot child : children) {
 			child.addSizeChangeListener(this);
 			child.setParent(this);
-			child.setContext(getContext());
+			if (!child.isDetachedContext()) {
+				child.setContext(getContext());
+			}
 		}
 		recalcSize();
 		recalcPosChildren();
@@ -247,7 +257,9 @@ public abstract class CommandSlotCollection extends GuiCommandSlotImpl implement
 		children.set(index, child);
 		child.addSizeChangeListener(this);
 		child.setParent(this);
-		child.setContext(getContext());
+		if (!child.isDetachedContext()) {
+			child.setContext(getContext());
+		}
 		recalcSize();
 		recalcPosChildren();
 	}

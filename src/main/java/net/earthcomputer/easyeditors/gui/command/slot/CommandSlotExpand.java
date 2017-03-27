@@ -156,7 +156,9 @@ public class CommandSlotExpand extends GuiCommandSlotImpl implements ISizeChange
 	@Override
 	public void setContext(CommandSlotContext context) {
 		super.setContext(context);
-		child.setContext(context);
+		if (!child.isDetachedContext()) {
+			child.setContext(context);
+		}
 	}
 
 	private void recalcSize() {

@@ -25,6 +25,7 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	private IGuiCommandSlot parent;
 	private List<ISizeChangeListener> sizeChangeListeners = Lists.newArrayList();
 	private CommandSlotContext context;
+	private boolean isContextDetached = false;
 
 	private List<Tooltip> tooltips = Lists.newArrayList();
 
@@ -121,6 +122,16 @@ public abstract class GuiCommandSlotImpl extends Gui implements IGuiCommandSlot 
 	@Override
 	public void setContext(CommandSlotContext context) {
 		this.context = context;
+	}
+
+	@Override
+	public boolean isDetachedContext() {
+		return isContextDetached;
+	}
+
+	@Override
+	public void detachContext() {
+		isContextDetached = true;
 	}
 
 	@Override

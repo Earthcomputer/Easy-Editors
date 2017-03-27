@@ -50,7 +50,9 @@ public class CommandSlotBox extends GuiCommandSlotImpl implements ISizeChangeLis
 				setHeight(child.getHeight() + getPadding() * 2);
 				child.addSizeChangeListener(this);
 				child.setParent(this);
-				child.setContext(getContext());
+				if (!child.isDetachedContext()) {
+					child.setContext(getContext());
+				}
 			}
 		}
 	}
@@ -123,7 +125,7 @@ public class CommandSlotBox extends GuiCommandSlotImpl implements ISizeChangeLis
 	@Override
 	public void setContext(CommandSlotContext context) {
 		super.setContext(context);
-		if (child != null)
+		if (child != null && !child.isDetachedContext())
 			child.setContext(context);
 	}
 

@@ -25,12 +25,14 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 	private String commandName = "";
 	private CommandSyntax commandSyntax;
 
+	public CommandSlotCommand() {
+		addChild(buildHeader(""));
+	}
+
 	@Override
 	public int readFromArgs(String[] args, int index) {
-		commandName = args.length <= index ? null : args[index];
+		commandName = args.length <= index ? "" : args[index];
 		IGuiCommandSlot header = buildHeader(commandName);
-		String[] newArgs = new String[args.length - index - 1];
-		System.arraycopy(args, index + 1, newArgs, 0, newArgs.length);
 		commandSyntax = CommandSyntax.forCommandName(commandName, getContext());
 		clearChildren();
 		addChild(header);
@@ -54,7 +56,9 @@ public class CommandSlotCommand extends CommandSlotVerticalArrangement implement
 				commandName.isEmpty() ? Translate.GUI_COMMANDEDITOR_NOCOMMAND : commandName, Colors.commandName.color);
 		if (CommandSyntax.forCommandName(commandName, getContext()) == null) {
 			label.setColor(Colors.invalidCommandName.color);
-			getContext().commandSyntaxError();
+			if (!commandName.isEmpty()) {
+				getContext().commandSyntaxError();
+			}
 		}
 		return CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_COMMANDLABEL, label,
 				new CommandSlotButton(20, 20, "...") {
