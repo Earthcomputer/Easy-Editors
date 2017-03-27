@@ -401,6 +401,7 @@ gui.commandEditor.scoreboard.objectives.setdisplay.sidebar=Side Bar
 gui.commandEditor.scoreboard.objectives.setdisplay.sidebar.team=Team:
 gui.commandEditor.scoreboard.objectives.setdisplay.slot=Display Slot:
 gui.commandEditor.scoreboard.player=Player:
+gui.commandEditor.scoreboard.player.all=All Tracked Players
 gui.commandEditor.scoreboard.playerList=Player(s):
 gui.commandEditor.scoreboard.players=Players
 gui.commandEditor.scoreboard.players.add=Add to Player Score

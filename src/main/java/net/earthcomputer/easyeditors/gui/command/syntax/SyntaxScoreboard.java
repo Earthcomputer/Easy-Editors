@@ -31,6 +31,7 @@ import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotVerticalArrange
 import net.earthcomputer.easyeditors.gui.command.slot.IGuiCommandSlot;
 import net.earthcomputer.easyeditors.gui.command.slot.ITextField;
 import net.earthcomputer.easyeditors.util.Translate;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.ResourceLocation;
@@ -75,7 +76,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 	private CommandSlotScore objective1;
 	private CommandSlotScore objective2;
-	private CommandSlotPlayerSelector player1;
+	private IGuiCommandSlot player1;
 	private CommandSlotPlayerSelector player2;
 	private CommandSlotList<IGuiCommandSlot> playerList;
 	private CommandSlotEntityNBT playerNBT;
@@ -144,11 +145,30 @@ public class SyntaxScoreboard extends CommandSyntax {
 		objective1 = new CommandSlotScore();
 		objective2 = new CommandSlotScore();
 		playerNBT = new CommandSlotEntityNBT(getContext());
-		player1 = new CommandSlotPlayerSelector() {
+		player1 = new CommandSlotRadioList(new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
+				Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYER_ALL, Colors.playerSelectorLabel.color) {
+			@Override
+			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+				return 1;
+			}
+
+			@Override
+			public void addArgs(List<String> args) throws UIInvalidException {
+				args.add("*");
+			}
+		}, new CommandSlotPlayerSelector() {
 			@Override
 			protected void onSetEntityTo(ResourceLocation newEntityType) {
 				playerNBT.setEntityType(CommandSlotPlayerSelector.ENTITY_ANYTHING.equals(newEntityType) ? null
 						: GeneralUtils.getEntityClassFromLocation(newEntityType));
+			}
+		}) {
+			@Override
+			protected int getSelectedIndexForString(String[] args, int index) throws CommandSyntaxException {
+				if (args.length == index) {
+					throw new CommandSyntaxException();
+				}
+				return "*".equals(args[index]) ? 0 : 1;
 			}
 		};
 		player2 = new CommandSlotPlayerSelector();
