@@ -6,6 +6,7 @@ gui.commandEditor.item.nbt.leatherArmor.color=Colour
 gui.commandEditor.item.nbt.leatherArmor.color.tooltip=The colour this armour has been dyed
 gui.commandEditor.playerSelector.farthest=Furthest
 gui.commandEditor.replaceitem.slot.horse.armor=Horse Armour Slot
+gui.commandEditor.scoreboard.teams.option.color=Colour:
 gui.commandEditor.selectScore.armor=Armour
 gui.commandEditor.selectTeam.options.color=Colour:
 gui.commandEditor.textField.hint.color=Change colour = Ctrl+F

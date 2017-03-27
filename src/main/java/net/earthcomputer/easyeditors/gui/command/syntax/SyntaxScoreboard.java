@@ -287,9 +287,10 @@ public class SyntaxScoreboard extends CommandSyntax {
 		tagOperationList = new CommandSlotVerticalArrangement();
 		tagOperationAddRemove = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERS_TAG_NAME, tag),
-				new CommandSlotRectangle(
-						new CommandSlotOptional.Impl(playerNBT, Lists.<CommandSlotOptional>newArrayList()),
-						Colors.nbtBox.color));
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_NBT,
+						new CommandSlotRectangle(
+								new CommandSlotOptional.Impl(playerNBT, Lists.<CommandSlotOptional>newArrayList()),
+								Colors.nbtBox.color)));
 		tagOperationArg = new CommandSlotModifiable(tagOperationList);
 		team = new CommandSlotTeam();
 		teamOption = new CommandSlotMenu(
@@ -470,6 +471,11 @@ public class SyntaxScoreboard extends CommandSyntax {
 					}
 				});
 
+		argsPlayersEnable = new CommandSlotVerticalArrangement(
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYER,
+						new CommandSlotRectangle(player1, Colors.playerSelectorBox.color)),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_OBJECTIVE, objective1));
+
 		argsPlayersTest = new CommandSlotVerticalArrangement(
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYER,
 						new CommandSlotRectangle(player1, Colors.playerSelectorBox.color)),
@@ -554,7 +560,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 				} else if ("add".equals(to)) {
 					teamsSubCommandArgs.setChild(argsTeamsAdd);
 				} else if ("remove".equals(to)) {
-					teamsSubCommandArgs.setChild(argsObjectivesRemove);
+					teamsSubCommandArgs.setChild(argsTeamsRemove);
 				} else if ("empty".equals(to)) {
 					teamsSubCommandArgs.setChild(argsTeamsEmpty);
 				} else if ("join".equals(to)) {
@@ -571,29 +577,38 @@ public class SyntaxScoreboard extends CommandSyntax {
 
 		argsTeamsList = new CommandSlotVerticalArrangement();
 
-		argsTeamsAdd = new CommandSlotVerticalArrangement(team,
-				new CommandSlotOptional((IGuiCommandSlot) displayName, Lists.<CommandSlotOptional>newArrayList()) {
-					@Override
-					protected boolean isDefault() throws UIInvalidException {
-						return displayName.getTextAsString().isEmpty()
-								|| displayName.getTextAsString().equals(team.getTeam());
-					}
+		argsTeamsAdd = new CommandSlotVerticalArrangement(
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_TEAM, team),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_DISPLAYNAME,
+						new CommandSlotOptional((IGuiCommandSlot) displayName,
+								Lists.<CommandSlotOptional>newArrayList()) {
+							@Override
+							protected boolean isDefault() throws UIInvalidException {
+								return displayName.getTextAsString().isEmpty()
+										|| displayName.getTextAsString().equals(team.getTeam());
+							}
 
-					@Override
-					protected void setToDefault() {
-						displayName.setTextAsString("");
-					}
-				});
+							@Override
+							protected void setToDefault() {
+								displayName.setTextAsString("");
+							}
+						}));
 
-		argsTeamsRemove = new CommandSlotVerticalArrangement(team);
+		argsTeamsRemove = new CommandSlotVerticalArrangement(
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_TEAM, team));
 
 		argsTeamsEmpty = argsTeamsRemove;
 
-		argsTeamsJoin = new CommandSlotVerticalArrangement(team, playerList);
+		argsTeamsJoin = new CommandSlotVerticalArrangement(
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_TEAM, team),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_PLAYERLIST, playerList));
 
 		argsTeamsLeave = argsTeamsJoin;
 
-		argsTeamsOption = new CommandSlotVerticalArrangement(team, teamOption, teamOptionArg);
+		argsTeamsOption = new CommandSlotVerticalArrangement(
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_TEAM, team),
+				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_TEAMS_OPTION_TYPE, teamOption),
+				teamOptionArg);
 
 		teamsSubCommandArgs = new CommandSlotModifiable(argsTeamsList);
 
