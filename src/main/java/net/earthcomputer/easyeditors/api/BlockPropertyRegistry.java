@@ -24,7 +24,6 @@ import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockPrismarine;
 import net.minecraft.block.BlockQuartz;
 import net.minecraft.block.BlockRedSandstone;
-import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockSand;
 import net.minecraft.block.BlockSandStone;
 import net.minecraft.block.BlockSapling;
@@ -56,6 +55,7 @@ public class BlockPropertyRegistry {
 	}
 
 	private static void registerVanillaVariantProps() {
+		// TODO: omit similar blocks
 		registerVariantProperty(BlockStone.VARIANT);
 		registerVariantProperty(BlockPlanks.VARIANT);
 		registerVariantProperty(BlockSapling.TYPE);
@@ -75,7 +75,6 @@ public class BlockPropertyRegistry {
 		registerVariantProperty(BlockStoneSlab.VARIANT);
 		registerVariantProperty(BlockWoodSlab.VARIANT);
 		registerVariantProperty(BlockAnvil.DAMAGE);
-		registerVariantProperty(BlockRedstoneComparator.POWERED);
 		registerVariantProperty(BlockQuartz.VARIANT);
 		registerVariantProperty(BlockCarpet.COLOR);
 		registerVariantProperty(BlockDoublePlant.VARIANT);
@@ -94,7 +93,7 @@ public class BlockPropertyRegistry {
 	 * @param property
 	 */
 	public static <T extends Comparable<T>> void registerVariantProperty(IProperty<T> property) {
-		registerVariantProperty(Predicates.<Block> alwaysTrue(), property);
+		registerVariantProperty(Predicates.<Block>alwaysTrue(), property);
 	}
 
 	/**
@@ -140,7 +139,7 @@ public class BlockPropertyRegistry {
 	public static boolean isVariantProperty(Block block, IProperty<?> property) {
 		for (Pair<Predicate<Block>, IProperty<?>> entry : variants) {
 			if (entry.getLeft().apply(block)) {
-				if (entry.getRight().equals(property)) {
+				if (entry.getRight() == property) {
 					return true;
 				}
 			}
