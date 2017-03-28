@@ -298,10 +298,17 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 			CommandSlotVerticalArrangement propertiesCommandSlot = new CommandSlotVerticalArrangement();
 			if (isTest) {
 				variantsIgnoring = Maps.newHashMap();
+				CommandSlotVerticalArrangement variantsIgnoringSlot = new CommandSlotVerticalArrangement();
+				variantsIgnoringSlot.addChild(CommandSlotLabel
+						.createLabel(Translate.GUI_COMMANDEDITOR_BLOCK_VARIANTSIGNORING, Colors.itemLabel.color));
 				for (IProperty<?> variantProp : variantProperties) {
 					CommandSlotCheckbox checkbox = new CommandSlotCheckbox(variantProp.getName());
-					propertiesCommandSlot.addChild(checkbox);
+					variantsIgnoringSlot.addChild(checkbox);
 					variantsIgnoring.put(variantProp, checkbox);
+				}
+				if (!variantsIgnoring.isEmpty()) {
+					propertiesCommandSlot
+							.addChild(new CommandSlotRectangle(variantsIgnoringSlot, Colors.itemBox.color));
 				}
 			} else {
 				variantsIgnoring = null;

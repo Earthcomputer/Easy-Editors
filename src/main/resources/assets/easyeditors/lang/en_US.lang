@@ -30,6 +30,7 @@ gui.commandBlock.trackingOutput=Tracking Output
 gui.commandBlock.ignoringOutput=Ignoring Output
 gui.commandBlock.noOutput=[No Output]
 
+gui.commandEditor.block.variantsIgnoring=Ignore:
 gui.commandEditor.clear.allItems=All Items
 gui.commandEditor.clear.specificItem=Item:
 gui.commandEditor.clear.target=Player:
