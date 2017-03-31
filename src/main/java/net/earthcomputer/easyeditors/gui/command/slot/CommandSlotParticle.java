@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
 import net.earthcomputer.easyeditors.api.util.FakeWorld;
+import net.earthcomputer.easyeditors.gui.GuiSelectFromList;
 import net.earthcomputer.easyeditors.gui.ICallback;
 import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.GuiSelectParticle;
@@ -24,6 +25,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
@@ -224,7 +226,7 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 					params[i] = Integer.parseInt(args.get(i));
 				}
 
-				int particleId = type.getParticle().getParticleID();
+				int particleId = type.getValue().getParticleID();
 				IParticleFactory particleFactory = (IParticleFactory) ((Map<?, ?>) particleManagerParticleTypesField
 						.get(Minecraft.getMinecraft().effectRenderer)).get(particleId);
 
@@ -364,68 +366,36 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 		}
 	}
 
-	private class ParticleType extends CommandSlotHorizontalArrangement implements ICallback<EnumParticleTypes> {
-		private EnumParticleTypes particleType;
-		private CommandSlotLabel particleName;
-
+	private class ParticleType extends CommandSlotSelectFromList<EnumParticleTypes> {
 		public ParticleType() {
-			particleName = new CommandSlotLabel(Minecraft.getMinecraft().fontRendererObj,
-					Translate.GUI_COMMANDEDITOR_NOPARTICLE, Colors.invalidItemName.color);
-			addChild(particleName);
-			addChild(new CommandSlotButton(20, 20, "...") {
-				@Override
-				public void onPress() {
-					Minecraft.getMinecraft().displayGuiScreen(
-							new GuiSelectParticle(Minecraft.getMinecraft().currentScreen, ParticleType.this));
-				}
-			});
+			super(Translate.GUI_COMMANDEDITOR_NOPARTICLE, TranslateKeys.GUI_COMMANDEDITOR_NOPARTICLESELECTED);
 		}
 
 		@Override
-		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-			if (args.length == index) {
-				throw new CommandSyntaxException();
-			}
-			EnumParticleTypes particle = EnumParticleTypes.getByName(args[index]);
-			if (particle == null) {
-				throw new CommandSyntaxException();
-			}
-			setParticle(particle);
-			return 1;
+		protected GuiSelectFromList<EnumParticleTypes> createGui(GuiScreen currentScreen,
+				ICallback<EnumParticleTypes> callback) {
+			return new GuiSelectParticle(currentScreen, callback);
 		}
 
 		@Override
-		public void addArgs(List<String> args) throws UIInvalidException {
-			checkValid();
-			args.add(particleType.getParticleName());
-		}
-
-		public EnumParticleTypes getParticle() {
-			return particleType;
-		}
-
-		public void setParticle(EnumParticleTypes particle) {
-			this.particleType = particle;
-			particleName.setText(I18n.format("gui.commandEditor.particle." + particle.getParticleName() + ".name"));
-			particleName.setColor(Colors.itemName.color);
-			simulations.clear();
-			onChangeParticleTo(particle);
+		protected String getDisplayName(EnumParticleTypes val) {
+			return I18n.format("gui.commandEditor.particle." + val.getParticleName() + ".name");
 		}
 
 		@Override
-		public EnumParticleTypes getCallbackValue() {
-			return getParticle();
+		protected EnumParticleTypes readArg(String arg) {
+			return EnumParticleTypes.getByName(arg);
 		}
 
 		@Override
-		public void setCallbackValue(EnumParticleTypes value) {
-			setParticle(value);
+		protected String writeArg(EnumParticleTypes arg) {
+			return arg.getParticleName();
 		}
 
-		public void checkValid() throws UIInvalidException {
-			if (particleType == null) {
-				throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOPARTICLESELECTED);
-			}
+		@Override
+		public void setValue(EnumParticleTypes value) {
+			super.setValue(value);
+			onChangeParticleTo(value);
 		}
 	}
 
