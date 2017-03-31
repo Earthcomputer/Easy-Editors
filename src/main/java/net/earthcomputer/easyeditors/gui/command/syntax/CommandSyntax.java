@@ -177,6 +177,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("playsound", SyntaxPlaySound.class);
 		registerCommandSyntax("scoreboard", SyntaxScoreboard.class);
 		registerCommandSyntax("execute", SyntaxExecute.class);
+		registerCommandSyntax("trigger", SyntaxTrigger.class);
 	}
 
 }
