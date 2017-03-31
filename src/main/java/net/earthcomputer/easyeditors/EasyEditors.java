@@ -81,6 +81,7 @@ public class EasyEditors {
 
 	@EventHandler
 	public void preinit(FMLPreInitializationEvent e) {
+		EasyEditorsApi.init();
 		MinecraftForge.EVENT_BUS.register(Translate.class);
 
 		config = new Configuration(e.getSuggestedConfigurationFile());

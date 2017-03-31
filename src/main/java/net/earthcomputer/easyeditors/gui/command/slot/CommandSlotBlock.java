@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -33,7 +32,6 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.property.PropertyFloat;
 import net.minecraftforge.fml.client.config.HoverChecker;
 
 public class CommandSlotBlock extends CommandSlotVerticalArrangement implements ICallback<IBlockState> {
@@ -302,7 +300,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 				variantsIgnoringSlot.addChild(CommandSlotLabel
 						.createLabel(Translate.GUI_COMMANDEDITOR_BLOCK_VARIANTSIGNORING, Colors.itemLabel.color));
 				for (IProperty<?> variantProp : variantProperties) {
-					CommandSlotCheckbox checkbox = new CommandSlotCheckbox(variantProp.getName());
+					CommandSlotCheckbox checkbox = new CommandSlotCheckbox(GuiSelectBlock.getPropertyName(variantProp));
 					variantsIgnoringSlot.addChild(checkbox);
 					variantsIgnoring.put(variantProp, checkbox);
 				}
@@ -359,7 +357,9 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 	@SuppressWarnings("unchecked")
 	private static <T extends Comparable<T>> IPropertyControl<T> createPropertyControl(IProperty<T> prop,
 			boolean isTest) {
-		if (prop instanceof PropertyInteger) {
+		if (canUseGenericPropertyControl(prop)) {
+			return new PropertyControl<T>(prop, isTest);
+		} else if (prop instanceof PropertyInteger) {
 			int min = Integer.MIN_VALUE, max = Integer.MAX_VALUE;
 			for (int allowedVal : ((PropertyInteger) prop).getAllowedValues()) {
 				if (allowedVal < min) {
@@ -369,24 +369,25 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 					max = allowedVal;
 				}
 			}
-			return (IPropertyControl<T>) new IntPropertyControl(prop.getName(), min, max, isTest);
-		} else if (prop instanceof PropertyFloat) {
-			final PropertyFloat propFloat = (PropertyFloat) prop;
-			return (IPropertyControl<T>) new FloatPropertyControl(propFloat.getName(), new Predicate<Float>() {
-				@Override
-				public boolean apply(Float val) {
-					return propFloat.isValid(val);
-				}
-			}, isTest);
+			return (IPropertyControl<T>) new IntPropertyControl((IProperty<Integer>) prop, min, max, isTest);
 		} else if (prop instanceof PropertyBool) {
 			if (isTest) {
-				return (IPropertyControl<T>) new TestBooleanPropertyControl(prop.getName());
+				return (IPropertyControl<T>) new TestBooleanPropertyControl((IProperty<Boolean>) prop);
 			} else {
-				return (IPropertyControl<T>) new BooleanPropertyControl(prop.getName());
+				return (IPropertyControl<T>) new BooleanPropertyControl((IProperty<Boolean>) prop);
 			}
 		} else {
-			return new PropertyControl<T>(prop.getName(), prop, isTest);
+			return new PropertyControl<T>(prop, isTest);
 		}
+	}
+
+	private static <T extends Comparable<T>> boolean canUseGenericPropertyControl(IProperty<T> prop) {
+		for (T value : prop.getAllowedValues()) {
+			if (BlockPropertyRegistry.getValueUnlocalizedName(prop, value) == null) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public NBTTagCompound getNbt() {
@@ -501,8 +502,8 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		private boolean isTest;
 		private CommandSlotIntTextField value;
 
-		public IntPropertyControl(String propertyName, int min, int max, boolean isTest) {
-			this.propertyName = propertyName;
+		public IntPropertyControl(IProperty<Integer> property, int min, int max, boolean isTest) {
+			this.propertyName = GuiSelectBlock.getPropertyName(property);
 			this.isTest = isTest;
 			this.value = new CommandSlotIntTextField(50, 100, min, max);
 		}
@@ -541,65 +542,15 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 	}
 
-	private static class FloatPropertyControl implements IPropertyControl<Float> {
-
-		private String propertyName;
-		private Predicate<Float> validator;
-		private boolean isTest;
-		private CommandSlotNumberTextField value;
-
-		public FloatPropertyControl(String propertyName, Predicate<Float> validator, boolean isTest) {
-			this.propertyName = propertyName;
-			this.validator = validator;
-			this.isTest = isTest;
-			this.value = new CommandSlotNumberTextField(50, 100);
-		}
-
-		@Override
-		public boolean isIgnoringProperty() {
-			return isTest && value.getText().isEmpty();
-		}
-
-		@Override
-		public void setIgnoringProperty() {
-			value.setText("");
-		}
-
-		@Override
-		public Float getSelectedValue() {
-			return (float) value.getDoubleValue();
-		}
-
-		@Override
-		public void setSelectedValue(Float value) {
-			this.value.setText(GeneralUtils.doubleToString(value));
-		}
-
-		@Override
-		public void checkValid() throws UIInvalidException {
-			if (!isIgnoringProperty()) {
-				value.checkValid();
-				if (!validator.apply((float) value.getDoubleValue())) {
-					throw new UIInvalidException(Translate.GUI_COMMANDEDITOR_NUMBERINVALID);
-				}
-			}
-		}
-
-		@Override
-		public IGuiCommandSlot getCommandSlot() {
-			return CommandSlotLabel.createLabel(propertyName, Colors.itemLabel.color, value);
-		}
-
-	}
-
 	private static class TestBooleanPropertyControl implements IPropertyControl<Boolean> {
 
 		private String propertyName;
 		private CommandSlotMenu value;
 
-		public TestBooleanPropertyControl(String propertyName) {
-			this.propertyName = propertyName;
-			value = new CommandSlotMenu("either", "false", "true");
+		public TestBooleanPropertyControl(IProperty<Boolean> property) {
+			this.propertyName = GuiSelectBlock.getPropertyName(property);
+			value = new CommandSlotMenu(new String[] { Translate.GUI_COMMANDEDITOR_BLOCK_PROPCONTROL_EITHER,
+					Translate.PROPERTY_FALSE, Translate.PROPERTY_TRUE }, "either", "false", "true");
 		}
 
 		@Override
@@ -637,8 +588,8 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		private CommandSlotCheckbox value;
 
-		public BooleanPropertyControl(String propertyName) {
-			value = new CommandSlotCheckbox(propertyName);
+		public BooleanPropertyControl(IProperty<Boolean> property) {
+			value = new CommandSlotCheckbox(GuiSelectBlock.getPropertyName(property));
 		}
 
 		@Override
@@ -679,17 +630,17 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		private CommandSlotMenu value;
 		private boolean isTest;
 
-		public PropertyControl(String propertyName, IProperty<T> prop, boolean isTest) {
-			this.propertyName = propertyName;
+		public PropertyControl(IProperty<T> prop, boolean isTest) {
+			this.propertyName = GuiSelectBlock.getPropertyName(prop);
 			List<T> values = Lists.newArrayList(prop.getAllowedValues());
 			this.values = values;
 			String[] names = new String[values.size()];
 			for (int i = 0; i < names.length; i++) {
-				names[i] = prop.getName(values.get(i));
+				names[i] = GuiSelectBlock.getPropertyValueName(prop, values.get(i));
 			}
 			if (isTest) {
 				String[] newNames = new String[names.length + 1];
-				newNames[0] = "any";
+				newNames[0] = Translate.GUI_COMMANDEDITOR_BLOCK_PROPCONTROL_ANY;
 				System.arraycopy(names, 0, newNames, 1, names.length);
 				names = newNames;
 			}

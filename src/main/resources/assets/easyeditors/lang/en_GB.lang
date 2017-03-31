@@ -34,6 +34,15 @@ gui.easyeditorsconfig.colors.misc.itemName.invalid.tooltip=The colour of an inva
 
 gui.selectColor.title=Select Colour
 
+property.colored.color=Colour
+property.colored.color.gray=Grey
+property.colored.color.silver=Light Grey
+property.sandstone.type.chiseled_sandstone=Chiselled
+property.monster_egg.variant.chiseled_brick=Chiselled Stone Brick
+property.stonebrick.variant.chiseled_stonebrick=Chiselled
+property.mushroom_block.variant.center=Centre
+property.quartz.variant.chiseled=Chiselled
+
 ######## HELP ########
 
 # PLAYER SELECTORS

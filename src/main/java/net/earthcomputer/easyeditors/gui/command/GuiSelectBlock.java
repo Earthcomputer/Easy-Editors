@@ -112,6 +112,31 @@ public class GuiSelectBlock extends GuiSelectFromList<IBlockState> {
 		});
 	}
 
+	public static String getPropertyName(IProperty<?> prop) {
+		String unlocalizedName = BlockPropertyRegistry.getUnlocalizedName(prop);
+		if (!SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(unlocalizedName)) {
+			return prop.getName();
+		} else {
+			return I18n.format(unlocalizedName);
+		}
+	}
+
+	public static <T extends Comparable<T>> String getPropertyValueName(IProperty<T> prop, T value) {
+		String unlocalizedName = BlockPropertyRegistry.getValueUnlocalizedName(prop, value);
+		if (!SmartTranslationRegistry.getLanguageMapInstance().isKeyTranslated(unlocalizedName)) {
+			if (prop.getValueClass() == Boolean.class) {
+				if (value == Boolean.TRUE) {
+					unlocalizedName = "property.true";
+				} else {
+					unlocalizedName = "property.false";
+				}
+			} else {
+				return prop.getName(value);
+			}
+		}
+		return I18n.format(unlocalizedName);
+	}
+
 	/**
 	 * Returns a list of strings to display in a tooltip describing a block
 	 * state
@@ -150,17 +175,7 @@ public class GuiSelectBlock extends GuiSelectFromList<IBlockState> {
 				prop = iterator1.next();
 			else
 				prop = iterator2.next();
-			currentLine = TextFormatting.BLUE + prop.getName() + TextFormatting.RESET + ": ";
-			Comparable<?> value = blockState.getValue(prop);
-			String valueStr = value.toString();
-			if (value == Boolean.TRUE)
-				valueStr = TextFormatting.GREEN + valueStr;
-			else if (value == Boolean.FALSE)
-				valueStr = TextFormatting.RED + valueStr;
-			else
-				valueStr = TextFormatting.YELLOW + valueStr;
-			currentLine += valueStr;
-			otherLines.add(currentLine);
+			addPropertyToTooltip(tooltip, blockState, prop);
 		}
 
 		if (advanced) {
@@ -172,6 +187,21 @@ public class GuiSelectBlock extends GuiSelectFromList<IBlockState> {
 			tooltip.addAll(otherLines);
 		}
 		return tooltip;
+	}
+
+	private static <T extends Comparable<T>> void addPropertyToTooltip(List<String> tooltip, IBlockState state,
+			IProperty<T> prop) {
+		String currentLine = TextFormatting.BLUE + getPropertyName(prop) + TextFormatting.RESET + ": ";
+		T value = state.getValue(prop);
+		String valueStr = getPropertyValueName(prop, value);
+		if (value == Boolean.TRUE)
+			valueStr = TextFormatting.GREEN + valueStr;
+		else if (value == Boolean.FALSE)
+			valueStr = TextFormatting.RED + valueStr;
+		else
+			valueStr = TextFormatting.YELLOW + valueStr;
+		currentLine += valueStr;
+		tooltip.add(currentLine);
 	}
 
 	/**

@@ -15,7 +15,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
 /**
- * Static utilities involving the Easy Editors API.
+ * Static utilities involving the Easy Editors API. Don't forget if you are
+ * using the API, you should call the {@link #init()} method from the
+ * pre-initialization phase of the mod.
  * 
  * <b>This class is a member of the Easy Editors API</b>
  * 
@@ -60,6 +62,18 @@ public class EasyEditorsApi {
 					Predicate.class, Class.class);
 			md_SlotHandler_registerHandler = cls_SlotHandler.getMethod("registerHandler", cls_SlotHandler);
 		} catch (Exception e) {
+		}
+	}
+
+	private static boolean hasInitialized = false;
+
+	/**
+	 * Call this if you are going to use the API!
+	 */
+	public static void init() {
+		if (!hasInitialized) {
+			hasInitialized = true;
+			BlockPropertyRegistry.init();
 		}
 	}
 
