@@ -627,7 +627,8 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		private String propertyName;
 		private List<T> values;
-		private CommandSlotMenu value;
+		private CommandSlotMenu menuValue;
+		private CommandSlotCycleButton cycleButtonValue;
 		private boolean isTest;
 
 		public PropertyControl(IProperty<T> prop, boolean isTest) {
@@ -644,23 +645,43 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 				System.arraycopy(names, 0, newNames, 1, names.length);
 				names = newNames;
 			}
-			value = new CommandSlotMenu(names);
+			if (values.size() <= 7) {
+				menuValue = new CommandSlotMenu(names);
+			} else {
+				cycleButtonValue = new CommandSlotCycleButton(100, 20, names);
+			}
 			this.isTest = isTest;
 		}
 
 		@Override
 		public boolean isIgnoringProperty() {
-			return isTest && value.getCurrentIndex() == 0;
+			if (!isTest) {
+				return false;
+			}
+			if (menuValue == null) {
+				return cycleButtonValue.getCurrentIndex() == 0;
+			} else {
+				return menuValue.getCurrentIndex() == 0;
+			}
 		}
 
 		@Override
 		public void setIgnoringProperty() {
-			value.setCurrentIndex(0);
+			if (menuValue == null) {
+				cycleButtonValue.setCurrentIndex(0);
+			} else {
+				menuValue.setCurrentIndex(0);
+			}
 		}
 
 		@Override
 		public T getSelectedValue() {
-			int index = value.getCurrentIndex();
+			int index;
+			if (menuValue == null) {
+				index = cycleButtonValue.getCurrentIndex();
+			} else {
+				index = menuValue.getCurrentIndex();
+			}
 			if (isTest) {
 				index--;
 			}
@@ -673,7 +694,11 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 			if (isTest) {
 				index++;
 			}
-			this.value.setCurrentIndex(index);
+			if (this.menuValue == null) {
+				this.cycleButtonValue.setCurrentIndex(index);
+			} else {
+				this.menuValue.setCurrentIndex(index);
+			}
 		}
 
 		@Override
@@ -682,7 +707,8 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 
 		@Override
 		public IGuiCommandSlot getCommandSlot() {
-			return CommandSlotLabel.createLabel(propertyName, Colors.itemLabel.color, value);
+			return CommandSlotLabel.createLabel(propertyName, Colors.itemLabel.color,
+					menuValue == null ? cycleButtonValue : menuValue);
 		}
 
 	}
