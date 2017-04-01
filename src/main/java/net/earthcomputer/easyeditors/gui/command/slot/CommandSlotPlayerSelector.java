@@ -197,6 +197,11 @@ public class CommandSlotPlayerSelector extends CommandSlotVerticalArrangement {
 
 		@Override
 		public boolean isDefault() throws UIInvalidException {
+			// Don't skip this argument out unless we're sure we are actually an
+			// entity
+			if (getContext().getSenderClass() == null || !getContext().isEntity()) {
+				return false;
+			}
 			List<String> args = Lists.newArrayListWithCapacity(1);
 			addArgs(args);
 			String arg = args.get(0);
