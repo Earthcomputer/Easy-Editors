@@ -179,6 +179,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("execute", SyntaxExecute.class);
 		registerCommandSyntax("trigger", SyntaxTrigger.class);
 		registerCommandSyntax("achievement", SyntaxAchievement.class);
+		registerCommandSyntax("summon", SyntaxSummon.class);
 	}
 
 }

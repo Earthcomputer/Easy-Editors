@@ -2,6 +2,8 @@ package net.earthcomputer.easyeditors.gui.command.slot;
 
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.earthcomputer.easyeditors.api.util.GeneralUtils;
 import net.earthcomputer.easyeditors.gui.GuiSelectEntity;
 import net.earthcomputer.easyeditors.gui.IEntitySelectorCallback;
@@ -10,6 +12,7 @@ import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.util.Translate;
 import net.earthcomputer.easyeditors.util.TranslateKeys;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
@@ -53,7 +56,19 @@ public class CommandSlotEntity extends CommandSlotHorizontalArrangement implemen
 	public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
 		if (index >= args.length)
 			throw new CommandSyntaxException();
-		setEntity(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(args[index])).delegate.name());
+		ResourceLocation key = new ResourceLocation(args[index]);
+		boolean valid = ForgeRegistries.ENTITIES.containsKey(key);
+		if (EntityList.LIGHTNING_BOLT.equals(key) && includeLightning) {
+			valid = true;
+		} else if (GuiSelectEntity.PLAYER.equals(key) && includePlayer) {
+			valid = true;
+		} else if (ArrayUtils.contains(additionalOptions, key)) {
+			valid = true;
+		}
+		if (!valid) {
+			throw new CommandSyntaxException();
+		}
+		setEntity(key);
 		return 1;
 	}
 

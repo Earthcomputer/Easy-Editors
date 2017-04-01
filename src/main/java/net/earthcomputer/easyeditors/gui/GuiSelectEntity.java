@@ -10,6 +10,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.EasyEditors;
@@ -69,7 +70,8 @@ public class GuiSelectEntity extends GuiScreen {
 
 	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
 			boolean includeLightning, ResourceLocation... additionalOptions) {
-
+		this(previousScreen, callback, includePlayer, includeLightning, Predicates.<ResourceLocation>alwaysTrue(),
+				additionalOptions);
 	}
 
 	public GuiSelectEntity(GuiScreen previousScreen, IEntitySelectorCallback callback, boolean includePlayer,
