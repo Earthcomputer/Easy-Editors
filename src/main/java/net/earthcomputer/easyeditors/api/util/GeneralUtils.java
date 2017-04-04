@@ -174,7 +174,7 @@ public class GeneralUtils {
 		if (M == r) {
 			h = ((g - b) / c);
 			while (h < 0)
-				h = 6 - h;
+				h += 6;
 			h %= 6;
 		} else if (M == g) {
 			h = ((b - r) / c) + 2;
