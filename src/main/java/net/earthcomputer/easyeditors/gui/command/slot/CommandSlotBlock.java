@@ -264,7 +264,9 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 				break;
 			}
 		}
-		potentialArgs = potentialArgs.subList(0, maxElementToCopy + 1);
+		if (canSkipOptionals()) {
+			potentialArgs = potentialArgs.subList(0, maxElementToCopy + 1);
+		}
 		args.addAll(potentialArgs);
 	}
 
@@ -280,6 +282,10 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 				handler.checkValid();
 			}
 		}
+	}
+
+	protected boolean canSkipOptionals() throws UIInvalidException {
+		return true;
 	}
 
 	public IBlockState getBlock() {

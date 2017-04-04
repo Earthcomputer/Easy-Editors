@@ -43,7 +43,7 @@ public class Colors {
 	public static final Color miscBigBoxLabel = new Color("label.miscBigBox", 0x662312,
 			"The color of labels in miscellaneous big boxes");
 	public static final Color nbtBox = new Color("box.nbt", 0xffe050a4, true, "The color of NBT boxes");
-	public static final Color nbtLabel = new Color("label.nbt", 0xb54184, "The color of labels in NBT boxes");
+	public static final Color nbtLabel = new Color("label.nbt", 0x893164, "The color of labels in NBT boxes");
 
 	/**
 	 * 

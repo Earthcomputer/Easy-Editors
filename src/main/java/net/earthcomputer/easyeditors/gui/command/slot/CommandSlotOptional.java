@@ -18,15 +18,15 @@ public abstract class CommandSlotOptional extends CommandSlotBox {
 		optionalGroup.add(this);
 	}
 
-	protected abstract boolean isDefault() throws UIInvalidException;
+	public abstract boolean isDefault() throws UIInvalidException;
 
-	protected abstract void setToDefault();
+	public abstract void setToDefault();
 
-	protected boolean isPresentInArgs(String[] args, int index) throws CommandSyntaxException {
+	public boolean isPresentInArgs(String[] args, int index) throws CommandSyntaxException {
 		return args.length != index;
 	}
 
-	protected boolean shouldAddToArgs() throws UIInvalidException {
+	public boolean shouldAddToArgs() throws UIInvalidException {
 		for (int i = optionalGroupIndex, e = optionalGroup.size(); i < e; i++) {
 			if (!optionalGroup.get(i).isDefault()) {
 				return true;
@@ -79,12 +79,12 @@ public abstract class CommandSlotOptional extends CommandSlotBox {
 		}
 
 		@Override
-		protected boolean isDefault() throws UIInvalidException {
+		public boolean isDefault() throws UIInvalidException {
 			return optionalChild.isDefault();
 		}
 
 		@Override
-		protected void setToDefault() {
+		public void setToDefault() {
 			optionalChild.setToDefault();
 		}
 

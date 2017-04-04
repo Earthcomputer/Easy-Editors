@@ -32,7 +32,7 @@ public class SyntaxTP extends CommandSyntax {
 		optionalTeleportingEntity = new CommandSlotOptional.Impl(teleportingEntity,
 				Lists.<CommandSlotOptional>newArrayList()) {
 			@Override
-			protected boolean isPresentInArgs(String[] args, int index) throws CommandSyntaxException {
+			public boolean isPresentInArgs(String[] args, int index) throws CommandSyntaxException {
 				int len = args.length - index;
 				return len == 2 || len == 4 || len == 6;
 			}

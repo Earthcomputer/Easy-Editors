@@ -385,13 +385,13 @@ public class SyntaxScoreboard extends CommandSyntax {
 						new CommandSlotOptional((IGuiCommandSlot) displayName,
 								Lists.<CommandSlotOptional>newArrayList()) {
 							@Override
-							protected boolean isDefault() throws UIInvalidException {
+							public boolean isDefault() throws UIInvalidException {
 								return displayName.getTextAsString().equals(objective1.getScore())
 										|| displayName.getTextAsString().isEmpty();
 							}
 
 							@Override
-							protected void setToDefault() {
+							public void setToDefault() {
 								displayName.setTextAsString("");
 							}
 						}));
@@ -456,13 +456,13 @@ public class SyntaxScoreboard extends CommandSyntax {
 				CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_SCOREBOARD_VALUE,
 						new CommandSlotOptional(value1, optionalGroup) {
 							@Override
-							protected boolean isDefault() throws UIInvalidException {
+							public boolean isDefault() throws UIInvalidException {
 								value1.checkValid();
 								return value1.getIntValue() == 0;
 							}
 
 							@Override
-							protected void setToDefault() {
+							public void setToDefault() {
 								value1.setText("0");
 							}
 						}),
@@ -537,13 +537,13 @@ public class SyntaxScoreboard extends CommandSyntax {
 							}
 						}, Lists.<CommandSlotOptional>newArrayList()) {
 							@Override
-							protected boolean isDefault() throws UIInvalidException {
+							public boolean isDefault() throws UIInvalidException {
 								value2.checkValid();
 								return value2.getIntValue() == Integer.MAX_VALUE;
 							}
 
 							@Override
-							protected void setToDefault() {
+							public void setToDefault() {
 								value2.setText(String.valueOf(Integer.MAX_VALUE));
 							}
 						}));
@@ -603,13 +603,13 @@ public class SyntaxScoreboard extends CommandSyntax {
 						new CommandSlotOptional((IGuiCommandSlot) displayName,
 								Lists.<CommandSlotOptional>newArrayList()) {
 							@Override
-							protected boolean isDefault() throws UIInvalidException {
+							public boolean isDefault() throws UIInvalidException {
 								return displayName.getTextAsString().isEmpty()
 										|| displayName.getTextAsString().equals(team.getTeam());
 							}
 
 							@Override
-							protected void setToDefault() {
+							public void setToDefault() {
 								displayName.setTextAsString("");
 							}
 						}));

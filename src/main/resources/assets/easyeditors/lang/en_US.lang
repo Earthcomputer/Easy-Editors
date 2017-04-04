@@ -506,6 +506,8 @@ gui.commandEditor.selectCommand.scoreboard.desc=Various operations on the scoreb
 gui.commandEditor.selectCommand.scoreboard.example=/scoreboard players set Earthcomputer randomVariable 0
 gui.commandEditor.selectCommand.seed.desc=Shows the world generation seed
 gui.commandEditor.selectCommand.seed.example=/seed
+gui.commandEditor.selectCommand.setblock.desc=Places a block in the world
+gui.commandEditor.selectCommand.setblock.example=/setblock 0 64 0 diamond_block
 gui.commandEditor.selectCommand.setworldspawn.desc=Sets the world spawn point
 gui.commandEditor.selectCommand.setworldspawn.example=/setworldspawn 0 64 0
 gui.commandEditor.selectCommand.spawnpoint.desc=Sets the spawn point of a player
@@ -610,6 +612,13 @@ gui.commandEditor.selectTeam.remove=Remove Selected Team
 gui.commandEditor.selectTeam.timedOut=Request of teams from server timed out
 gui.commandEditor.selectTeam.title=Select Team
 gui.commandEditor.selectTeam.waiting=Waiting for the team list from the server...
+gui.commandEditor.setblock.block=Block:
+gui.commandEditor.setblock.mode=Mode:
+gui.commandEditor.setblock.mode.destroy=Destroy
+gui.commandEditor.setblock.mode.keep=Keep
+gui.commandEditor.setblock.mode.replace=Replace
+gui.commandEditor.setblock.nbt=NBT:
+gui.commandEditor.setblock.pos=Position:
 gui.commandEditor.spawnpoint.target=Player:
 gui.commandEditor.spreadplayers.spreadDistance=Spread Distance:
 gui.commandEditor.spreadplayers.spreadDistance.tooltip=The minimum distance between players/teams
@@ -652,6 +661,7 @@ gui.commandEditor.textField.hint.obfuscated=Obfuscated = Ctrl+O
 gui.commandEditor.textField.hint.strikethrough=Strikethrough = Ctrl+S
 gui.commandEditor.textField.hint.underline=Underline = Ctrl+U
 gui.commandEditor.textField.initialHint=Press Ctrl+Space for a list of shortcuts
+gui.commandEditor.tileEntity.comparator.outputSignal=Signal Strength
 gui.commandEditor.time.add=Add to the time
 gui.commandEditor.time.add.subcommand=Time to add
 gui.commandEditor.time.invalid=Invalid number in time

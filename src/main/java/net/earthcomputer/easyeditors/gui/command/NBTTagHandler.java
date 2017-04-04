@@ -17,6 +17,7 @@ import net.earthcomputer.easyeditors.api.util.Predicates2;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotColor;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotEnchantment;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotFormattedTextField;
+import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotIntTextField;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotList;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotTextField;
@@ -33,6 +34,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityComparator;
 import net.minecraftforge.common.util.Constants;
 
 /**
@@ -47,6 +49,11 @@ public abstract class NBTTagHandler {
 			.newLinkedHashMap();
 
 	static {
+		registerVanillaStackHandlers();
+		registerVanillaTileEntityHandlers();
+	}
+
+	private static void registerVanillaStackHandlers() {
 		registerItemStackHandler(Predicates.<ItemStack>alwaysTrue(), DisplayHandler.class);
 		registerItemStackHandler(Predicates.<ItemStack>alwaysTrue(), EnchantmentHandler.class);
 		registerItemStackHandler(new Predicate<ItemStack>() {
@@ -59,6 +66,10 @@ public abstract class NBTTagHandler {
 						&& ((ItemArmor) item).getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER;
 			}
 		}, ArmorColorHandler.class);
+	}
+
+	private static void registerVanillaTileEntityHandlers() {
+		registerTileEntityHandler(TileEntityComparator.class, ComparatorHandler.class);
 	}
 
 	private CommandSlotContext context;
@@ -495,6 +506,35 @@ public abstract class NBTTagHandler {
 			}
 		}
 
+	}
+
+	public static class ComparatorHandler extends NBTTagHandler {
+		private CommandSlotIntTextField outputSignal;
+
+		@Override
+		public IGuiCommandSlot[] setupCommandSlot() {
+			return new IGuiCommandSlot[] {
+					CommandSlotLabel.createLabel(Translate.GUI_COMMANDEDITOR_TILEENTITY_COMPARATOR_OUTPUTSIGNAL,
+							Colors.nbtLabel.color, outputSignal = new CommandSlotIntTextField(50, 50, 0, 15)) };
+		}
+
+		@Override
+		public void readFromNBT(NBTTagCompound nbt) {
+			outputSignal.setText(String.valueOf(nbt.getInteger("OutputSignal")));
+		}
+
+		@Override
+		public void writeToNBT(NBTTagCompound nbt) {
+			int val = outputSignal.getIntValue();
+			if (val != 0) {
+				nbt.setInteger("OutputSignal", val);
+			}
+		}
+
+		@Override
+		public void checkValid() throws UIInvalidException {
+			outputSignal.checkValid();
+		}
 	}
 
 }

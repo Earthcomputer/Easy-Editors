@@ -45,12 +45,12 @@ public class SyntaxClear extends CommandSyntax {
 			}
 		}, optionalGroup) {
 			@Override
-			protected boolean isDefault() throws UIInvalidException {
+			public boolean isDefault() throws UIInvalidException {
 				return ((CommandSlotRadioList) getChild()).getSelectedIndex() == 0;
 			}
 
 			@Override
-			protected void setToDefault() {
+			public void setToDefault() {
 				((CommandSlotRadioList) getChild()).setSelectedIndex(0);
 			}
 		};

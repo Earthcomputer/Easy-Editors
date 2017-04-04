@@ -157,14 +157,14 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 				Translate.GUI_COMMANDEDITOR_PARTICLE_PLAYERS_TOOLTIP,
 				new CommandSlotRectangle(new CommandSlotOptional(players, optionalGroup) {
 					@Override
-					protected boolean isDefault() throws UIInvalidException {
+					public boolean isDefault() throws UIInvalidException {
 						List<String> args = Lists.newArrayList();
 						getChild().addArgs(args);
 						return args.get(0).equals("@a");
 					}
 
 					@Override
-					protected void setToDefault() {
+					public void setToDefault() {
 						try {
 							getChild().readFromArgs(new String[] { "@a" }, 0);
 						} catch (CommandSyntaxException e) {
@@ -175,12 +175,12 @@ public class CommandSlotParticle extends CommandSlotVerticalArrangement {
 		addChild(args);
 		new CommandSlotOptional(args, optionalGroup) {
 			@Override
-			protected boolean isDefault() throws UIInvalidException {
+			public boolean isDefault() throws UIInvalidException {
 				return args.getChild() == null;
 			}
 
 			@Override
-			protected void setToDefault() {
+			public void setToDefault() {
 				args.setChild(null);
 			}
 		};

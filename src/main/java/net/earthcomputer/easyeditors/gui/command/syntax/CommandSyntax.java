@@ -180,6 +180,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("trigger", SyntaxTrigger.class);
 		registerCommandSyntax("achievement", SyntaxAchievement.class);
 		registerCommandSyntax("summon", SyntaxSummon.class);
+		registerCommandSyntax("setblock", SyntaxSetBlock.class);
 	}
 
 }
