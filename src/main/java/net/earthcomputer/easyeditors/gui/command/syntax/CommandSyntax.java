@@ -181,6 +181,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("achievement", SyntaxAchievement.class);
 		registerCommandSyntax("summon", SyntaxSummon.class);
 		registerCommandSyntax("setblock", SyntaxSetBlock.class);
+		registerCommandSyntax("fill", SyntaxFill.class);
 	}
 
 }

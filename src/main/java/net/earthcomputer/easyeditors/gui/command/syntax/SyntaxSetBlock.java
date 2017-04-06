@@ -91,7 +91,7 @@ public class SyntaxSetBlock extends CommandSyntax {
 				new CommandSlotOptional.Impl(nbt, optionalGroup) };
 	}
 
-	private static class BlockNBT extends CommandSlotBox implements IOptionalCommandSlot {
+	public static class BlockNBT extends CommandSlotBox implements IOptionalCommandSlot {
 
 		private Class<? extends TileEntity> currentTEClass = null;
 		private List<NBTTagHandler> handlers = Lists.newArrayList();

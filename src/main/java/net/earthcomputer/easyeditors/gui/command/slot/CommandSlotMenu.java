@@ -77,7 +77,7 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	}
 
 	@Override
-	public void addArgs(List<String> args) {
+	public void addArgs(List<String> args) throws UIInvalidException {
 		if (values.length == 0)
 			args.add("");
 		else

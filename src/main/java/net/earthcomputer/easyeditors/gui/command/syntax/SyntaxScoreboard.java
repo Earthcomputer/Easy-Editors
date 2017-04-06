@@ -235,7 +235,7 @@ public class SyntaxScoreboard extends CommandSyntax {
 			}
 
 			@Override
-			public void addArgs(List<String> args) {
+			public void addArgs(List<String> args) throws UIInvalidException {
 				if (getCurrentIndex() == 1) {
 					if (teamOptionColor.getCurrentIndex() == 0) {
 						args.add("sidebar");
