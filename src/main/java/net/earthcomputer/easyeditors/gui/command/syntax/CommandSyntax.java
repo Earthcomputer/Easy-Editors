@@ -182,6 +182,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("summon", SyntaxSummon.class);
 		registerCommandSyntax("setblock", SyntaxSetBlock.class);
 		registerCommandSyntax("fill", SyntaxFill.class);
+		registerCommandSyntax("clone", SyntaxClone.class);
 	}
 
 }
