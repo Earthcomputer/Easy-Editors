@@ -54,6 +54,15 @@ public class SyntaxSetBlock extends CommandSyntax {
 					return super.readFromArgs(args, index);
 				}
 			}
+
+			@Override
+			public void addArgs(List<String> args) throws UIInvalidException {
+				if (getCurrentIndex() == 0) {
+					args.add("-");
+				} else {
+					super.addArgs(args);
+				}
+			}
 		};
 
 		nbt = new BlockNBT();

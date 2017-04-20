@@ -74,7 +74,11 @@ public class SyntaxFill extends CommandSyntax {
 						&& block.getBlock().getBlock().hasTileEntity(block.getBlock())) {
 					throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_FILL_REPLACEWITHTILEENTITY);
 				}
-				super.addArgs(args);
+				if (getCurrentIndex() == 0) {
+					args.add("-");
+				} else {
+					super.addArgs(args);
+				}
 			}
 
 			@Override
