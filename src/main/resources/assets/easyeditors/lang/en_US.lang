@@ -556,6 +556,8 @@ gui.commandEditor.selectCommand.test.desc=A test command
 gui.commandEditor.selectCommand.test.example=/test Sample text
 gui.commandEditor.selectCommand.testfor.desc=Tests for an entity's existence
 gui.commandEditor.selectCommand.testfor.example=/testfor @e[type=creeper]
+gui.commandEditor.selectCommand.testforblocks.desc=Compares two areas of blocks
+gui.commandEditor.selectCommand.testforblocks.example=/testforblocks 0 0 0 64 64 64 0 0 100
 gui.commandEditor.selectCommand.time.desc=Sets/queries the world time
 gui.commandEditor.selectCommand.time.example=/time set day
 gui.commandEditor.selectCommand.title=Select Command
@@ -683,6 +685,13 @@ gui.commandEditor.teleport.targetCoordinate=Target Coordinate:
 gui.commandEditor.tell.target=Receiver
 gui.commandEditor.testfor.nbt=Entity NBT:
 gui.commandEditor.testfor.testingFor=Testing For:
+gui.commandEditor.testforblocks.fromFrom=From (first corner):
+gui.commandEditor.testforblocks.fromTo=From (opposite corner):
+gui.commandEditor.testforblocks.mask=Mask
+gui.commandEditor.testforblocks.mask.all=All
+gui.commandEditor.testforblocks.mask.masked=Masked
+gui.commandEditor.testforblocks.to=To (lowest corner):
+gui.commandEditor.testforblocks.to.tooltip=The north-west bottommost corner of the area to test with
 gui.commandEditor.textField.hint.bold=Bold = Ctrl+B
 gui.commandEditor.textField.hint.color=Change color = Ctrl+F
 gui.commandEditor.textField.hint.italic=Italic = Ctrl+I
