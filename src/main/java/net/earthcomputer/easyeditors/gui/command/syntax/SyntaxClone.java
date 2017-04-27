@@ -36,7 +36,7 @@ public class SyntaxClone extends CommandSyntax {
 
 		to = new CommandSlotRelativeCoordinate();
 
-		maskMode = new CommandSlotMenu.Optional("replace",
+		maskMode = new CommandSlotMenu.WithDefault("replace",
 				new String[] { Translate.GUI_COMMANDEDITOR_CLONE_MASKMODE_REPLACE,
 						Translate.GUI_COMMANDEDITOR_CLONE_MASKMODE_MASKED,
 						Translate.GUI_COMMANDEDITOR_CLONE_MASKMODE_FILTERED },
@@ -49,51 +49,13 @@ public class SyntaxClone extends CommandSyntax {
 					modifiableBlock.setChild(null);
 				}
 			}
-
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (!"masked".equals(args[index]) && !"filtered".equals(args[index])) {
-					setCurrentIndex(0);
-					return 1;
-				} else {
-					return super.readFromArgs(args, index);
-				}
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				if (getCurrentIndex() == 0) {
-					args.add("-");
-				} else {
-					super.addArgs(args);
-				}
-			}
 		};
 
-		cloneMode = new CommandSlotMenu.Optional("normal",
+		cloneMode = new CommandSlotMenu.WithDefault("normal",
 				new String[] { Translate.GUI_COMMANDEDITOR_CLONE_CLONEMODE_NORMAL,
 						Translate.GUI_COMMANDEDITOR_CLONE_CLONEMODE_FORCE,
 						Translate.GUI_COMMANDEDITOR_CLONE_CLONEMODE_MOVE },
-				"normal", "force", "move") {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (!"force".equals(args[index]) && !"move".equals(args[index])) {
-					setCurrentIndex(0);
-					return 1;
-				} else {
-					return super.readFromArgs(args, index);
-				}
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				if (getCurrentIndex() == 0) {
-					args.add("-");
-				} else {
-					super.addArgs(args);
-				}
-			}
-		};
+				"normal", "force", "move");
 
 		block = new CommandSlotBlock(true, 1, CommandSlotBlock.COMPONENT_BLOCK, CommandSlotBlock.COMPONENT_PROPERTIES);
 

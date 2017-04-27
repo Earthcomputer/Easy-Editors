@@ -79,7 +79,7 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 	@Override
 	public void addArgs(List<String> args) throws UIInvalidException {
 		if (values.length == 0)
-			args.add("");
+			args.add("-");
 		else
 			args.add(values[currentValue]);
 	}
@@ -233,6 +233,43 @@ public class CommandSlotMenu extends GuiCommandSlotImpl {
 			}
 		}
 
+	}
+
+	public static class WithDefault extends Optional {
+
+		public WithDefault(String defaultValue, String... values) {
+			super(defaultValue, values);
+		}
+
+		public WithDefault(String defaultValue, String[] displayValues, String... values) {
+			super(defaultValue, displayValues, values);
+		}
+		
+		@Override
+		public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
+			String givenValue = args[index];
+			boolean containsValue = false;
+			for (int i = 0; i < wordCount(); i++) {
+				if (getValueAt(i).equals(givenValue)) {
+					containsValue = true;
+					setCurrentIndex(i);
+					break;
+				}
+			}
+			if (!containsValue) {
+				setToDefault();
+			}
+			return 1;
+		}
+
+		@Override
+		public void addArgs(List<String> args) throws UIInvalidException {
+			if (isDefault()) {
+				args.add("-");
+			} else {
+				super.addArgs(args);
+			}
+		}
 	}
 
 }

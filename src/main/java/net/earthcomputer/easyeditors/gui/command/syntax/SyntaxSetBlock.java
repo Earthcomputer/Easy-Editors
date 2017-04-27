@@ -33,7 +33,7 @@ public class SyntaxSetBlock extends CommandSyntax {
 
 	private CommandSlotRelativeCoordinate pos;
 	private CommandSlotBlock block;
-	private CommandSlotMenu mode;
+	private CommandSlotMenu.Optional mode;
 	private BlockNBT nbt;
 
 	@Override
@@ -42,42 +42,15 @@ public class SyntaxSetBlock extends CommandSyntax {
 
 		List<CommandSlotOptional> optionalGroup = Lists.newArrayList();
 
-		mode = new CommandSlotMenu(new String[] { Translate.GUI_COMMANDEDITOR_SETBLOCK_MODE_REPLACE,
-				Translate.GUI_COMMANDEDITOR_SETBLOCK_MODE_DESTROY, Translate.GUI_COMMANDEDITOR_SETBLOCK_MODE_KEEP }, "",
-				"destroy", "keep") {
-			@Override
-			public int readFromArgs(String[] args, int index) throws CommandSyntaxException {
-				if (!"destroy".equals(args[index]) && !"keep".equals(args[index])) {
-					setCurrentIndex(0);
-					return 1;
-				} else {
-					return super.readFromArgs(args, index);
-				}
-			}
-
-			@Override
-			public void addArgs(List<String> args) throws UIInvalidException {
-				if (getCurrentIndex() == 0) {
-					args.add("-");
-				} else {
-					super.addArgs(args);
-				}
-			}
-		};
+		mode = new CommandSlotMenu.WithDefault("replace",
+				new String[] { Translate.GUI_COMMANDEDITOR_SETBLOCK_MODE_REPLACE,
+						Translate.GUI_COMMANDEDITOR_SETBLOCK_MODE_DESTROY,
+						Translate.GUI_COMMANDEDITOR_SETBLOCK_MODE_KEEP },
+				"replace", "destroy", "keep");
 
 		nbt = new BlockNBT();
 
-		final CommandSlotOptional firstOptionalCmdSlot = new CommandSlotOptional(mode, optionalGroup) {
-			@Override
-			public boolean isDefault() throws UIInvalidException {
-				return mode.getCurrentIndex() == 0;
-			}
-
-			@Override
-			public void setToDefault() {
-				mode.setCurrentIndex(0);
-			}
-		};
+		final CommandSlotOptional firstOptionalCmdSlot = new CommandSlotOptional.Impl(mode, optionalGroup);
 
 		block = new CommandSlotBlock(false, 1, CommandSlotBlock.COMPONENT_BLOCK,
 				CommandSlotBlock.COMPONENT_PROPERTIES) {
