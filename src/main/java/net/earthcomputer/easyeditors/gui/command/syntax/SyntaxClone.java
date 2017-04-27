@@ -5,7 +5,6 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import net.earthcomputer.easyeditors.api.util.Colors;
-import net.earthcomputer.easyeditors.gui.command.CommandSyntaxException;
 import net.earthcomputer.easyeditors.gui.command.UIInvalidException;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotBlock;
 import net.earthcomputer.easyeditors.gui.command.slot.CommandSlotLabel;
