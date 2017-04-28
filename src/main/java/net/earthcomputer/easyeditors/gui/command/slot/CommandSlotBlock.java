@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -43,6 +45,7 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 	private boolean isTest;
 	private int[] argOrder;
 	private int optionalStart;
+	private Predicate<IBlockState> allowedBlockPredicate = Predicates.alwaysTrue();
 
 	private IBlockState state;
 	private Map<IProperty<?>, CommandSlotCheckbox> variantsIgnoring;
@@ -66,7 +69,8 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 			@Override
 			public void onPress() {
 				Minecraft.getMinecraft().displayGuiScreen(new GuiSelectBlock(Minecraft.getMinecraft().currentScreen,
-						CommandSlotBlock.this, (finalDisplayComponents & (COMPONENT_PROPERTIES | COMPONENT_NBT)) != 0));
+						CommandSlotBlock.this, (finalDisplayComponents & (COMPONENT_PROPERTIES | COMPONENT_NBT)) != 0,
+						allowedBlockPredicate));
 			}
 		}));
 
@@ -77,6 +81,11 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		if ((displayComponents & COMPONENT_NBT) != 0) {
 			addChild(nbt = new CommandSlotModifiable());
 		}
+	}
+
+	public CommandSlotBlock setAllowedBlockPredicate(Predicate<IBlockState> allowedBlockPredicate) {
+		this.allowedBlockPredicate = allowedBlockPredicate;
+		return this;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -159,6 +168,9 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		IBlockState state = block.getDefaultState();
 		for (Map.Entry<IProperty<?>, Comparable<?>> entry : properties.entrySet()) {
 			state = putProperty(state, entry.getKey(), entry.getValue());
+		}
+		if (!allowedBlockPredicate.apply(state)) {
+			throw new CommandSyntaxException();
 		}
 
 		setBlock(state);
@@ -274,8 +286,10 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 		if (state == null) {
 			throw new UIInvalidException(TranslateKeys.GUI_COMMANDEDITOR_NOBLOCKSELECTED);
 		}
-		for (IPropertyControl<?> property : nonVariants.values()) {
-			property.checkValid();
+		if (properties != null) {
+			for (IPropertyControl<?> property : nonVariants.values()) {
+				property.checkValid();
+			}
 		}
 		if (nbtHandlers != null) {
 			for (NBTTagHandler handler : nbtHandlers) {
@@ -293,43 +307,55 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 	}
 
 	public void setBlock(IBlockState block) {
-		boolean sameBlock = state == null ? false : state.getBlock() == block.getBlock();
+		boolean sameBlock;
+		if (state == null) {
+			sameBlock = block == null;
+		} else if (block == null) {
+			sameBlock = false;
+		} else {
+			sameBlock = state.getBlock() == block.getBlock();
+		}
 		this.state = block;
 
 		if (!sameBlock && this.properties != null) {
-			List<IProperty<?>> properties = Lists.newArrayList(block.getPropertyKeys());
-			List<IProperty<?>> variantProperties = BlockPropertyRegistry.getVariantProperties(block.getBlock());
-			CommandSlotVerticalArrangement propertiesCommandSlot = new CommandSlotVerticalArrangement();
-			if (isTest) {
-				variantsIgnoring = Maps.newHashMap();
-				CommandSlotVerticalArrangement variantsIgnoringSlot = new CommandSlotVerticalArrangement();
-				variantsIgnoringSlot.addChild(CommandSlotLabel
-						.createLabel(Translate.GUI_COMMANDEDITOR_BLOCK_VARIANTSIGNORING, Colors.itemLabel.color));
-				for (IProperty<?> variantProp : variantProperties) {
-					CommandSlotCheckbox checkbox = new CommandSlotCheckbox(GuiSelectBlock.getPropertyName(variantProp));
-					variantsIgnoringSlot.addChild(checkbox);
-					variantsIgnoring.put(variantProp, checkbox);
-				}
-				if (!variantsIgnoring.isEmpty()) {
-					propertiesCommandSlot
-							.addChild(new CommandSlotRectangle(variantsIgnoringSlot, Colors.itemBox.color));
-				}
+			if (block == null) {
+				properties.setChild(null);
 			} else {
-				variantsIgnoring = null;
+				List<IProperty<?>> properties = Lists.newArrayList(block.getPropertyKeys());
+				List<IProperty<?>> variantProperties = BlockPropertyRegistry.getVariantProperties(block.getBlock());
+				CommandSlotVerticalArrangement propertiesCommandSlot = new CommandSlotVerticalArrangement();
+				if (isTest) {
+					variantsIgnoring = Maps.newHashMap();
+					CommandSlotVerticalArrangement variantsIgnoringSlot = new CommandSlotVerticalArrangement();
+					variantsIgnoringSlot.addChild(CommandSlotLabel
+							.createLabel(Translate.GUI_COMMANDEDITOR_BLOCK_VARIANTSIGNORING, Colors.itemLabel.color));
+					for (IProperty<?> variantProp : variantProperties) {
+						CommandSlotCheckbox checkbox = new CommandSlotCheckbox(
+								GuiSelectBlock.getPropertyName(variantProp));
+						variantsIgnoringSlot.addChild(checkbox);
+						variantsIgnoring.put(variantProp, checkbox);
+					}
+					if (!variantsIgnoring.isEmpty()) {
+						propertiesCommandSlot
+								.addChild(new CommandSlotRectangle(variantsIgnoringSlot, Colors.itemBox.color));
+					}
+				} else {
+					variantsIgnoring = null;
+				}
+				properties.removeAll(variantProperties);
+				nonVariants = Maps.newHashMap();
+				for (IProperty<?> prop : properties) {
+					IPropertyControl<?> control = createPropertyControl(prop, isTest);
+					setControlSelectedValue(control, block.getValue(prop));
+					propertiesCommandSlot.addChild(control.getCommandSlot());
+					nonVariants.put(prop, control);
+				}
+				this.properties.setChild(propertiesCommandSlot);
 			}
-			properties.removeAll(variantProperties);
-			nonVariants = Maps.newHashMap();
-			for (IProperty<?> prop : properties) {
-				IPropertyControl<?> control = createPropertyControl(prop, isTest);
-				setControlSelectedValue(control, block.getValue(prop));
-				propertiesCommandSlot.addChild(control.getCommandSlot());
-				nonVariants.put(prop, control);
-			}
-			this.properties.setChild(propertiesCommandSlot);
 		}
 
 		if (this.nbt != null) {
-			if (block.getBlock().hasTileEntity(block)) {
+			if (block != null && block.getBlock().hasTileEntity(block)) {
 				TileEntity te = block.getBlock().createTileEntity(Minecraft.getMinecraft().world, block);
 				nbtHandlers = te == null ? null
 						: NBTTagHandler.constructTileEntityHandlers(te.getClass(), getContext());
@@ -397,12 +423,19 @@ public class CommandSlotBlock extends CommandSlotVerticalArrangement implements 
 	}
 
 	public NBTTagCompound getNbt() {
-		if (this.nbt == null) {
+		if (this.nbt == null || this.nbtHandlers == null) {
 			return null;
 		}
 		NBTTagCompound nbt = new NBTTagCompound();
 		NBTTagHandler.writeToNBT(nbt, nbtHandlers);
 		return nbt.hasNoTags() ? null : nbt;
+	}
+
+	public void setNbt(NBTTagCompound nbt) {
+		if (this.nbt == null || this.nbtHandlers == null) {
+			return;
+		}
+		NBTTagHandler.readFromNBT(nbt, nbtHandlers);
 	}
 
 	@Override

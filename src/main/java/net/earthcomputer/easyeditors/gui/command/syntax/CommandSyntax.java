@@ -184,6 +184,7 @@ public abstract class CommandSyntax {
 		registerCommandSyntax("fill", SyntaxFill.class);
 		registerCommandSyntax("clone", SyntaxClone.class);
 		registerCommandSyntax("testforblocks", SyntaxTestForBlocks.class);
+		registerCommandSyntax("blockdata", SyntaxBlockData.class);
 	}
 
 }
